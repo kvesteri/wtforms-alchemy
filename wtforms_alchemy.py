@@ -1,5 +1,3 @@
-import inspect
-
 #import pytz
 from wtforms import (
     BooleanField,
@@ -11,11 +9,13 @@ from wtforms import (
     IntegerField,
     TextAreaField,
     TextField,
+    SelectField,
 )
 from wtforms.form import FormMeta
-from wtforms.validators import Length, Required
+from wtforms.validators import Length, Required, ValidationError
 from sqlalchemy import types
-from sqlalchemy.orm.properties import RelationshipProperty, ColumnProperty
+from sqlalchemy.orm.properties import ColumnProperty
+from sqlalchemy.orm.exc import NoResultFound
 
 
 class Null(object):
@@ -23,6 +23,47 @@ class Null(object):
 
 
 null = Null()
+
+
+class Unique(object):
+    """Checks field value unicity against specified table field.
+
+    Currently only supports Flask-SQLAlchemy style models which have the query
+    class.
+
+    We must require models to have query class so that unique validators can be
+    generated without the need of explicitly setting the SQLAlchemy session.
+
+    :param model:
+        The model to check unicity against.
+    :param column:
+        The unique column.
+    :param message:
+        The error message.
+    """
+    field_flags = ('unique', )
+
+    def __init__(self, model, column, message=None):
+        self.model = model
+        self.column = column
+        self.message = message
+
+        if not hasattr(self.model, 'query'):
+            raise Exception('Model classes must have query class.')
+
+    def __call__(self, form, field):
+        try:
+            obj = (
+                self.model.query
+                .filter(self.column == field.data).one()
+            )
+
+            if not hasattr(form, '_obj') or not form._obj == obj:
+                if self.message is None:
+                    self.message = field.gettext(u'Already exists.')
+                raise ValidationError(self.message)
+        except NoResultFound:
+            pass
 
 
 class UnknownTypeException(Exception):
@@ -42,25 +83,24 @@ class FormGenerator(object):
         types.Float: FloatField,
         types.Numeric: DecimalField,
         types.Boolean: BooleanField,
+        types.Enum: SelectField,
     }
 
     def __init__(self,
                  model_class,
                  default=None,
-                 assign_defaults=True,
+                 assign_required=True,
                  validator=None,
                  only_indexed_fields=False,
                  include_primary_keys=False,
-                 include_foreign_keys=False,
-                 include_relations=True):
+                 include_foreign_keys=False):
         self.validator = validator
         self.model_class = model_class
         self.default = default
-        self.assign_defaults = assign_defaults
+        self.assign_required = assign_required
         self.only_indexed_fields = only_indexed_fields
         self.include_primary_keys = include_primary_keys
         self.include_foreign_keys = include_foreign_keys
-        self.include_relations = include_relations
 
     def create_form(self, form, include=None, exclude=None):
         fields = set(self.model_class._sa_class_manager.values())
@@ -83,79 +123,28 @@ class FormGenerator(object):
 
         return self.create_fields(form, fields)
 
-    def create_fields(self, form, fields, include_relations=True):
+    def create_fields(self, form, fields):
         for field in fields:
             column = field.property
 
-            form_field = None
-            if isinstance(column, RelationshipProperty):
-                # if include_relations:
-                #     form_field = self.relation_field(column)
-                #     name = column.key
-                pass
-            elif isinstance(column, ColumnProperty):
-                name = column.columns[0].name
-                form_field = self.column_schema_node(column)
-            if not form_field:
+            if not isinstance(column, ColumnProperty):
                 continue
+
+            name = column.columns[0].name
+            form_field = self.create_field(column)
+
             if not hasattr(form, name):
                 setattr(form, name, form_field)
         return form
 
-    def is_nullable(self, name):
-        return True
-
-    def is_read_only(self, name):
-        return False
-
-    def validators(self, name):
-        return None
-
-    def relation_field(self, relation_property):
-        model = relation_property.argument
-        if model.__class__.__name__ == 'function':
-            # for string based relations (relations where the first
-            # argument is a classname string instead of actual class)
-            # sqlalchemy generates return_cls functions which we need
-            # to call in order to obtain the actual model class
-            model = model()
-
-        name = relation_property.key
-
-        if name not in self.model_class.__form__:
-            return None
-
-        if not inspect.isclass(model) or \
-                not issubclass(model, FormMixin):
-            raise Exception('Could not create schema for %r' % model)
-        else:
-            if self.is_nullable(name):
-                default = null
-            else:
-                default = self.missing
-            kwargs = {
-                'default': default,
-                'assign_defaults': self.assign_defaults
-            }
-            try:
-                form_creator = self.model_class.__form__[name]['schema']
-            except KeyError:
-                form_creator = model.get_form
-                del kwargs['assign_defaults']
-
-            form = form_creator(**kwargs)
-            # if self.is_nullable(name):
-            #     schema_node = nullable(schema_node)
-            return form
-
     def skip_column(self, column_property):
+        """Whether or not to skip column in the generation process."""
         column = column_property.columns[0]
         if (not self.include_primary_keys and column.primary_key or
                 column.foreign_keys):
             return True
 
-        if (self.is_read_only(column.name) or
-                column_property._is_polymorphic_discriminator):
+        if column_property._is_polymorphic_discriminator:
             return True
 
         if self.only_indexed_fields and not self.has_index(column):
@@ -171,27 +160,41 @@ class FormGenerator(object):
                 return True
         return False
 
-    def column_schema_node(self, column_property):
+    def create_field(self, column_property):
         column = column_property.columns[0]
         name = column.name
         validators = []
 
         field_class = self.get_field_class(column.type)
-        if column.default and self.assign_defaults:
+        if column.default:
             default = column.default.arg
         else:
-            if self.is_nullable(name) and column.nullable:
+            if column.nullable:
                 default = null
             else:
                 default = self.default
-                validators.append(Required())
 
-        validators.append(self.length_validator(column))
-        return field_class(
-            name,
-            default=default,
-            validators=validators
-        )
+        if not column.nullable and self.assign_required:
+            validators.append(Required())
+        validator = self.length_validator(column)
+        if validator:
+            validators.append(validator)
+
+        if column.unique:
+            validators.append(
+                Unique(
+                    self.model_class,
+                    getattr(self.model_class, name)
+                )
+            )
+        kwargs = {
+            'validators': validators,
+            'default': default,
+        }
+        if hasattr(column.type, 'enums'):
+            kwargs['choices'] = [(enum, enum) for enum in column.type.enums]
+
+        return field_class(name, **kwargs)
 
     def length_validator(self, column):
         """
@@ -220,10 +223,16 @@ def class_list(cls):
 
 
 def properties(cls):
-    return {name: getattr(cls, name) for name in dir(cls)}
+    return dict((name, getattr(cls, name)) for name in dir(cls))
 
 
 class ModelFormMeta(FormMeta):
+    """Meta class that overrides WTForms base meta class. The primary purpose
+    of this class is allowing ModelForms use special configuration params under
+    the 'Meta' class namespace.
+
+    ModelForm classes inherit parent's Meta class properties.
+    """
     def __init__(cls, *args, **kwargs):
         property_dict = {}
         for class_ in reversed(class_list(cls)):
@@ -238,12 +247,11 @@ class ModelFormMeta(FormMeta):
             generator = cls.Meta.form_generator(
                 model_class=cls.Meta.model,
                 default=cls.Meta.default,
-                assign_defaults=cls.Meta.assign_defaults,
+                assign_required=cls.Meta.assign_required,
                 validator=cls.Meta.validator,
                 only_indexed_fields=cls.Meta.only_indexed_fields,
                 include_primary_keys=cls.Meta.include_primary_keys,
                 include_foreign_keys=cls.Meta.include_foreign_keys,
-                include_relations=cls.Meta.include_relations
             )
             generator.create_form(cls, cls.Meta.include, cls.Meta.exclude)
 
@@ -256,15 +264,25 @@ class ModelForm(Form):
     class Meta:
         model = None
         default = None
-        assign_defaults = True
+        #: Whether or not to assign non-nullable fields as required
+        assign_required = True
         validator = None
+        #: Whether or not to include only indexed fields
         only_indexed_fields = False
+        #: Whether or not to include primary keys.
         include_primary_keys = False
+        #: Whether or not to include primary keys. By default this is False
+        #: indicating that foreign keys are not included in the generated form.
         include_foreign_keys = False
-        include_relations = False
+        #: Which form generator to use. Only override this if you have a valid
+        #: form generator which you want to use instead of the default one.
         form_generator = FormGenerator
+        #: Additional fields to include in the generated form.
         include = []
+        #: List of fields to exclude from the generated form.
         exclude = []
+        #: List of fields to only include in the generated form.
+        only = []
 
     def __init__(self, *args, **kwargs):
         """Sets object as form attribute."""
@@ -275,13 +293,13 @@ class ModelForm(Form):
 
 
 class ModelCreateForm(ModelForm):
-    class Meta:
-        assign_defaults = True
+    pass
 
 
 class ModelUpdateForm(ModelForm):
     class Meta:
         default = null
+        assign_required = False
 
 
 class ModelSearchForm(ModelForm):
