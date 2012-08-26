@@ -41,6 +41,26 @@ class FormTestCase(object):
         msg = "Form does not have a field called '%s'." % field_name
         assert isinstance(field, Field), msg
 
+    def assert_field_min_length(self, field_name, min_length):
+        field = self._get_field(field_name)
+        found = False
+        for validator in field.validators:
+            # we might have multiple Length validators
+            if isinstance(validator, Length):
+                if validator.min == min_length:
+                    found = True
+        assert found, "Field does not have min length of %d" % min_length
+
+    def assert_field_max_length(self, field_name, max_length):
+        field = self._get_field(field_name)
+        found = False
+        for validator in field.validators:
+            # we might have multiple Length validators
+            if isinstance(validator, Length):
+                if validator.max == max_length:
+                    found = True
+        assert found, "Field does not have max length of %d" % max_length
+
     def assert_field_default(self, field_name, default):
         field = self._get_field(field_name)
         assert field.default == default

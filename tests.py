@@ -8,7 +8,7 @@ from wtforms import (
     TextAreaField,
     TextField,
 )
-from wtforms.validators import NumberRange
+from wtforms.validators import NumberRange, Length
 from wtforms_alchemy import ModelCreateForm, ModelUpdateForm
 from wtforms_alchemy.test import FormTestCase
 from sqlalchemy import orm
@@ -37,6 +37,7 @@ class User(Entity):
     excluded_field = sa.Column(sa.Integer)
     is_active = sa.Column(sa.Boolean)
     age = sa.Column(sa.Integer)
+    description = sa.Column(sa.Unicode(255))
 
 
 class Location(Base):
@@ -60,7 +61,10 @@ class CreateUserForm(ModelCreateForm):
     class Meta:
         model = User
         exclude = ['excluded_field']
-        validators = {'age': NumberRange(15, 99)}
+        validators = {
+            'age': NumberRange(15, 99),
+            'description': Length(min=2, max=55),
+        }
 
     deleted_at = DateTimeField()
     overridable_field = BooleanField()
@@ -133,6 +137,10 @@ class TestCreateUserForm(FormTestCase):
     def test_fields_can_be_excluded(self):
         form = CreateUserForm()
         assert not hasattr(form, 'excluded_field')
+
+    def test_adding_custom_length_validators(self):
+        self.assert_field_min_length('description', 2)
+        self.assert_field_max_length('description', 55)
 
     # def test_patch_data_with_validation(self):
     #     form = self.form_class(name='some name')
