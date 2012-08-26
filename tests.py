@@ -8,8 +8,6 @@ from wtforms import (
     SelectField,
     TextAreaField,
     TextField,
-    Form,
-    FormField,
 )
 from wtforms.validators import Required, Length, Email, Optional
 from wtforms_alchemy import ModelCreateForm, ModelUpdateForm, Unique
