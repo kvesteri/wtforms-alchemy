@@ -52,7 +52,8 @@ class Event(Entity):
 
     id = sa.Column(sa.BigInteger, sa.ForeignKey(Entity.id), primary_key=True)
     name = sa.Column(sa.Unicode(255), index=True, nullable=False, default=u'')
-    start_time = sa.Column(sa.Date)
+    start_time = sa.Column(sa.DateTime)
+    is_private = sa.Column(sa.Boolean, nullable=False)
     description = sa.Column(sa.UnicodeText)
     location_id = sa.Column(sa.BigInteger, sa.ForeignKey(Location.id))
     location = orm.relationship(Location)
@@ -84,6 +85,7 @@ class LocationForm(ModelCreateForm):
 class EventForm(ModelCreateForm):
     class Meta:
         model = Event
+        datetime_format = '%Y-%m-%dT%H:%M:%S'
 
     location = FormField(LocationForm)
 
@@ -174,8 +176,19 @@ class TestEventForm(FormTestCase):
         self.assert_field_type('description', TextAreaField)
 
     def test_date_column_converts_to_date_field(self):
-        self.assert_field_type('start_time', DateField)
+        self.assert_field_type('start_time', DateTimeField)
 
     def test_patch_data_with_form_fields(self):
         form = self.form_class(name='some patched name')
         assert form.patch_data == {'name': 'some patched name'}
+
+    def test_does_not_add_required_validators_to_non_nullable_booleans(self):
+        self.assert_field_is_required('is_private')
+
+    def test_supports_custom_datetime_format(self):
+        class MultiDict(dict):
+            def getlist(self, key):
+                return [self[key]]
+
+        form = self.form_class()
+        assert form.start_time.format == '%Y-%m-%dT%H:%M:%S'

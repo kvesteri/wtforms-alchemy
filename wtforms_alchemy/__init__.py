@@ -89,7 +89,9 @@ class FormGenerator(object):
                  only_indexed_fields=False,
                  include_primary_keys=False,
                  include_foreign_keys=False,
-                 all_fields_optional=False):
+                 all_fields_optional=False,
+                 datetime_format=None,
+                 date_format=None):
         self.validators = validators
         self.model_class = model_class
         self.default = default
@@ -98,6 +100,8 @@ class FormGenerator(object):
         self.include_primary_keys = include_primary_keys
         self.include_foreign_keys = include_foreign_keys
         self.all_fields_optional = all_fields_optional
+        self.datetime_format = datetime_format
+        self.date_format = date_format
 
     def create_form(self, form, include=None, exclude=None):
         fields = set(self.model_class._sa_class_manager.values())
@@ -197,6 +201,12 @@ class FormGenerator(object):
         if hasattr(column.type, 'enums'):
             kwargs['choices'] = [(enum, enum) for enum in column.type.enums]
 
+        if isinstance(column.type, types.DateTime):
+            kwargs['format'] = self.datetime_format
+
+        if isinstance(column.type, types.Date):
+            kwargs['format'] = self.date_format
+
         return field_class(name, **kwargs)
 
     def length_validator(self, column):
@@ -216,6 +226,20 @@ class FormGenerator(object):
             if isinstance(column_type, class_):
                 return self.TYPE_MAP[class_]
         raise UnknownTypeException(column_type)
+
+
+def wtforms_decode_json(json):
+    decoded = {}
+    for key, value in json:
+        if value is not False:
+            continue
+        elif isinstance(value, list):
+            decoded[key] = [wtforms_decode_json(item) for item in value]
+        elif isinstance(value, dict):
+            decoded[key] = wtforms_decode_json(value)
+        else:
+            decoded[key] = value
+    return decoded
 
 
 def class_list(cls):
@@ -256,6 +280,8 @@ class ModelFormMeta(FormMeta):
                 include_primary_keys=cls.Meta.include_primary_keys,
                 include_foreign_keys=cls.Meta.include_foreign_keys,
                 all_fields_optional=cls.Meta.all_fields_optional,
+                datetime_format=cls.Meta.datetime_format,
+                date_format=cls.Meta.date_format
             )
             generator.create_form(cls, cls.Meta.include, cls.Meta.exclude)
 
@@ -268,27 +294,42 @@ class ModelForm(Form):
     class Meta:
         model = None
         default = None
+
         #: Whether or not to assign non-nullable fields as required
         assign_required = True
+
         #: Whether or not to assign all fields as optional, useful when
         #: creating update forms
         all_fields_optional = False
 
         validators = {}
+
         #: Whether or not to include only indexed fields
         only_indexed_fields = False
+
         #: Whether or not to include primary keys.
         include_primary_keys = False
+
         #: Whether or not to include primary keys. By default this is False
         #: indicating that foreign keys are not included in the generated form.
         include_foreign_keys = False
+
         #: Which form generator to use. Only override this if you have a valid
         #: form generator which you want to use instead of the default one.
         form_generator = FormGenerator
+
+        #: Default date format
+        date_format = '%Y-%m-%d'
+
+        #: Default datetime format
+        datetime_format = '%Y-%m-%d %H:%M:%S'
+
         #: Additional fields to include in the generated form.
         include = []
+
         #: List of fields to exclude from the generated form.
         exclude = []
+
         #: List of fields to only include in the generated form.
         only = []
 
