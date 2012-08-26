@@ -20,7 +20,7 @@ class FormTestCase(object):
                 return validator
 
     def has_field(self, field_name):
-        form = self._mame_form()
+        form = self._make_form()
         return hasattr(form, field_name)
 
     def assert_field_type(self, field_name, field_type):
