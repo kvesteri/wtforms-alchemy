@@ -55,8 +55,8 @@ class FormTestCase(object):
         field = self._get_field(field_name)
         found = False
         for validator in field.validators:
-            # we might have multiple Length validators
-            if isinstance(validator, Length):
+            # we might have multiple NumberRange validators
+            if isinstance(validator, NumberRange):
                 if validator.max == max_value:
                     found = True
         assert found, "Field does not have max value of %d" % max_value
