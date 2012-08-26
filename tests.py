@@ -134,6 +134,12 @@ class TestCreateUserForm(FormTestCase):
         form = CreateUserForm()
         assert not hasattr(form, 'excluded_field')
 
+    # def test_patch_data_with_validation(self):
+    #     form = self.form_class(name='some name')
+    #     form.validate()
+    #     print form.errors
+    #     print form.patch_data
+
 
 class TestUpdateUserForm(FormTestCase):
     form_class = UpdateUserForm
