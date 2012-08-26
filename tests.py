@@ -4,6 +4,7 @@ from wtforms import (
     BooleanField,
     DateField,
     DateTimeField,
+    FormField,
     SelectField,
     TextAreaField,
     TextField,
@@ -84,7 +85,7 @@ class EventForm(ModelCreateForm):
     class Meta:
         model = Event
 
-    location = LocationForm()
+    location = FormField(LocationForm)
 
 
 class TestModelFormConfiguration(object):
@@ -162,10 +163,6 @@ class TestUpdateUserForm(FormTestCase):
         self.assert_field_is_optional('name')
 
     def test_patch_data(self):
-        class MultiDict(dict):
-            def getlist(self, key):
-                return [self[key]]
-
         form = self.form_class(name='some patched name')
         assert form.patch_data == {'name': 'some patched name'}
 
@@ -176,9 +173,9 @@ class TestEventForm(FormTestCase):
     def test_unicode_text_columns_convert_to_textarea_fields(self):
         self.assert_field_type('description', TextAreaField)
 
-    def test_supports_relations(self):
-        form = EventForm()
-        assert 'name' in form.location
-
     def test_date_column_converts_to_date_field(self):
         self.assert_field_type('start_time', DateField)
+
+    def test_patch_data_with_form_fields(self):
+        form = self.form_class(name='some patched name')
+        assert form.patch_data == {'name': 'some patched name'}

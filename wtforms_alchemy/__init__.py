@@ -6,6 +6,7 @@ from wtforms import (
     DecimalField,
     FloatField,
     Form,
+    FormField,
     IntegerField,
     TextAreaField,
     TextField,
@@ -306,18 +307,19 @@ class ModelForm(Form):
                 data[name] = f.data
         return data
 
-original_process = Field.process
+
+def monkey_patch_process(func):
+    def process(self, formdata, data=_unset_value):
+        if data is _unset_value:
+            self.is_unset = True
+        else:
+            self.is_unset = False
+        func(self, formdata, data=data)
+    return process
 
 
-def process(self, formdata, data=_unset_value):
-    if data is _unset_value:
-        self.is_unset = True
-    else:
-        self.is_unset = False
-    original_process(self, formdata, data=data)
-
-
-Field.process = process
+Field.process = monkey_patch_process(Field.process)
+FormField.process = monkey_patch_process(FormField.process)
 
 
 class ModelCreateForm(ModelForm):
