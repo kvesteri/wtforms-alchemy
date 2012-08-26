@@ -11,6 +11,7 @@ from wtforms import (
     TextField,
     SelectField,
 )
+from wtforms.fields import Field, _unset_value
 from wtforms.form import FormMeta
 from wtforms.validators import Length, Optional, Required, ValidationError
 from sqlalchemy import types
@@ -296,6 +297,27 @@ class ModelForm(Form):
         if 'obj' in kwargs:
             self._obj = kwargs['obj']
         super(ModelForm, self).__init__(*args, **kwargs)
+
+    @property
+    def patch_data(self):
+        data = {}
+        for name, f in self._fields.iteritems():
+            if not f.is_unset:
+                data[name] = f.data
+        return data
+
+original_process = Field.process
+
+
+def process(self, formdata, data=_unset_value):
+    if data is _unset_value:
+        self.is_unset = True
+    else:
+        self.is_unset = False
+    original_process(self, formdata, data=data)
+
+
+Field.process = process
 
 
 class ModelCreateForm(ModelForm):

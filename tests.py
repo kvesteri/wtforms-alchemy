@@ -144,6 +144,14 @@ class TestUpdateUserForm(FormTestCase):
     def test_all_fields_optional_by_default(self):
         self.assert_field_is_optional('name')
 
+    def test_patch_data(self):
+        class MultiDict(dict):
+            def getlist(self, key):
+                return [self[key]]
+
+        form = self.form_class(name='some patched name')
+        assert form.patch_data == {'name': 'some patched name'}
+
 
 class TestEventForm(FormTestCase):
     form_class = EventForm
