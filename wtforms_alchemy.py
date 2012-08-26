@@ -12,17 +12,10 @@ from wtforms import (
     SelectField,
 )
 from wtforms.form import FormMeta
-from wtforms.validators import Length, Required, ValidationError
+from wtforms.validators import Length, Optional, Required, ValidationError
 from sqlalchemy import types
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.exc import NoResultFound
-
-
-class Null(object):
-    pass
-
-
-null = Null()
 
 
 class Unique(object):
@@ -93,7 +86,8 @@ class FormGenerator(object):
                  validator=None,
                  only_indexed_fields=False,
                  include_primary_keys=False,
-                 include_foreign_keys=False):
+                 include_foreign_keys=False,
+                 all_fields_optional=False):
         self.validator = validator
         self.model_class = model_class
         self.default = default
@@ -101,6 +95,7 @@ class FormGenerator(object):
         self.only_indexed_fields = only_indexed_fields
         self.include_primary_keys = include_primary_keys
         self.include_foreign_keys = include_foreign_keys
+        self.all_fields_optional = all_fields_optional
 
     def create_form(self, form, include=None, exclude=None):
         fields = set(self.model_class._sa_class_manager.values())
@@ -164,18 +159,20 @@ class FormGenerator(object):
         column = column_property.columns[0]
         name = column.name
         validators = []
-
+        kwargs = {}
         field_class = self.get_field_class(column.type)
-        if column.default:
-            default = column.default.arg
-        else:
-            if column.nullable:
-                default = null
-            else:
-                default = self.default
 
-        if not column.nullable and self.assign_required:
-            validators.append(Required())
+        if self.all_fields_optional:
+            validators.append(Optional())
+        else:
+            if column.default:
+                kwargs['default'] = column.default.arg
+            else:
+                if not column.nullable:
+                    kwargs['default'] = self.default
+
+            if not column.nullable and self.assign_required:
+                validators.append(Required())
         validator = self.length_validator(column)
         if validator:
             validators.append(validator)
@@ -187,10 +184,8 @@ class FormGenerator(object):
                     getattr(self.model_class, name)
                 )
             )
-        kwargs = {
-            'validators': validators,
-            'default': default,
-        }
+        kwargs['validators'] = validators
+
         if hasattr(column.type, 'enums'):
             kwargs['choices'] = [(enum, enum) for enum in column.type.enums]
 
@@ -252,6 +247,7 @@ class ModelFormMeta(FormMeta):
                 only_indexed_fields=cls.Meta.only_indexed_fields,
                 include_primary_keys=cls.Meta.include_primary_keys,
                 include_foreign_keys=cls.Meta.include_foreign_keys,
+                all_fields_optional=cls.Meta.all_fields_optional,
             )
             generator.create_form(cls, cls.Meta.include, cls.Meta.exclude)
 
@@ -266,6 +262,10 @@ class ModelForm(Form):
         default = None
         #: Whether or not to assign non-nullable fields as required
         assign_required = True
+        #: Whether or not to assign all fields as optional, useful when
+        #: creating update forms
+        all_fields_optional = False
+
         validator = None
         #: Whether or not to include only indexed fields
         only_indexed_fields = False
@@ -298,11 +298,12 @@ class ModelCreateForm(ModelForm):
 
 class ModelUpdateForm(ModelForm):
     class Meta:
-        default = null
+        all_fields_optional = True
         assign_required = False
 
 
 class ModelSearchForm(ModelForm):
     class Meta:
+        all_fields_optional = True
         only_indexed_fields = True
         include_primary_keys = True

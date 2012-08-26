@@ -8,8 +8,10 @@ from wtforms import (
     SelectField,
     TextAreaField,
     TextField,
+    Form,
+    FormField,
 )
-from wtforms.validators import Required, Length, Email
+from wtforms.validators import Required, Length, Email, Optional
 from wtforms_alchemy import ModelCreateForm, ModelUpdateForm, Unique
 from sqlalchemy import orm
 from sqlalchemy.types import BigInteger
@@ -129,6 +131,16 @@ class FormTestCase(object):
         msg = "Field '%s' not is unique." % field_name
         assert self._get_validator(field, Unique), msg
 
+    def assert_field_is_not_optional(self, field_name):
+        field = self._get_field(field_name)
+        msg = "Field '%s' is optional." % field_name
+        assert not self._get_validator(field, Required), msg
+
+    def assert_field_is_optional(self, field_name):
+        field = self._get_field(field_name)
+        msg = "Field '%s' is not optional." % field_name
+        assert self._get_validator(field, Optional), msg
+
     def assert_field_is_not_required(self, field_name):
         field = self._get_field(field_name)
         msg = "Field '%s' is required." % field_name
@@ -210,6 +222,9 @@ class TestUpdateUserForm(FormTestCase):
 
     def test_does_not_assign_non_nullable_fields_as_required(self):
         self.assert_field_is_not_required('name')
+
+    def test_all_fields_optional_by_default(self):
+        self.assert_field_is_optional('name')
 
 
 class TestEventForm(FormTestCase):
