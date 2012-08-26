@@ -1,6 +1,6 @@
 from wtforms import Field
 
-from wtforms.validators import Required, Length, Email, Optional
+from wtforms.validators import Required, Length, Email, Optional, NumberRange
 from . import Unique
 
 
@@ -40,6 +40,26 @@ class FormTestCase(object):
             field = None
         msg = "Form does not have a field called '%s'." % field_name
         assert isinstance(field, Field), msg
+
+    def assert_field_min_value(self, field_name, min_value):
+        field = self._get_field(field_name)
+        found = False
+        for validator in field.validators:
+            # we might have multiple NumberRange validators
+            if isinstance(validator, NumberRange):
+                if validator.min == min_value:
+                    found = True
+        assert found, "Field does not have min value of %d" % min_value
+
+    def assert_field_max_value(self, field_name, max_value):
+        field = self._get_field(field_name)
+        found = False
+        for validator in field.validators:
+            # we might have multiple Length validators
+            if isinstance(validator, Length):
+                if validator.max == max_value:
+                    found = True
+        assert found, "Field does not have max value of %d" % max_value
 
     def assert_field_min_length(self, field_name, min_length):
         field = self._get_field(field_name)
