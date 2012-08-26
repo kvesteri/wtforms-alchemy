@@ -19,6 +19,12 @@ class FormTestCase(object):
             if isinstance(validator, validator_class):
                 return validator
 
+    def get_validator(self, field_name, validator_class):
+        return self._get_validator(
+            self._get_field(field_name),
+            validator_class
+        )
+
     def has_field(self, field_name):
         form = self._make_form()
         return hasattr(form, field_name)

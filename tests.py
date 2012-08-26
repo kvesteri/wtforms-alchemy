@@ -8,6 +8,7 @@ from wtforms import (
     TextAreaField,
     TextField,
 )
+from wtforms.validators import NumberRange
 from wtforms_alchemy import ModelCreateForm, ModelUpdateForm
 from wtforms_alchemy.test import FormTestCase
 from sqlalchemy import orm
@@ -35,6 +36,7 @@ class User(Entity):
     overridable_field = sa.Column(sa.Integer)
     excluded_field = sa.Column(sa.Integer)
     is_active = sa.Column(sa.Boolean)
+    age = sa.Column(sa.Integer)
 
 
 class Location(Base):
@@ -58,6 +60,7 @@ class CreateUserForm(ModelCreateForm):
     class Meta:
         model = User
         exclude = ['excluded_field']
+        validators = {'age': NumberRange(15, 99)}
 
     deleted_at = DateTimeField()
     overridable_field = BooleanField()
@@ -104,8 +107,7 @@ class TestCreateUserForm(FormTestCase):
         self.assert_field_type('is_active', BooleanField)
 
     def test_does_not_contain_surrogate_primary_keys_by_default(self):
-        form = CreateUserForm()
-        assert not hasattr(form, 'id')
+        assert not self.has_field('id')
 
     def test_basic_fields_do_not_have_validators(self):
         form = CreateUserForm()
@@ -116,6 +118,9 @@ class TestCreateUserForm(FormTestCase):
 
     def test_assigns_unique_validator_for_unique_fields(self):
         self.assert_field_is_unique('email')
+
+    def test_age_has_additional_validator(self):
+        assert self.get_validator('age', NumberRange)
 
     def test_enum_field_converts_to_select_field(self):
         self.assert_field_type('status', SelectField)

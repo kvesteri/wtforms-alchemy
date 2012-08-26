@@ -83,12 +83,12 @@ class FormGenerator(object):
                  model_class,
                  default=None,
                  assign_required=True,
-                 validator=None,
+                 validators={},
                  only_indexed_fields=False,
                  include_primary_keys=False,
                  include_foreign_keys=False,
                  all_fields_optional=False):
-        self.validator = validator
+        self.validators = validators
         self.model_class = model_class
         self.default = default
         self.assign_required = assign_required
@@ -177,6 +177,12 @@ class FormGenerator(object):
         if validator:
             validators.append(validator)
 
+        if name in self.validators:
+            if isinstance(self.validators[name], list):
+                validators.extend(self.validators[name])
+            else:
+                validators.append(self.validators[name])
+
         if column.unique:
             validators.append(
                 Unique(
@@ -243,7 +249,7 @@ class ModelFormMeta(FormMeta):
                 model_class=cls.Meta.model,
                 default=cls.Meta.default,
                 assign_required=cls.Meta.assign_required,
-                validator=cls.Meta.validator,
+                validators=cls.Meta.validators,
                 only_indexed_fields=cls.Meta.only_indexed_fields,
                 include_primary_keys=cls.Meta.include_primary_keys,
                 include_foreign_keys=cls.Meta.include_foreign_keys,
@@ -266,7 +272,7 @@ class ModelForm(Form):
         #: creating update forms
         all_fields_optional = False
 
-        validator = None
+        validators = {}
         #: Whether or not to include only indexed fields
         only_indexed_fields = False
         #: Whether or not to include primary keys.
