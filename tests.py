@@ -118,7 +118,7 @@ class TestCreateUserForm(FormTestCase):
         assert form.is_active.validators == []
 
     def test_assigns_non_nullable_fields_as_required(self):
-        self.assert_field_is_required('name')
+        self.assert_field_is_required('email')
 
     def test_assigns_unique_validator_for_unique_fields(self):
         self.assert_field_is_unique('email')
@@ -141,6 +141,9 @@ class TestCreateUserForm(FormTestCase):
     def test_adding_custom_length_validators(self):
         self.assert_field_min_length('description', 2)
         self.assert_field_max_length('description', 55)
+
+    def test_non_nullable_fields_with_defaults_are_not_required(self):
+        self.assert_field_is_not_required('name')
 
     # def test_patch_data_with_validation(self):
     #     form = self.form_class(name='some name')

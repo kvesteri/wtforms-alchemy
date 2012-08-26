@@ -172,8 +172,8 @@ class FormGenerator(object):
                 if not column.nullable:
                     kwargs['default'] = self.default
 
-            if not column.nullable and self.assign_required:
-                validators.append(Required())
+                if not column.nullable and self.assign_required:
+                    validators.append(Required())
         validator = self.length_validator(column)
         if validator:
             validators.append(validator)
