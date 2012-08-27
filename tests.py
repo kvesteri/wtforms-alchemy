@@ -7,9 +7,14 @@ from wtforms import (
     SelectField,
     TextAreaField,
     TextField,
+    Form,
 )
-from wtforms.validators import NumberRange, Length
-from wtforms_alchemy import ModelCreateForm, ModelUpdateForm, decode_json_dict
+from wtforms.validators import NumberRange, Length, Required
+from wtforms_alchemy import (
+    ModelCreateForm,
+    ModelUpdateForm,
+    decode_json,
+)
 from wtforms_alchemy.test import FormTestCase
 from sqlalchemy import orm
 from sqlalchemy.types import BigInteger
@@ -43,7 +48,7 @@ class User(Entity):
 class Location(Base):
     __tablename__ = 'location'
     id = sa.Column(BigInteger, autoincrement=True, primary_key=True)
-    name = sa.Column(sa.Unicode(255))
+    name = sa.Column(sa.Unicode(255), nullable=False)
 
 
 class Event(Entity):
@@ -76,9 +81,15 @@ class UpdateUserForm(ModelUpdateForm):
         model = User
 
 
+class AddressForm(Form):
+    name = TextField(validators=[Required()])
+
+
 class LocationForm(ModelCreateForm):
     class Meta:
         model = Location
+
+    address = FormField(AddressForm)
 
 
 class EventForm(ModelCreateForm):
@@ -91,14 +102,25 @@ class EventForm(ModelCreateForm):
 
 class TestJsonDecoder(object):
     def test_supports_dicts(self):
-        assert decode_json_dict({'a': False, 'b': 123}) == {'b': 123}
+        assert decode_json({'a': False, 'b': 123}) == {'b': 123}
+
+    def test_supports_dicts_with_lists(self):
+        assert decode_json({'a': [1, 2, 3]}) == {'a-0': 1, 'a-1': 2, 'a-2': 3}
 
     def test_supports_nested_dicts_and_lists(self):
         data = {
-            'a': [{'b': False}, {'b': True}]
+            'a': [{'b': True}]
         }
+        assert decode_json(data) == {'a-0-b': True}
 
-        assert decode_json_dict(data) == {'a': [{}, {'b': True}]}
+    def test_supports_empty_lists(self):
+        data = {
+            'a': []
+        }
+        assert decode_json(data) == {}
+
+    def test_flatten_dict(self):
+        assert decode_json({'a': {'b': {'c': 'd'}}}) == {'a-b-c': 'd'}
 
 
 class TestModelFormConfiguration(object):
@@ -201,5 +223,16 @@ class TestEventForm(FormTestCase):
             def getlist(self, key):
                 return [self[key]]
 
-        form = self.form_class()
+        form = self.form_class(MultiDict(
+            decode_json({
+                'location': {
+                    'name': 'some location',
+                    'address': {
+                        'name': 'some address'
+                        }
+                },
+                'is_private': True,
+            })
+        ))
+        form.validate()
         assert form.start_time.format == '%Y-%m-%dT%H:%M:%S'

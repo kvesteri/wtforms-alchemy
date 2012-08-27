@@ -1,4 +1,5 @@
 #import pytz
+import collections
 from wtforms import (
     BooleanField,
     DateField,
@@ -228,30 +229,34 @@ class FormGenerator(object):
         raise UnknownTypeException(column_type)
 
 
-def decode_json_dict(json):
-    decoded = {}
+def decode_json(json, parent_key='', separator='-'):
+    items = []
     for key, value in json.items():
         if value is False:
             continue
+        new_key = parent_key + separator + key if parent_key else key
+        if isinstance(value, collections.MutableMapping):
+            items.extend(decode_json(value, new_key).items())
         elif isinstance(value, list):
-            decoded[key] = decode_json_list(value)
-        elif isinstance(value, dict):
-            decoded[key] = decode_json_dict(value)
+            items.extend(decode_json_list(value, new_key))
         else:
-            decoded[key] = value
-    return decoded
+            items.append((new_key, value))
+    return dict(items)
 
 
-def decode_json_list(json):
-    decoded = []
+def decode_json_list(json, parent_key='', separator='-'):
+    items = []
+    i = 0
     for item in json:
+        new_key = parent_key + separator + str(i)
         if isinstance(item, list):
-            decoded.append(decode_json_list(item))
+            items.extend(decode_json_list(item, new_key, separator))
         elif isinstance(item, dict):
-            decoded.append(decode_json_dict(item))
+            items.extend(decode_json(item, new_key, separator).items())
         else:
-            decoded.append(item)
-    return decoded
+            items.append((new_key, item))
+        i += 1
+    return items
 
 
 def class_list(cls):
