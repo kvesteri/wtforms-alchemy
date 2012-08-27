@@ -9,7 +9,7 @@ from wtforms import (
     TextField,
 )
 from wtforms.validators import NumberRange, Length
-from wtforms_alchemy import ModelCreateForm, ModelUpdateForm
+from wtforms_alchemy import ModelCreateForm, ModelUpdateForm, decode_json_dict
 from wtforms_alchemy.test import FormTestCase
 from sqlalchemy import orm
 from sqlalchemy.types import BigInteger
@@ -87,6 +87,18 @@ class EventForm(ModelCreateForm):
         datetime_format = '%Y-%m-%dT%H:%M:%S'
 
     location = FormField(LocationForm)
+
+
+class TestJsonDecoder(object):
+    def test_supports_dicts(self):
+        assert decode_json_dict({'a': False, 'b': 123}) == {'b': 123}
+
+    def test_supports_nested_dicts_and_lists(self):
+        data = {
+            'a': [{'b': False}, {'b': True}]
+        }
+
+        assert decode_json_dict(data) == {'a': [{}, {'b': True}]}
 
 
 class TestModelFormConfiguration(object):

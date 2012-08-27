@@ -228,17 +228,29 @@ class FormGenerator(object):
         raise UnknownTypeException(column_type)
 
 
-def wtforms_decode_json(json):
+def decode_json_dict(json):
     decoded = {}
-    for key, value in json:
-        if value is not False:
+    for key, value in json.items():
+        if value is False:
             continue
         elif isinstance(value, list):
-            decoded[key] = [wtforms_decode_json(item) for item in value]
+            decoded[key] = decode_json_list(value)
         elif isinstance(value, dict):
-            decoded[key] = wtforms_decode_json(value)
+            decoded[key] = decode_json_dict(value)
         else:
             decoded[key] = value
+    return decoded
+
+
+def decode_json_list(json):
+    decoded = []
+    for item in json:
+        if isinstance(item, list):
+            decoded.append(decode_json_list(item))
+        elif isinstance(item, dict):
+            decoded.append(decode_json_dict(item))
+        else:
+            decoded.append(item)
     return decoded
 
 
