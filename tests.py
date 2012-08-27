@@ -2,7 +2,6 @@ import sqlalchemy as sa
 
 from wtforms import (
     BooleanField,
-    DateField,
     DateTimeField,
     FormField,
     SelectField,
