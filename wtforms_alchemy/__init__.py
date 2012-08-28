@@ -218,6 +218,10 @@ class FormGenerator(object):
             return Length(max=column.type.length)
 
     def get_field_class(self, column_type):
+        """
+        Returns WTForms field class that corresponds to given SQLAlchemy column
+        type.
+        """
         for class_ in self.TYPE_MAP:
             # Float type in sqlalchemy inherits numeric type, hence we need
             # the following check
@@ -361,9 +365,17 @@ class ModelForm(Form):
 @property
 def patch_data(self):
     data = {}
+
+    def is_optional(field):
+        return Optional in [v.__class__ for v in field.validators]
+
+    def is_required(field):
+        return Required in [v.__class__ for v in field.validators]
+
     for name, f in self._fields.iteritems():
-        if not f.is_unset:
-            data[name] = f.data
+        if f.is_unset and (is_optional(f) or not is_required(f)):
+            continue
+        data[name] = f.data
     return data
 
 

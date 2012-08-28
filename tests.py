@@ -9,7 +9,7 @@ from wtforms import (
     TextField,
     Form,
 )
-from wtforms.validators import NumberRange, Length, Required
+from wtforms.validators import NumberRange, Length, Required, Optional
 from wtforms_alchemy import (
     ModelCreateForm,
     ModelUpdateForm,
@@ -212,8 +212,12 @@ class TestEventForm(FormTestCase):
         self.assert_field_type('start_time', DateTimeField)
 
     def test_patch_data_with_form_fields(self):
-        form = self.form_class(MultiDict({'name': 'some patched name'}))
-        assert form.patch_data == {'name': 'some patched name'}
+        json = {
+            'name': 'some patched name',
+            'is_private': True
+        }
+        form = self.form_class(MultiDict(json))
+        assert form.patch_data == json
 
     def test_does_not_add_required_validators_to_non_nullable_booleans(self):
         self.assert_field_is_required('is_private')
@@ -224,6 +228,7 @@ class TestEventForm(FormTestCase):
 
     def test_patch_data_for_form_fields(self):
         json = {
+            'name': 'some name',
             'location': {
                 'name': 'some location',
                 'address': {
@@ -241,14 +246,17 @@ class MultiDict(dict):
         return [self[key]]
 
 
-from wtforms.validators import Optional
-
-
 class BooleanForm(ModelUpdateForm):
-    field = BooleanField(validators=[Optional()])
+    field_with_default = BooleanField(default=False, validators=[Optional()])
+    required_field = BooleanField(default=True, validators=[Required()])
 
 
 class TestPatchedBooleans(object):
     def test_supports_false_values(self):
-        form = BooleanForm(MultiDict({'field': False}))
-        assert form.patch_data == {'field': False}
+        form = BooleanForm(MultiDict(
+            {'field_with_default': False, 'required_field': True}
+        ))
+        assert form.patch_data == {
+            'field_with_default': False,
+            'required_field': True
+        }
