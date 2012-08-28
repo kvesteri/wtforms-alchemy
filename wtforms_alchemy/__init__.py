@@ -369,16 +369,28 @@ def patch_data(self):
 
 def monkey_patch_process(func):
     def process(self, formdata, data=_unset_value):
-        self.is_unset = True
-        if formdata:
-            if self.name in formdata:
-                self.is_unset = not bool(formdata.getlist(self.name))
-            else:
-                self.is_unset = True
+        if isinstance(self, FormField):
+            pass
+        else:
+            self.is_unset = True
+            if formdata:
+                if self.name in formdata:
+                    self.is_unset = not bool(formdata.getlist(self.name))
+                else:
+                    self.is_unset = True
         func(self, formdata, data=data)
     return process
 
 
+@property
+def is_unset(self):
+    for name, field in self._fields.items():
+        if not field.is_unset:
+            return False
+    return True
+
+
+Form.is_unset = is_unset
 Form.patch_data = patch_data
 Field.process = monkey_patch_process(Field.process)
 FormField.process = monkey_patch_process(FormField.process)

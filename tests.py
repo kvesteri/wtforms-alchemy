@@ -219,19 +219,21 @@ class TestEventForm(FormTestCase):
         self.assert_field_is_required('is_private')
 
     def test_supports_custom_datetime_format(self):
-        form = self.form_class(MultiDict(
-            decode_json({
-                'location': {
-                    'name': 'some location',
-                    'address': {
-                        'name': 'some address'
-                        }
-                },
-                'is_private': True,
-            })
-        ))
-        form.validate()
+        form = self.form_class()
         assert form.start_time.format == '%Y-%m-%dT%H:%M:%S'
+
+    def test_patch_data_for_form_fields(self):
+        json = {
+            'location': {
+                'name': 'some location',
+                'address': {
+                    'name': 'some address'
+                }
+            },
+            'is_private': True,
+        }
+        form = self.form_class(MultiDict(decode_json(json)))
+        assert form.patch_data == json
 
 
 class MultiDict(dict):
