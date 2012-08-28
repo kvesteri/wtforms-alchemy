@@ -373,8 +373,11 @@ def patch_data(self):
         return Required in [v.__class__ for v in field.validators]
 
     for name, f in self._fields.iteritems():
-        if f.is_unset and (is_optional(f) or not is_required(f)):
-            continue
+        if f.is_unset:
+            if is_optional(f):
+                continue
+            elif not is_required(f) and f.default is None:
+                continue
         data[name] = f.data
     return data
 

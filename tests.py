@@ -181,12 +181,6 @@ class TestCreateUserForm(FormTestCase):
     def test_non_nullable_fields_with_defaults_are_not_required(self):
         self.assert_field_is_not_required('name')
 
-    # def test_patch_data_with_validation(self):
-    #     form = self.form_class(name='some name')
-    #     form.validate()
-    #     print form.errors
-    #     print form.patch_data
-
 
 class TestUpdateUserForm(FormTestCase):
     form_class = UpdateUserForm
@@ -246,17 +240,27 @@ class MultiDict(dict):
         return [self[key]]
 
 
-class BooleanForm(ModelUpdateForm):
+class BooleanTest(Base):
+    __tablename__ = 'boolean_test'
+    id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
+    is_private = sa.Column(sa.Boolean, nullable=False, default=False)
+
+
+class BooleanTestForm(ModelCreateForm):
+    class Meta:
+        model = BooleanTest
+
     field_with_default = BooleanField(default=False, validators=[Optional()])
     required_field = BooleanField(default=True, validators=[Required()])
 
 
 class TestPatchedBooleans(object):
     def test_supports_false_values(self):
-        form = BooleanForm(MultiDict(
+        form = BooleanTestForm(MultiDict(
             {'field_with_default': False, 'required_field': True}
         ))
         assert form.patch_data == {
             'field_with_default': False,
-            'required_field': True
+            'required_field': True,
+            'is_private': False
         }
