@@ -198,7 +198,7 @@ class TestUpdateUserForm(FormTestCase):
         self.assert_field_is_optional('name')
 
     def test_patch_data(self):
-        form = self.form_class(name='some patched name')
+        form = self.form_class(MultiDict({'name': 'some patched name'}))
         assert form.patch_data == {'name': 'some patched name'}
 
 
@@ -212,17 +212,13 @@ class TestEventForm(FormTestCase):
         self.assert_field_type('start_time', DateTimeField)
 
     def test_patch_data_with_form_fields(self):
-        form = self.form_class(name='some patched name')
+        form = self.form_class(MultiDict({'name': 'some patched name'}))
         assert form.patch_data == {'name': 'some patched name'}
 
     def test_does_not_add_required_validators_to_non_nullable_booleans(self):
         self.assert_field_is_required('is_private')
 
     def test_supports_custom_datetime_format(self):
-        class MultiDict(dict):
-            def getlist(self, key):
-                return [self[key]]
-
         form = self.form_class(MultiDict(
             decode_json({
                 'location': {
@@ -236,3 +232,21 @@ class TestEventForm(FormTestCase):
         ))
         form.validate()
         assert form.start_time.format == '%Y-%m-%dT%H:%M:%S'
+
+
+class MultiDict(dict):
+    def getlist(self, key):
+        return [self[key]]
+
+
+from wtforms.validators import Optional
+
+
+class BooleanForm(ModelUpdateForm):
+    field = BooleanField(validators=[Optional()])
+
+
+class TestPatchedBooleans(object):
+    def test_supports_false_values(self):
+        form = BooleanForm(MultiDict({'field': False}))
+        assert form.patch_data == {'field': False}

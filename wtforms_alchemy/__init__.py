@@ -357,27 +357,44 @@ class ModelForm(Form):
             self._obj = kwargs['obj']
         super(ModelForm, self).__init__(*args, **kwargs)
 
-    @property
-    def patch_data(self):
-        data = {}
-        for name, f in self._fields.iteritems():
-            if not f.is_unset:
-                data[name] = f.data
-        return data
+
+@property
+def patch_data(self):
+    data = {}
+    for name, f in self._fields.iteritems():
+        if not f.is_unset:
+            data[name] = f.data
+    return data
 
 
 def monkey_patch_process(func):
     def process(self, formdata, data=_unset_value):
-        if data is _unset_value:
-            self.is_unset = True
-        else:
-            self.is_unset = False
+        self.is_unset = True
+        if formdata:
+            if self.name in formdata:
+                self.is_unset = not bool(formdata.getlist(self.name))
+            else:
+                self.is_unset = True
         func(self, formdata, data=data)
     return process
 
 
+Form.patch_data = patch_data
 Field.process = monkey_patch_process(Field.process)
 FormField.process = monkey_patch_process(FormField.process)
+
+
+def process_formdata(self, valuelist):
+    # Checkboxes and submit buttons simply do not send a value when
+    # unchecked/not pressed. So the actual value="" doesn't matter for
+    # purpose of determining .data, only whether one exists or not.
+    if valuelist and valuelist[0] is False:
+        self.data = False
+    else:
+        self.data = bool(valuelist)
+
+
+BooleanField.process_formdata = process_formdata
 
 
 class ModelCreateForm(ModelForm):
