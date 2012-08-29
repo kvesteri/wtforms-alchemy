@@ -9,11 +9,10 @@ from wtforms import (
     TextField,
     Form,
 )
-from wtforms.validators import NumberRange, Length, Required, Optional
+from wtforms.validators import NumberRange, Length, Required
 from wtforms_alchemy import (
     ModelCreateForm,
     ModelUpdateForm,
-    decode_json,
 )
 from wtforms_alchemy.test import FormTestCase
 from sqlalchemy import orm
@@ -49,11 +48,12 @@ class Location(Base):
     __tablename__ = 'location'
     id = sa.Column(BigInteger, autoincrement=True, primary_key=True)
     name = sa.Column(sa.Unicode(255), nullable=False)
+    longitude = sa.Column(sa.Integer)
+    latitude = sa.Column(sa.Integer)
 
 
 class Event(Entity):
     __tablename__ = 'event'
-
     id = sa.Column(sa.BigInteger, sa.ForeignKey(Entity.id), primary_key=True)
     name = sa.Column(sa.Unicode(255), index=True, nullable=False, default=u'')
     start_time = sa.Column(sa.DateTime)
@@ -98,29 +98,6 @@ class EventForm(ModelCreateForm):
         datetime_format = '%Y-%m-%dT%H:%M:%S'
 
     location = FormField(LocationForm)
-
-
-class TestJsonDecoder(object):
-    def test_supports_dicts(self):
-        assert decode_json({'a': False, 'b': 123}) == {'b': 123}
-
-    def test_supports_dicts_with_lists(self):
-        assert decode_json({'a': [1, 2, 3]}) == {'a-0': 1, 'a-1': 2, 'a-2': 3}
-
-    def test_supports_nested_dicts_and_lists(self):
-        data = {
-            'a': [{'b': True}]
-        }
-        assert decode_json(data) == {'a-0-b': True}
-
-    def test_supports_empty_lists(self):
-        data = {
-            'a': []
-        }
-        assert decode_json(data) == {}
-
-    def test_flatten_dict(self):
-        assert decode_json({'a': {'b': {'c': 'd'}}}) == {'a-b-c': 'd'}
 
 
 class TestModelFormConfiguration(object):
@@ -191,10 +168,6 @@ class TestUpdateUserForm(FormTestCase):
     def test_all_fields_optional_by_default(self):
         self.assert_field_is_optional('name')
 
-    def test_patch_data(self):
-        form = self.form_class(MultiDict({'name': 'some patched name'}))
-        assert form.patch_data == {'name': 'some patched name'}
-
 
 class TestEventForm(FormTestCase):
     form_class = EventForm
@@ -205,62 +178,9 @@ class TestEventForm(FormTestCase):
     def test_date_column_converts_to_date_field(self):
         self.assert_field_type('start_time', DateTimeField)
 
-    def test_patch_data_with_form_fields(self):
-        json = {
-            'name': 'some patched name',
-            'is_private': True
-        }
-        form = self.form_class(MultiDict(json))
-        assert form.patch_data == json
-
     def test_does_not_add_required_validators_to_non_nullable_booleans(self):
         self.assert_field_is_required('is_private')
 
     def test_supports_custom_datetime_format(self):
         form = self.form_class()
         assert form.start_time.format == '%Y-%m-%dT%H:%M:%S'
-
-    def test_patch_data_for_form_fields(self):
-        json = {
-            'name': 'some name',
-            'location': {
-                'name': 'some location',
-                'address': {
-                    'name': 'some address'
-                }
-            },
-            'is_private': True,
-        }
-        form = self.form_class(MultiDict(decode_json(json)))
-        assert form.patch_data == json
-
-
-class MultiDict(dict):
-    def getlist(self, key):
-        return [self[key]]
-
-
-class BooleanTest(Base):
-    __tablename__ = 'boolean_test'
-    id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
-    is_private = sa.Column(sa.Boolean, nullable=False, default=False)
-
-
-class BooleanTestForm(ModelCreateForm):
-    class Meta:
-        model = BooleanTest
-
-    field_with_default = BooleanField(default=False, validators=[Optional()])
-    required_field = BooleanField(default=True, validators=[Required()])
-
-
-class TestPatchedBooleans(object):
-    def test_supports_false_values(self):
-        form = BooleanTestForm(MultiDict(
-            {'field_with_default': False, 'required_field': True}
-        ))
-        assert form.patch_data == {
-            'field_with_default': False,
-            'required_field': True,
-            'is_private': False
-        }

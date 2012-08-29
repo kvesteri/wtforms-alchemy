@@ -1,5 +1,4 @@
 #import pytz
-import collections
 from wtforms import (
     BooleanField,
     DateField,
@@ -7,13 +6,11 @@ from wtforms import (
     DecimalField,
     FloatField,
     Form,
-    FormField,
     IntegerField,
     TextAreaField,
     TextField,
     SelectField,
 )
-from wtforms.fields import Field, _unset_value
 from wtforms.form import FormMeta
 from wtforms.validators import Length, Optional, Required, ValidationError
 from sqlalchemy import types
@@ -82,29 +79,11 @@ class FormGenerator(object):
         types.Enum: SelectField,
     }
 
-    def __init__(self,
-                 model_class,
-                 default=None,
-                 assign_required=True,
-                 validators={},
-                 only_indexed_fields=False,
-                 include_primary_keys=False,
-                 include_foreign_keys=False,
-                 all_fields_optional=False,
-                 datetime_format=None,
-                 date_format=None):
-        self.validators = validators
+    def __init__(self, model_class, meta):
         self.model_class = model_class
-        self.default = default
-        self.assign_required = assign_required
-        self.only_indexed_fields = only_indexed_fields
-        self.include_primary_keys = include_primary_keys
-        self.include_foreign_keys = include_foreign_keys
-        self.all_fields_optional = all_fields_optional
-        self.datetime_format = datetime_format
-        self.date_format = date_format
+        self.meta = meta
 
-    def create_form(self, form, include=None, exclude=None):
+    def create_form(self, form):
         fields = set(self.model_class._sa_class_manager.values())
         tmp = []
         for field in fields:
@@ -114,13 +93,14 @@ class FormGenerator(object):
             tmp.append(field)
         fields = set(tmp)
 
-        if include:
-            fields.update(set(
-                [getattr(self.model_class, field) for field in include]
-            ))
+        if self.meta.include:
+            fields.update(set([
+                getattr(self.model_class, field)
+                for field in self.meta.include
+            ]))
 
-        if exclude:
-            func = lambda a: a.key not in exclude
+        if self.meta.exclude:
+            func = lambda a: a.key not in self.meta.exclude
             fields = filter(func, fields)
 
         return self.create_fields(form, fields)
@@ -142,18 +122,19 @@ class FormGenerator(object):
     def skip_column(self, column_property):
         """Whether or not to skip column in the generation process."""
         column = column_property.columns[0]
-        if (not self.include_primary_keys and column.primary_key or
+        if (not self.meta.include_primary_keys and column.primary_key or
                 column.foreign_keys):
             return True
 
         if column_property._is_polymorphic_discriminator:
             return True
 
-        if self.only_indexed_fields and not self.has_index(column):
+        if self.meta.only_indexed_fields and not self.has_index(column):
             return True
         return False
 
     def has_index(self, column):
+        """Whether or not this column has an index."""
         if column.primary_key or column.foreign_keys:
             return True
         table = column.table
@@ -169,26 +150,43 @@ class FormGenerator(object):
         kwargs = {}
         field_class = self.get_field_class(column.type)
 
-        if self.all_fields_optional:
+        if self.meta.all_fields_optional:
             validators.append(Optional())
         else:
             if column.default:
                 kwargs['default'] = column.default.arg
             else:
                 if not column.nullable:
-                    kwargs['default'] = self.default
+                    kwargs['default'] = self.meta.default
 
-                if not column.nullable and self.assign_required:
+                if not column.nullable and self.meta.assign_required:
                     validators.append(Required())
+
+        validators.extend(self.create_validators(column))
+        kwargs['validators'] = validators
+
+        if hasattr(column.type, 'enums'):
+            kwargs['choices'] = [(enum, enum) for enum in column.type.enums]
+
+        if isinstance(column.type, types.DateTime):
+            kwargs['format'] = self.meta.datetime_format
+
+        if isinstance(column.type, types.Date):
+            kwargs['format'] = self.meta.date_format
+
+        return field_class(name, **kwargs)
+
+    def create_validators(self, column):
+        validators = []
         validator = self.length_validator(column)
         if validator:
             validators.append(validator)
-
-        if name in self.validators:
-            if isinstance(self.validators[name], list):
-                validators.extend(self.validators[name])
+        name = column.name
+        if name in self.meta.validators:
+            if isinstance(self.meta.validators[name], list):
+                validators.extend(self.meta.validators[name])
             else:
-                validators.append(self.validators[name])
+                validators.append(self.meta.validators[name])
 
         if column.unique:
             validators.append(
@@ -197,18 +195,7 @@ class FormGenerator(object):
                     getattr(self.model_class, name)
                 )
             )
-        kwargs['validators'] = validators
-
-        if hasattr(column.type, 'enums'):
-            kwargs['choices'] = [(enum, enum) for enum in column.type.enums]
-
-        if isinstance(column.type, types.DateTime):
-            kwargs['format'] = self.datetime_format
-
-        if isinstance(column.type, types.Date):
-            kwargs['format'] = self.date_format
-
-        return field_class(name, **kwargs)
+        return validators
 
     def length_validator(self, column):
         """
@@ -233,37 +220,10 @@ class FormGenerator(object):
         raise UnknownTypeException(column_type)
 
 
-def decode_json(json, parent_key='', separator='-'):
-    items = []
-    for key, value in json.items():
-        if value is False:
-            continue
-        new_key = parent_key + separator + key if parent_key else key
-        if isinstance(value, collections.MutableMapping):
-            items.extend(decode_json(value, new_key).items())
-        elif isinstance(value, list):
-            items.extend(decode_json_list(value, new_key))
-        else:
-            items.append((new_key, value))
-    return dict(items)
-
-
-def decode_json_list(json, parent_key='', separator='-'):
-    items = []
-    i = 0
-    for item in json:
-        new_key = parent_key + separator + str(i)
-        if isinstance(item, list):
-            items.extend(decode_json_list(item, new_key, separator))
-        elif isinstance(item, dict):
-            items.extend(decode_json(item, new_key, separator).items())
-        else:
-            items.append((new_key, item))
-        i += 1
-    return items
-
-
 def class_list(cls):
+    """Simple recursive function for listing the parent classes of given class.
+    Used by the ModelFormMeta class.
+    """
     list_of_parents = [cls]
     for parent in cls.__bases__:
         list_of_parents.extend(class_list(parent))
@@ -292,19 +252,8 @@ class ModelFormMeta(FormMeta):
 
     def __call__(cls, *args, **kwargs):
         if cls.Meta.model:
-            generator = cls.Meta.form_generator(
-                model_class=cls.Meta.model,
-                default=cls.Meta.default,
-                assign_required=cls.Meta.assign_required,
-                validators=cls.Meta.validators,
-                only_indexed_fields=cls.Meta.only_indexed_fields,
-                include_primary_keys=cls.Meta.include_primary_keys,
-                include_foreign_keys=cls.Meta.include_foreign_keys,
-                all_fields_optional=cls.Meta.all_fields_optional,
-                datetime_format=cls.Meta.datetime_format,
-                date_format=cls.Meta.date_format
-            )
-            generator.create_form(cls, cls.Meta.include, cls.Meta.exclude)
+            generator = cls.Meta.form_generator(cls.Meta.model, cls.Meta)
+            generator.create_form(cls)
 
         return FormMeta.__call__(cls, *args, **kwargs)
 
@@ -314,6 +263,7 @@ class ModelForm(Form):
 
     class Meta:
         model = None
+
         default = None
 
         #: Whether or not to assign non-nullable fields as required
@@ -360,68 +310,6 @@ class ModelForm(Form):
         if 'obj' in kwargs:
             self._obj = kwargs['obj']
         super(ModelForm, self).__init__(*args, **kwargs)
-
-
-@property
-def patch_data(self):
-    data = {}
-
-    def is_optional(field):
-        return Optional in [v.__class__ for v in field.validators]
-
-    def is_required(field):
-        return Required in [v.__class__ for v in field.validators]
-
-    for name, f in self._fields.iteritems():
-        if f.is_unset:
-            if is_optional(f):
-                continue
-            elif not is_required(f) and f.default is None:
-                continue
-        data[name] = f.data
-    return data
-
-
-def monkey_patch_process(func):
-    def process(self, formdata, data=_unset_value):
-        if isinstance(self, FormField):
-            pass
-        else:
-            self.is_unset = True
-            if formdata:
-                if self.name in formdata:
-                    self.is_unset = not bool(formdata.getlist(self.name))
-                else:
-                    self.is_unset = True
-        func(self, formdata, data=data)
-    return process
-
-
-@property
-def is_unset(self):
-    for name, field in self._fields.items():
-        if not field.is_unset:
-            return False
-    return True
-
-
-Form.is_unset = is_unset
-Form.patch_data = patch_data
-Field.process = monkey_patch_process(Field.process)
-FormField.process = monkey_patch_process(FormField.process)
-
-
-def process_formdata(self, valuelist):
-    # Checkboxes and submit buttons simply do not send a value when
-    # unchecked/not pressed. So the actual value="" doesn't matter for
-    # purpose of determining .data, only whether one exists or not.
-    if valuelist and valuelist[0] is False:
-        self.data = False
-    else:
-        self.data = bool(valuelist)
-
-
-BooleanField.process_formdata = process_formdata
 
 
 class ModelCreateForm(ModelForm):
