@@ -24,7 +24,7 @@ Lets say we have a model called User with couple of fields::
     from wtforms import Form
     from wtforms_alchemy import ModelForm
 
-    class User(Entity):
+    class User(Base):
         __tablename__ = 'user'
 
         id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
@@ -44,7 +44,7 @@ Now the following forms are essentially the same::
         email = TextField(validators=[Required(), Length(max=255)])
 
 
-SQLAlchemy column to WTForms field conversion
+Field type conversion
 ---------------------------------------------
 ========================    =================
  SQAlchemy column type      WTForms Field
@@ -64,6 +64,89 @@ Configuration
 -------------
 
 The following configuration options are available for ModelForm's Meta subclass.
+
+**include_primary_keys** (default: False)
+
+If you wish to include primary keys in the generated form please set this to True.
+This is useful when dealing with natural primary keys. In the following example each
+user has a natural primary key on its column name.
+
+The UserForm would contain two fields name and email. ::
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        email = sa.Column(sa.Unicode(255), nullable=False)
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            include_primary_keys = True
+
+
+**exclude**
+
+You can exclude certain fields by adding them to the exclude list. ::
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        email = sa.Column(sa.Unicode(255), nullable=False)
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            include_primary_keys = True
+            exclude = ['email']
+            # this form contains only 'name' field
+
+
+**include_foreign_keys** (default: False)
+
+Foreign keys can be included in the form by setting include_foreign_keys to True.
+
+**only_indexed_fields** (default: False)
+
+When setting this option to True, only fields that have an index will be included in
+the form. This is very useful when creating forms for searching a specific model.
+
+**validators**
+
+A dict containing additional validators for the generated form field objects.
+
+Example::
+
+    from wtfroms.validators import Email
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        email = sa.Column(sa.Unicode(255), nullable=False)
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            include_primary_keys = True
+            validators = {'email': [Email()]}
+
+**datetime_format** (default: '%Y-%m-%d %H:%M:%S')
+
+Defines the default datetime format, which will be assigned to generated datetime
+fields.
+
+**date_format** (default: '%Y-%m-%d')
+
+Defines the default date format, which will be assigned to generated datetime
+fields.
+
+
 
 
 API reference
