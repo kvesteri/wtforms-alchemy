@@ -55,7 +55,10 @@ Field type conversion
     Enum                    SelectField
     Float                   FloatField
     Integer                 IntegerField
+    Integer                 IntegerField
     Numeric                 DecimalField
+    SmallInteger            IntegerField
+    Text                    TextAreaField
     Unicode                 TextField
     UnicodeText             TextAreaField
 ========================    =================
@@ -146,6 +149,14 @@ fields.
 Defines the default date format, which will be assigned to generated datetime
 fields.
 
+
+**all_fields_optional** (default: False)
+
+Defines all generated fields as optional (useful for update forms).
+
+**assign_required** (default: True)
+
+Whether or not to assign non-nullable fields as required.
 
 **form_generator** (default: FormGenerator class)
 
