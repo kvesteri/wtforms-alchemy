@@ -147,7 +147,35 @@ Defines the default date format, which will be assigned to generated datetime
 fields.
 
 
+**form_generator** (default: FormGenerator class)
 
+Change this if you want to use custom form generator class.
+
+
+Form Inheritance
+----------------
+
+ModelForm's configuration support inheritance. This means that child classes inherit
+parents Meta properties.
+
+Example::
+
+    from wtfroms.validators import Email
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            validators = {'email': [Email()]}
+
+
+    class UserUpdateForm(UserForm):
+        class Meta:
+            all_fields_optional = True
+
+
+Here UserUpdateForm inherits the configuration properties of UserForm, hence it would
+use model User and have additional Email validator on column 'email'.
 
 API reference
 -------------
