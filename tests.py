@@ -47,7 +47,14 @@ class User(Entity):
 class Location(Base):
     __tablename__ = 'location'
     id = sa.Column(BigInteger, autoincrement=True, primary_key=True)
-    name = sa.Column(sa.Unicode(255), nullable=False)
+    name = sa.Column(
+        sa.Unicode(255),
+        nullable=False,
+        info={
+            'label': 'Name',
+            'description': 'This is name of the location.'
+        }
+    )
     longitude = sa.Column(sa.Integer)
     latitude = sa.Column(sa.Integer)
 
@@ -108,20 +115,27 @@ class TestModelFormConfiguration(object):
         assert CreateUserForm.Meta.model == User
 
 
+class TestLocationForm(FormTestCase):
+    form_class = LocationForm
+
+    def test_assigns_description_from_column_info(self):
+        self.assert_description('name', 'This is name of the location.')
+
+
 class TestCreateUserForm(FormTestCase):
     form_class = CreateUserForm
 
     def test_converts_unicode_columns_to_text_fields(self):
-        self.assert_field_type('name', TextField)
+        self.assert_type('name', TextField)
 
     def test_users_may_manually_override_generated_fields(self):
-        self.assert_field_type('overridable_field', BooleanField)
+        self.assert_type('overridable_field', BooleanField)
 
     def test_auto_assigns_length_validators(self):
-        self.assert_field_has_max_length('name', 255)
+        self.assert_max_length('name', 255)
 
     def test_boolean_column_converts_to_boolean_field(self):
-        self.assert_field_type('is_active', BooleanField)
+        self.assert_type('is_active', BooleanField)
 
     def test_does_not_contain_surrogate_primary_keys_by_default(self):
         assert not self.has_field('id')
@@ -131,55 +145,55 @@ class TestCreateUserForm(FormTestCase):
         assert form.is_active.validators == []
 
     def test_assigns_non_nullable_fields_as_required(self):
-        self.assert_field_is_required('email')
+        self.assert_is_required('email')
 
     def test_assigns_unique_validator_for_unique_fields(self):
-        self.assert_field_is_unique('email')
+        self.assert_is_unique('email')
 
     def test_age_has_additional_validator(self):
         assert self.get_validator('age', NumberRange)
 
     def test_enum_field_converts_to_select_field(self):
-        self.assert_field_type('status', SelectField)
+        self.assert_type('status', SelectField)
         form = CreateUserForm()
         assert form.status.choices == [(s, s) for s in User.STATUSES]
 
     def test_assigns_default_values(self):
-        self.assert_field_default('name', '')
+        self.assert_default('name', '')
 
     def test_fields_can_be_excluded(self):
         form = CreateUserForm()
         assert not hasattr(form, 'excluded_field')
 
     def test_adding_custom_length_validators(self):
-        self.assert_field_min_length('description', 2)
-        self.assert_field_max_length('description', 55)
+        self.assert_min_length('description', 2)
+        self.assert_max_length('description', 55)
 
     def test_non_nullable_fields_with_defaults_are_not_required(self):
-        self.assert_field_is_not_required('name')
+        self.assert_is_not_required('name')
 
 
 class TestUpdateUserForm(FormTestCase):
     form_class = UpdateUserForm
 
     def test_does_not_assign_non_nullable_fields_as_required(self):
-        self.assert_field_is_not_required('name')
+        self.assert_is_not_required('name')
 
     def test_all_fields_optional_by_default(self):
-        self.assert_field_is_optional('name')
+        self.assert_is_optional('name')
 
 
 class TestEventForm(FormTestCase):
     form_class = EventForm
 
     def test_unicode_text_columns_convert_to_textarea_fields(self):
-        self.assert_field_type('description', TextAreaField)
+        self.assert_type('description', TextAreaField)
 
     def test_date_column_converts_to_date_field(self):
-        self.assert_field_type('start_time', DateTimeField)
+        self.assert_type('start_time', DateTimeField)
 
     def test_does_not_add_required_validators_to_non_nullable_booleans(self):
-        self.assert_field_is_required('is_private')
+        self.assert_is_required('is_private')
 
     def test_supports_custom_datetime_format(self):
         form = self.form_class()

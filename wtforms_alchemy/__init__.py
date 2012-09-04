@@ -165,6 +165,9 @@ class FormGenerator(object):
         validators.extend(self.create_validators(column))
         kwargs['validators'] = validators
 
+        if 'description' in column.info:
+            kwargs['description'] = column.info['description']
+
         if hasattr(column.type, 'enums'):
             kwargs['choices'] = [(enum, enum) for enum in column.type.enums]
 
