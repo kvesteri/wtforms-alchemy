@@ -163,7 +163,24 @@ Whether or not to assign non-nullable fields as required.
 Change this if you want to use custom form generator class.
 
 
-Form Inheritance
+Adding column descriptions
+--------------------------
+
+Example::
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        email = sa.Column(
+            sa.Unicode(255),
+            nullable=False,
+            info={'description': 'This is the description of email.'}
+        )
+
+
+
+Form inheritance
 ----------------
 
 ModelForm's configuration support inheritance. This means that child classes inherit
