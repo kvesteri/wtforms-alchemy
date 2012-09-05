@@ -11,10 +11,11 @@ from wtforms import (
 )
 from wtforms.validators import NumberRange, Length, Required
 from wtforms_alchemy import (
+    Unique,
     ModelCreateForm,
     ModelUpdateForm,
 )
-from wtforms_alchemy.test import FormTestCase
+from wtforms_test import FormTestCase
 from sqlalchemy import orm
 from sqlalchemy.types import BigInteger
 from sqlalchemy.ext.declarative import declarative_base
@@ -148,7 +149,7 @@ class TestCreateUserForm(FormTestCase):
         self.assert_is_required('email')
 
     def test_assigns_unique_validator_for_unique_fields(self):
-        self.assert_is_unique('email')
+        self.assert_has_validator('email', Unique)
 
     def test_age_has_additional_validator(self):
         assert self.get_validator('age', NumberRange)
