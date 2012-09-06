@@ -89,6 +89,12 @@ class UpdateUserForm(ModelUpdateForm):
         model = User
 
 
+class UserOnlyNameForm(ModelCreateForm):
+    class Meta:
+        model = User
+        only = ['name']
+
+
 class AddressForm(Form):
     name = TextField(validators=[Required()])
 
@@ -199,3 +205,11 @@ class TestEventForm(FormTestCase):
     def test_supports_custom_datetime_format(self):
         form = self.form_class()
         assert form.start_time.format == '%Y-%m-%dT%H:%M:%S'
+
+
+class TestUserOnlyNameForm(FormTestCase):
+    form_class = UserOnlyNameForm
+
+    def test_meta_options_support_only(self):
+        form = self.form_class()
+        assert len(form._fields) == 1

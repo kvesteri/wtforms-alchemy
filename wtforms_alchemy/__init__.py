@@ -93,15 +93,21 @@ class FormGenerator(object):
             tmp.append(field)
         fields = set(tmp)
 
-        if self.meta.include:
-            fields.update(set([
+        if self.meta.only:
+            fields = set([
                 getattr(self.model_class, field)
-                for field in self.meta.include
-            ]))
+                for field in self.meta.only
+            ])
+        else:
+            if self.meta.include:
+                fields.update(set([
+                    getattr(self.model_class, field)
+                    for field in self.meta.include
+                ]))
 
-        if self.meta.exclude:
-            func = lambda a: a.key not in self.meta.exclude
-            fields = filter(func, fields)
+            if self.meta.exclude:
+                func = lambda a: a.key not in self.meta.exclude
+                fields = filter(func, fields)
 
         return self.create_fields(form, fields)
 
