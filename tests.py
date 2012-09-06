@@ -63,7 +63,10 @@ class Location(Base):
 class Event(Entity):
     __tablename__ = 'event'
     id = sa.Column(sa.BigInteger, sa.ForeignKey(Entity.id), primary_key=True)
-    name = sa.Column(sa.Unicode(255), index=True, nullable=False, default=u'')
+    name = sa.Column(
+        sa.Unicode(255), index=True, nullable=False, default=u'',
+        info={'label': 'Name', 'description': 'The name of the event.'}
+    )
     start_time = sa.Column(sa.DateTime)
     is_private = sa.Column(sa.Boolean, nullable=False)
     description = sa.Column(sa.UnicodeText)
@@ -198,6 +201,12 @@ class TestEventForm(FormTestCase):
 
     def test_date_column_converts_to_date_field(self):
         self.assert_type('start_time', DateTimeField)
+
+    def test_supports_labels(self):
+        self.assert_label('name', 'Name')
+
+    def test_supports_descriptions(self):
+        self.assert_description('name', 'The name of the event.')
 
     def test_does_not_add_required_validators_to_non_nullable_booleans(self):
         self.assert_is_required('is_private')

@@ -174,6 +174,11 @@ class FormGenerator(object):
         if 'description' in column.info:
             kwargs['description'] = column.info['description']
 
+        if 'label' in column.info:
+            kwargs['label'] = column.info['label']
+        else:
+            kwargs['label'] = name
+
         if hasattr(column.type, 'enums'):
             kwargs['choices'] = [(enum, enum) for enum in column.type.enums]
 
@@ -183,7 +188,7 @@ class FormGenerator(object):
         if isinstance(column.type, types.Date):
             kwargs['format'] = self.meta.date_format
 
-        return field_class(name, **kwargs)
+        return field_class(**kwargs)
 
     def create_validators(self, column):
         validators = []
