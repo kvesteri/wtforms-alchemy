@@ -12,7 +12,13 @@ from wtforms import (
     SelectField,
 )
 from wtforms.form import FormMeta
-from wtforms.validators import Length, Optional, Required, ValidationError
+from wtforms.validators import (
+    Length,
+    Optional,
+    NumberRange,
+    Required,
+    ValidationError
+)
 from sqlalchemy import types
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.exc import NoResultFound
@@ -178,6 +184,12 @@ class FormGenerator(object):
             kwargs['label'] = column.info['label']
         else:
             kwargs['label'] = name
+
+        min_ = column.info['min'] if 'min' in column.info else None
+        max_ = column.info['max'] if 'max' in column.info else None
+
+        if min_ or max_:
+            validators.append(NumberRange(min=min_, max=max_))
 
         if hasattr(column.type, 'enums'):
             kwargs['choices'] = [(enum, enum) for enum in column.type.enums]

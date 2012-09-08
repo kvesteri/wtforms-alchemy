@@ -42,6 +42,7 @@ class User(Entity):
     excluded_field = sa.Column(sa.Integer)
     is_active = sa.Column(sa.Boolean)
     age = sa.Column(sa.Integer)
+    level = sa.Column(sa.Integer, info={'min': 1, 'max': 100})
     description = sa.Column(sa.Unicode(255))
 
 
@@ -181,6 +182,11 @@ class TestCreateUserForm(FormTestCase):
 
     def test_non_nullable_fields_with_defaults_are_not_required(self):
         self.assert_is_not_required('name')
+
+    def test_min_and_max_info_attributes_generate_number_range_validator(self):
+        validator = self.get_validator('level', NumberRange)
+        assert validator.min == 1
+        assert validator.max == 100
 
 
 class TestUpdateUserForm(FormTestCase):
