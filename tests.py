@@ -43,6 +43,15 @@ class User(Entity):
         info={'validators': Email()}
     )
     status = sa.Column(sa.Enum(*STATUSES))
+    status2 = sa.Column(
+        sa.Enum(*STATUSES),
+        info={
+            'choices': {
+                'status1': 'some status',
+                'status2': 'another status'
+            }
+        }
+    )
     overridable_field = sa.Column(sa.Integer)
     excluded_field = sa.Column(sa.Integer)
     is_active = sa.Column(sa.Boolean)
@@ -156,6 +165,14 @@ class TestCreateUserForm(FormTestCase):
     def test_boolean_column_converts_to_boolean_field(self):
         self.assert_type('is_active', BooleanField)
 
+    def test_supports_custom_choices_for_enum_fields(self):
+        self.assert_choices(
+            'status2', {
+                'status1': 'some status',
+                'status2': 'another status'
+            }
+        )
+
     def test_does_not_contain_surrogate_primary_keys_by_default(self):
         assert not self.has_field('id')
 
@@ -164,7 +181,7 @@ class TestCreateUserForm(FormTestCase):
         assert form.is_active.validators == []
 
     def test_assigns_non_nullable_fields_as_required(self):
-        self.assert_is_required('email')
+        self.assert_required('email')
 
     def test_assigns_unique_validator_for_unique_fields(self):
         self.assert_has_validator('email', Unique)
@@ -189,7 +206,7 @@ class TestCreateUserForm(FormTestCase):
         self.assert_max_length('description', 55)
 
     def test_non_nullable_fields_with_defaults_are_not_required(self):
-        self.assert_is_not_required('name')
+        self.assert_not_required('name')
 
     def test_min_and_max_info_attributes_generate_number_range_validator(self):
         validator = self.get_validator('level', NumberRange)
@@ -201,10 +218,10 @@ class TestUpdateUserForm(FormTestCase):
     form_class = UpdateUserForm
 
     def test_does_not_assign_non_nullable_fields_as_required(self):
-        self.assert_is_not_required('name')
+        self.assert_not_required('name')
 
     def test_all_fields_optional_by_default(self):
-        self.assert_is_optional('name')
+        self.assert_optional('name')
 
 
 class TestEventForm(FormTestCase):
@@ -223,7 +240,7 @@ class TestEventForm(FormTestCase):
         self.assert_description('name', 'The name of the event.')
 
     def test_does_not_add_required_validators_to_non_nullable_booleans(self):
-        self.assert_is_required('is_private')
+        self.assert_required('is_private')
 
     def test_supports_custom_datetime_format(self):
         form = self.form_class()

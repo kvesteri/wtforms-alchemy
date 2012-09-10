@@ -192,7 +192,12 @@ class FormGenerator(object):
             validators.append(NumberRange(min=min_, max=max_))
 
         if hasattr(column.type, 'enums'):
-            kwargs['choices'] = [(enum, enum) for enum in column.type.enums]
+            if 'choices' in column.info and column.info['choices']:
+                kwargs['choices'] = column.info['choices']
+            else:
+                kwargs['choices'] = [
+                    (enum, enum) for enum in column.type.enums
+                ]
 
         if isinstance(column.type, types.DateTime):
             kwargs['format'] = self.meta.datetime_format
