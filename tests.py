@@ -9,7 +9,7 @@ from wtforms import (
     TextField,
     Form,
 )
-from wtforms.validators import NumberRange, Length, Required
+from wtforms.validators import NumberRange, Length, Required, Email
 from wtforms_alchemy import (
     Unique,
     ModelCreateForm,
@@ -36,7 +36,12 @@ class User(Entity):
 
     id = sa.Column(sa.BigInteger, sa.ForeignKey(Entity.id), primary_key=True)
     name = sa.Column(sa.Unicode(255), index=True, nullable=False, default=u'')
-    email = sa.Column(sa.Unicode(255), unique=True, nullable=False)
+    email = sa.Column(
+        sa.Unicode(255),
+        unique=True,
+        nullable=False,
+        info={'validators': Email()}
+    )
     status = sa.Column(sa.Enum(*STATUSES))
     overridable_field = sa.Column(sa.Integer)
     excluded_field = sa.Column(sa.Integer)
@@ -144,6 +149,9 @@ class TestCreateUserForm(FormTestCase):
 
     def test_auto_assigns_length_validators(self):
         self.assert_max_length('name', 255)
+
+    def test_assigns_validators_from_info_field(self):
+        self.assert_has_validator('email', Email)
 
     def test_boolean_column_converts_to_boolean_field(self):
         self.assert_type('is_active', BooleanField)

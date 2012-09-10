@@ -221,6 +221,11 @@ class FormGenerator(object):
                     getattr(self.model_class, name)
                 )
             )
+        if 'validators' in column.info and column.info['validators']:
+            try:
+                validators.extend(column.info['validators'])
+            except TypeError:
+                validators.append(column.info['validators'])
         return validators
 
     def length_validator(self, column):
