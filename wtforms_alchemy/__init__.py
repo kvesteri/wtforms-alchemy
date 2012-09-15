@@ -65,6 +65,10 @@ class Unique(object):
             pass
 
 
+def is_scalar(value):
+    return isinstance(value, (type(None), str, int, float, bool, unicode))
+
+
 class UnknownTypeException(Exception):
     pass
 
@@ -141,6 +145,11 @@ class FormGenerator(object):
         if column_property._is_polymorphic_discriminator:
             return True
 
+        if (not self.meta.include_datetimes_with_default and
+                isinstance(column.type, types.DateTime) and
+                column.default):
+            return True
+
         if self.meta.only_indexed_fields and not self.has_index(column):
             return True
         return False
@@ -165,7 +174,7 @@ class FormGenerator(object):
         if self.meta.all_fields_optional:
             validators.append(Optional())
         else:
-            if column.default:
+            if column.default and is_scalar(column.default.arg):
                 kwargs['default'] = column.default.arg
             else:
                 if not column.nullable:
@@ -320,6 +329,11 @@ class ModelForm(Form):
         #: Whether or not to include primary keys. By default this is False
         #: indicating that foreign keys are not included in the generated form.
         include_foreign_keys = False
+
+        #: Whether or not to include datetime columns that have a default
+        #: value. A good example is created_at column which has a default value
+        #: of datetime.utcnow.
+        include_datetimes_with_default = False
 
         #: Which form generator to use. Only override this if you have a valid
         #: form generator which you want to use instead of the default one.

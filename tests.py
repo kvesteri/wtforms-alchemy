@@ -1,3 +1,4 @@
+from datetime import datetime
 import sqlalchemy as sa
 
 from wtforms import (
@@ -84,9 +85,10 @@ class Event(Entity):
     )
     start_time = sa.Column(sa.DateTime)
     is_private = sa.Column(sa.Boolean, nullable=False)
-    description = sa.Column(sa.UnicodeText)
+    description = sa.Column(sa.UnicodeText, default=lambda: '')
     location_id = sa.Column(sa.BigInteger, sa.ForeignKey(Location.id))
     location = orm.relationship(Location)
+    created_at = sa.Column(sa.DateTime, default=datetime.utcnow)
 
 
 class CreateUserForm(ModelCreateForm):
@@ -245,6 +247,12 @@ class TestEventForm(FormTestCase):
     def test_supports_custom_datetime_format(self):
         form = self.form_class()
         assert form.start_time.format == '%Y-%m-%dT%H:%M:%S'
+
+    def test_does_not_add_default_value_if_default_is_callable(self):
+        self.assert_default('description', None)
+
+    def test_does_not_include_datetime_columns_with_default(self):
+        assert not self.has_field('created_at')
 
 
 class TestUserOnlyNameForm(FormTestCase):
