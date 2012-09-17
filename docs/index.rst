@@ -214,6 +214,7 @@ function. In the following example we have a UserForm which uses Flask-WTF
 form as a parent form for ModelForm. ::
 
     from flask.ext.wtf import Form
+    from wtforms-alchemy import model_form_factory
 
 
     class UserForm(model_form_factory(Form)):
