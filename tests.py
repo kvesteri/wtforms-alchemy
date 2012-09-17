@@ -15,6 +15,7 @@ from wtforms_alchemy import (
     Unique,
     ModelCreateForm,
     ModelUpdateForm,
+    model_form_factory,
 )
 from wtforms_test import FormTestCase
 from sqlalchemy import orm
@@ -140,6 +141,16 @@ class TestModelFormConfiguration(object):
 
     def test_child_classes_override_parents_config_params(self):
         assert CreateUserForm.Meta.model == User
+
+    def test_model_form_factory_with_custom_base_class(self):
+        class SomeForm(Form):
+            pass
+
+        class TestCustomBase(model_form_factory(SomeForm)):
+            class Meta:
+                model = Location
+
+        assert isinstance(TestCustomBase(), SomeForm)
 
 
 class TestLocationForm(FormTestCase):

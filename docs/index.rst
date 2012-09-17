@@ -205,6 +205,22 @@ Example::
 Here UserUpdateForm inherits the configuration properties of UserForm, hence it would
 use model User and have additional Email validator on column 'email'.
 
+
+Custom form base class
+----------------------
+
+You can use custom base class for your model forms by using model_form_factory
+function. In the following example we have a UserForm which uses Flask-WTF
+form as a parent form for ModelForm. ::
+
+    from flask.ext.wtf import Form
+
+
+    class UserForm(model_form_factory(Form)):
+        class Meta:
+            model = User
+
+
 API reference
 -------------
 

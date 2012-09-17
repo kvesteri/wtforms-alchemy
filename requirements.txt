@@ -1,1 +1,172 @@
 WTForms==1.0.1
+
+# Translations template for WTForms.
+# Copyright (C) 2012 WTForms Team
+# This file is distributed under the same license as the WTForms project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: WTForms 1.0.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2012-09-02 14:13-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Konsta Vesterinen <konsta.vesterinen@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: wtforms/validators.py:55
+#, python-format
+msgid "Invalid field name '%s'."
+msgstr "Virheellinen kentän nimi '%s'."
+
+#: wtforms/validators.py:62
+#, python-format
+msgid "Field must be equal to %(other_name)s."
+msgstr "Kentän täytyy olla sama kuin %(other_name)s."
+
+#: wtforms/validators.py:94
+#, python-format
+msgid "Field must be at least %(min)d character long."
+msgid_plural "Field must be at least %(min)d characters long."
+msgstr[0] "Kentän täytyy olla vähintään yhden kerkin pituinen."
+msgstr[1] "Kentän täytyy olla vähintään %(min)d merkkiä pitkä."
+
+#: wtforms/validators.py:97
+#, python-format
+msgid "Field cannot be longer than %(max)d character."
+msgid_plural "Field cannot be longer than %(max)d characters."
+msgstr[0] "Kentän voi olla enintään yhden merkin pituinen."
+msgstr[1] "Kenttä voi olla enintään %(max)d merkkiä pitkä. "
+
+#: wtforms/validators.py:100
+#, python-format
+msgid "Field must be between %(min)d and %(max)d characters long."
+msgstr "Kentän täytyy olla vähintään %(min)d merkkiä ja enintään %(max)d merkkiä pitkä."
+
+#: wtforms/validators.py:135
+#, python-format
+msgid "Number must be at least %(min)s."
+msgstr "Luvun täytyy olla vähintään %(min)s."
+
+#: wtforms/validators.py:137
+#, python-format
+msgid "Number must be at most %(max)s."
+msgstr "Luku voi olla enintään %(max)s."
+
+#: wtforms/validators.py:139
+#, python-format
+msgid "Number must be between %(min)s and %(max)s."
+msgstr "Luvun täytyy olla vähintään %(min)s ja enintään %(max)s."
+
+#: wtforms/validators.py:188 wtforms/validators.py:221
+msgid "This field is required."
+msgstr "Tämä kenttä on pakollinen."
+
+#: wtforms/validators.py:249
+msgid "Invalid input."
+msgstr "Virheellinen syöte."
+
+#: wtforms/validators.py:268
+msgid "Invalid email address."
+msgstr "Virheellinen sähköposti."
+
+#: wtforms/validators.py:297
+msgid "Invalid IP address."
+msgstr "Virheellinen IP-osoite."
+
+#: wtforms/validators.py:345
+msgid "Invalid Mac address."
+msgstr "Virheellinen MAC-osoite"
+
+#: wtforms/validators.py:370
+msgid "Invalid URL."
+msgstr "Virheellinen URL."
+
+#: wtforms/validators.py:388
+msgid "Invalid UUID."
+msgstr "Virheellinen UUID."
+
+#: wtforms/validators.py:415
+#, python-format
+msgid "Invalid value, must be one of: %(values)s."
+msgstr "Arvon täytyy olla joku seuraavista: %(values)s."
+
+#: wtforms/validators.py:442
+#, python-format
+msgid "Invalid value, can't be any of: %(values)s."
+msgstr "Arvo ei saa olla mikään seuraavista: %(values)s."
+
+#: wtforms/ext/appengine/fields.py:90 wtforms/ext/django/fields.py:89
+#: wtforms/ext/sqlalchemy/fields.py:125 wtforms/ext/sqlalchemy/fields.py:175
+#: wtforms/ext/sqlalchemy/fields.py:180 wtforms/fields/core.py:419
+msgid "Not a valid choice"
+msgstr "Virheellinen valinta."
+
+#: wtforms/ext/appengine/fields.py:109
+msgid "Not a valid list"
+msgstr "Virheellinen lista"
+
+#: wtforms/ext/csrf/form.py:47
+msgid "Invalid CSRF Token"
+msgstr "Virheellinen CSRF-token."
+
+#: wtforms/ext/csrf/session.py:57
+msgid "CSRF token missing"
+msgstr "CSRF-token on poissa."
+
+#: wtforms/ext/csrf/session.py:65
+msgid "CSRF failed"
+msgstr "CSRF epäonnistui."
+
+#: wtforms/ext/csrf/session.py:70
+msgid "CSRF token expired"
+msgstr "CSRF-token vanhentunut"
+
+#: wtforms/ext/dateutil/fields.py:50
+msgid "Please input a date/time value"
+msgstr "Syötä oikea päivämäärä."
+
+#: wtforms/ext/dateutil/fields.py:62
+msgid "Invalid date/time input"
+msgstr "Virheellinen päivämäärä."
+
+#: wtforms/ext/sqlalchemy/validators.py:33
+msgid "Already exists."
+msgstr "On jo olemassa."
+
+#: wtforms/fields/core.py:412
+msgid "Invalid Choice: could not coerce"
+msgstr "Virheellinen valinta."
+
+#: wtforms/fields/core.py:445
+msgid "Invalid choice(s): one or more data inputs could not be coerced"
+msgstr "Virheelliset valinnat."
+
+#: wtforms/fields/core.py:452
+#, python-format
+msgid "'%(value)s' is not a valid choice for this field"
+msgstr "'%(value)s' ei ole oikea valinta."
+
+#: wtforms/fields/core.py:507
+msgid "Not a valid integer value"
+msgstr "Ei ole kokonaisluku."
+
+#: wtforms/fields/core.py:554
+msgid "Not a valid decimal value"
+msgstr "Ei ole hyväksyttävä desimaaliluku."
+
+#: wtforms/fields/core.py:581
+msgid "Not a valid float value"
+msgstr "Ei ole hyväksyttävä desimaaliluku."
+
+#: wtforms/fields/core.py:632
+msgid "Not a valid datetime value"
+msgstr "Ei ole hyväksyttävä päivämäärä."
+
+#: wtforms/fields/core.py:649
+msgid "Not a valid date value"
+msgstr "Ei ole hyväksyttävä päivämäärä."

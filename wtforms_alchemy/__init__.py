@@ -292,7 +292,6 @@ class ModelFormMeta(FormMeta):
             if hasattr(class_, 'Meta'):
                 property_dict.update(properties(class_.Meta))
         cls.Meta = type('Meta', (object, ), property_dict)
-
         return FormMeta.__init__(cls, *args, **kwargs)
 
     def __call__(cls, *args, **kwargs):
@@ -303,63 +302,73 @@ class ModelFormMeta(FormMeta):
         return FormMeta.__call__(cls, *args, **kwargs)
 
 
-class ModelForm(Form):
-    __metaclass__ = ModelFormMeta
+def model_form_factory(base=Form):
+    """Creates new model form, with given base class."""
 
-    class Meta:
-        model = None
+    class ModelForm(base):
+        __metaclass__ = ModelFormMeta
 
-        default = None
+        class Meta:
+            model = None
 
-        #: Whether or not to assign non-nullable fields as required
-        assign_required = True
+            default = None
 
-        #: Whether or not to assign all fields as optional, useful when
-        #: creating update forms
-        all_fields_optional = False
+            #: Whether or not to assign non-nullable fields as required
+            assign_required = True
 
-        validators = {}
+            #: Whether or not to assign all fields as optional, useful when
+            #: creating update forms
+            all_fields_optional = False
 
-        #: Whether or not to include only indexed fields
-        only_indexed_fields = False
+            validators = {}
 
-        #: Whether or not to include primary keys.
-        include_primary_keys = False
+            #: Whether or not to include only indexed fields
+            only_indexed_fields = False
 
-        #: Whether or not to include primary keys. By default this is False
-        #: indicating that foreign keys are not included in the generated form.
-        include_foreign_keys = False
+            #: Whether or not to include primary keys.
+            include_primary_keys = False
 
-        #: Whether or not to include datetime columns that have a default
-        #: value. A good example is created_at column which has a default value
-        #: of datetime.utcnow.
-        include_datetimes_with_default = False
+            #: Whether or not to include primary keys. By default this is False
+            #: indicating that foreign keys are not included in the generated
+            #: form.
+            include_foreign_keys = False
 
-        #: Which form generator to use. Only override this if you have a valid
-        #: form generator which you want to use instead of the default one.
-        form_generator = FormGenerator
+            #: Whether or not to include datetime columns that have a default
+            #: value. A good example is created_at column which has a default
+            #: value of datetime.utcnow.
+            include_datetimes_with_default = False
 
-        #: Default date format
-        date_format = '%Y-%m-%d'
+            #: Which form generator to use. Only override this if you have a
+            #: valid form generator which you want to use instead of the
+            #: default one.
+            form_generator = FormGenerator
 
-        #: Default datetime format
-        datetime_format = '%Y-%m-%d %H:%M:%S'
+            #: Default date format
+            date_format = '%Y-%m-%d'
 
-        #: Additional fields to include in the generated form.
-        include = []
+            #: Default datetime format
+            datetime_format = '%Y-%m-%d %H:%M:%S'
 
-        #: List of fields to exclude from the generated form.
-        exclude = []
+            #: Additional fields to include in the generated form.
+            include = []
 
-        #: List of fields to only include in the generated form.
-        only = []
+            #: List of fields to exclude from the generated form.
+            exclude = []
 
-    def __init__(self, *args, **kwargs):
-        """Sets object as form attribute."""
+            #: List of fields to only include in the generated form.
+            only = []
 
-        if 'obj' in kwargs:
-            self._obj = kwargs['obj']
-        super(ModelForm, self).__init__(*args, **kwargs)
+        def __init__(self, *args, **kwargs):
+            """Sets object as form attribute."""
+
+            if 'obj' in kwargs:
+                self._obj = kwargs['obj']
+            super(ModelForm, self).__init__(*args, **kwargs)
+
+    return ModelForm
+
+
+ModelForm = model_form_factory(Form)
 
 
 class ModelCreateForm(ModelForm):
