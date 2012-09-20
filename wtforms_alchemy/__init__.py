@@ -69,6 +69,10 @@ def is_scalar(value):
     return isinstance(value, (type(None), str, int, float, bool, unicode))
 
 
+def nullable_enum_coerce(value):
+    return unicode(value) or None
+
+
 class UnknownTypeException(Exception):
     pass
 
@@ -201,6 +205,9 @@ class FormGenerator(object):
             validators.append(NumberRange(min=min_, max=max_))
 
         if hasattr(column.type, 'enums'):
+            if column.nullable:
+                kwargs['coerce'] = nullable_enum_coerce
+
             if 'choices' in column.info and column.info['choices']:
                 kwargs['choices'] = column.info['choices']
             else:

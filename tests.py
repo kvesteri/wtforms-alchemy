@@ -16,6 +16,7 @@ from wtforms_alchemy import (
     ModelCreateForm,
     ModelUpdateForm,
     model_form_factory,
+    nullable_enum_coerce,
 )
 from wtforms_test import FormTestCase
 from sqlalchemy import orm
@@ -90,6 +91,7 @@ class Event(Entity):
     location_id = sa.Column(sa.BigInteger, sa.ForeignKey(Location.id))
     location = orm.relationship(Location)
     created_at = sa.Column(sa.DateTime, default=datetime.utcnow)
+    some_enum = sa.Column(sa.Enum('1', '2'))
 
 
 class CreateUserForm(ModelCreateForm):
@@ -264,6 +266,10 @@ class TestEventForm(FormTestCase):
 
     def test_does_not_include_datetime_columns_with_default(self):
         assert not self.has_field('created_at')
+
+    def test_nullable_enum_converts_empty_strings_to_none(self):
+        field = self._get_field('some_enum')
+        assert field.coerce == nullable_enum_coerce
 
 
 class TestUserOnlyNameForm(FormTestCase):
