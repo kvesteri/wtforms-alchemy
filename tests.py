@@ -5,7 +5,6 @@ from wtforms import (
     BooleanField,
     DateTimeField,
     FormField,
-    SelectField,
     TextAreaField,
     TextField,
     Form,
@@ -15,8 +14,9 @@ from wtforms_alchemy import (
     Unique,
     ModelCreateForm,
     ModelUpdateForm,
+    SelectField,
     model_form_factory,
-    nullable_enum_coerce,
+    null_or_unicode,
 )
 from wtforms_test import FormTestCase
 from sqlalchemy import orm
@@ -269,7 +269,24 @@ class TestEventForm(FormTestCase):
 
     def test_nullable_enum_converts_empty_strings_to_none(self):
         field = self._get_field('some_enum')
-        assert field.coerce == nullable_enum_coerce
+        assert field.coerce == null_or_unicode
+
+
+class TestSelectField(object):
+    def test_understands_none_values(self):
+        class MyForm(Form):
+            choice_field = SelectField(
+                choices=[('', '-- Choose --'), ('choice 1', 'Something')],
+                coerce=null_or_unicode
+            )
+
+        class MultiDict(dict):
+            def getlist(self, key):
+                return [self[key]]
+
+        form = MyForm(MultiDict({'choice_field': u''}))
+        form.validate()
+        assert form.errors == {}
 
 
 class TestUserOnlyNameForm(FormTestCase):

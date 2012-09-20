@@ -9,7 +9,7 @@ from wtforms import (
     IntegerField,
     TextAreaField,
     TextField,
-    SelectField,
+    SelectField as _SelectField,
 )
 from wtforms.form import FormMeta
 from wtforms.validators import (
@@ -69,8 +69,16 @@ def is_scalar(value):
     return isinstance(value, (type(None), str, int, float, bool, unicode))
 
 
-def nullable_enum_coerce(value):
+def null_or_unicode(value):
     return unicode(value) or None
+
+
+class SelectField(_SelectField):
+    def pre_validate(self, form):
+        if self.data is None and u'' in [v[0] for v in self.choices]:
+            return True
+
+        _SelectField.pre_validate(self, form)
 
 
 class UnknownTypeException(Exception):
@@ -206,7 +214,7 @@ class FormGenerator(object):
 
         if hasattr(column.type, 'enums'):
             if column.nullable:
-                kwargs['coerce'] = nullable_enum_coerce
+                kwargs['coerce'] = null_or_unicode
 
             if 'choices' in column.info and column.info['choices']:
                 kwargs['choices'] = column.info['choices']
