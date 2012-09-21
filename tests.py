@@ -92,6 +92,15 @@ class Event(Entity):
     location = orm.relationship(Location)
     created_at = sa.Column(sa.DateTime, default=datetime.utcnow)
     some_enum = sa.Column(sa.Enum('1', '2'))
+    unicode_with_choices = sa.Column(
+        sa.Unicode(255),
+        info={
+            'choices': (
+                (u'1', u'Choice 1'),
+                (u'2', u'Choice 2')
+            )
+        }
+    )
 
 
 class CreateUserForm(ModelCreateForm):
@@ -270,6 +279,13 @@ class TestEventForm(FormTestCase):
     def test_nullable_enum_converts_empty_strings_to_none(self):
         field = self._get_field('some_enum')
         assert field.coerce == null_or_unicode
+
+    def test_unicode_with_choices_converts_to_select_field(self):
+        self.assert_type('unicode_with_choices', SelectField)
+        self.assert_choices('unicode_with_choices', (
+            (u'1', u'Choice 1'),
+            (u'2', u'Choice 2')
+        ))
 
 
 class TestSelectField(object):

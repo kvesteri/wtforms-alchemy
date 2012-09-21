@@ -181,7 +181,7 @@ class FormGenerator(object):
         name = column.name
         validators = []
         kwargs = {}
-        field_class = self.get_field_class(column.type)
+        field_class = self.get_field_class(column)
 
         if self.meta.all_fields_optional:
             validators.append(Optional())
@@ -212,7 +212,7 @@ class FormGenerator(object):
         if min_ or max_:
             validators.append(NumberRange(min=min_, max=max_))
 
-        if hasattr(column.type, 'enums'):
+        if hasattr(column.type, 'enums') or 'choices' in column.info:
             if column.nullable:
                 kwargs['coerce'] = null_or_unicode
 
@@ -264,20 +264,22 @@ class FormGenerator(object):
         if hasattr(column.type, 'length') and column.type.length:
             return Length(max=column.type.length)
 
-    def get_field_class(self, column_type):
+    def get_field_class(self, column):
         """
         Returns WTForms field class that corresponds to given SQLAlchemy column
         type.
         """
+        if 'choices' in column.info:
+            return SelectField
         for class_ in self.TYPE_MAP:
             # Float type in sqlalchemy inherits numeric type, hence we need
             # the following check
-            if column_type.__class__ is types.Float:
-                if isinstance(column_type, types.Float):
+            if column.type.__class__ is types.Float:
+                if isinstance(column.type, types.Float):
                     return self.TYPE_MAP[types.Float]
-            if isinstance(column_type, class_):
+            if isinstance(column.type, class_):
                 return self.TYPE_MAP[class_]
-        raise UnknownTypeException(column_type)
+        raise UnknownTypeException(column.type)
 
 
 def class_list(cls):
