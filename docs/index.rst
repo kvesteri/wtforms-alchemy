@@ -63,6 +63,32 @@ Field type conversion
     UnicodeText             TextAreaField
 ========================    =================
 
+Using choices parameter
+-----------------------
+
+Sometimes you may want to have integer and unicode fields convert to SelectFields.
+Probably the easiest way to achieve this is by using choices parameter for the column
+info dictionary.
+
+Example ::
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        age = sa.Column(
+            sa.Integer,
+            info={'choices': [i for i in xrange(13, 99)]},
+            nullable=False
+        )
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+
+Here the UserForm would have two fields. One TextField for the name column and one
+SelectField for the age column containing range of choices from 13 to 99.
+
 Configuration
 -------------
 
@@ -214,7 +240,7 @@ function. In the following example we have a UserForm which uses Flask-WTF
 form as a parent form for ModelForm. ::
 
     from flask.ext.wtf import Form
-    from wtforms-alchemy import model_form_factory
+    from wtforms_alchemy import model_form_factory
 
 
     class UserForm(model_form_factory(Form)):
