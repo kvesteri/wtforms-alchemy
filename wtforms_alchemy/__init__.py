@@ -384,32 +384,35 @@ def model_form_factory(base=Form):
                 self._obj = kwargs['obj']
             super(ModelForm, self).__init__(*args, **kwargs)
 
-        def populate_one_to_one_relations(self, obj, field):
+        def init_one_to_one(self, obj, name, field):
             session = object_session(obj)
 
-            if isinstance(field, FormField):
-                if isinstance(field.form, ModelForm):
-                    old_value = getattr(obj, field.name)
+            if (isinstance(field, FormField) and
+                    isinstance(field.form, ModelForm)):
+                try:
+                    old_value = getattr(obj, name)
                     if old_value:
                         session.delete(old_value)
-                        setattr(obj, field.name, None)
+                        setattr(obj, name, None)
                     if field.data:
-                        setattr(obj, field.name, field.form.Meta.model())
+                        setattr(obj, name, field.form.Meta.model())
+                except AttributeError:
+                    pass
 
-        def populate_one_to_many_relations(self, obj, field):
+        def init_one_to_many(self, obj, name, field):
             session = object_session(obj)
 
             if isinstance(field, FieldList):
                 unbound = field.unbound_field
                 if issubclass(unbound.field_class, FormField):
                     if issubclass(unbound.args[0], ModelForm):
-                        items = getattr(obj, field.name)
+                        items = getattr(obj, name)
                         while items:
                             session.delete(items.pop())
 
                         model = unbound.args[0].Meta.model
                         for _ in xrange(len(field.entries)):
-                            getattr(obj, field.name).append(model())
+                            getattr(obj, name).append(model())
 
         def populate_obj(self, obj):
             """
@@ -420,17 +423,9 @@ def model_form_factory(base=Form):
                    name as a field will be overridden. Use with caution.
             """
             for name, field in self._fields.items():
-                self.populate_one_to_one_relations(obj, field)
-                self.populate_one_to_many_relations(obj, field)
+                self.init_one_to_one(obj, name, field)
+                self.init_one_to_many(obj, name, field)
 
-            # for name in self.types.data:
-            #     obj.types.append(PropertyType(name=name, rescue_plan=obj))
-            # self.types.data = []
-
-            # for entry in self.substances_stored.entries:
-            #     obj.substances_stored.append(
-            #         SubstanceStorage(substance=entry.substance.data)
-            #     )
             super(ModelForm, self).populate_obj(obj)
 
     return ModelForm
