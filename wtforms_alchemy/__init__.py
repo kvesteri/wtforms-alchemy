@@ -394,25 +394,28 @@ def model_form_factory(base=Form):
                     if old_value:
                         session.delete(old_value)
                         setattr(obj, name, None)
-                    if field.data:
-                        setattr(obj, name, field.form.Meta.model())
                 except AttributeError:
                     pass
+
+                if field.data:
+                    setattr(obj, name, field.form.Meta.model())
 
         def init_one_to_many(self, obj, name, field):
             session = object_session(obj)
 
             if isinstance(field, FieldList):
                 unbound = field.unbound_field
-                if issubclass(unbound.field_class, FormField):
-                    if issubclass(unbound.args[0], ModelForm):
+                if (issubclass(unbound.field_class, FormField) and
+                        issubclass(unbound.args[0], ModelForm)):
+                    try:
                         items = getattr(obj, name)
                         while items:
                             session.delete(items.pop())
-
-                        model = unbound.args[0].Meta.model
-                        for _ in xrange(len(field.entries)):
-                            getattr(obj, name).append(model())
+                    except AttributeError:
+                        pass
+                    model = unbound.args[0].Meta.model
+                    for _ in xrange(len(field.entries)):
+                        getattr(obj, name).append(model())
 
         def populate_obj(self, obj):
             """
