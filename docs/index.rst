@@ -44,8 +44,16 @@ Now the following forms are essentially the same::
         email = TextField(validators=[Required(), Length(max=255)])
 
 
-Field type conversion
----------------------------------------------
+Converting model columns to form fields
+=======================================
+
+Basic type conversion
+---------------------
+
+By default WTForms-Alchemy converts SQLAlchemy model columns using the following
+type table. So for example if an Unicode column would be converted to TextField.
+
+
 ========================    =================
  SQAlchemy column type      WTForms Field
 ------------------------    -----------------
@@ -91,8 +99,164 @@ Example ::
 Here the UserForm would have two fields. One TextField for the name column and one
 SelectField for the age column containing range of choices from 13 to 99.
 
+
+Field descriptions
+------------------
+
+Example::
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        email = sa.Column(
+            sa.Unicode(255),
+            nullable=False,
+            info={'description': 'This is the description of email.'}
+        )
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+Now the 'email' field of UserForm would have description 'This is the description of email.'
+
+
+Field labels
+------------
+
+Example::
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(
+            sa.Unicode(100), primary_key=True, nullable=False,
+            info={'label': 'Name'}
+        )
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+Now the 'name' field of UserForm would have label 'Name'.
+
+
+Default values
+--------------
+
+By default WTForms-Alchemy ModelForm assigns the default values from column definitions.
+Example ::
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        level = sa.Column(sa.Integer, default=1)
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+Now the UseForm 'level' field default value would be 1.
+
+
+Auto-assigned validators
+------------------------
+
+By default WTForms-Alchemy ModelForm assigns the following validators:
+    * DataRequired validator if your column is not nullable and has no default value
+    * NumberRange validator if column info parameter has min or max arguments defined
+    * Unique validator if column has a unique index
+    * Length validator for String/Unicode columns with max length
+
+
+Additional field validators
+---------------------------
+
+Example::
+
+    from wtforms.validators import Email
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        email = sa.Column(
+            sa.Unicode(255),
+            nullable=False,
+            info={'validators': Email()}
+        )
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+Now the 'email' field of UserForm would have Email validator.
+
+
+
+Adding/overriding fields
+------------------------
+
+Example::
+
+    from wtforms.fields import TextField, IntegerField
+    from wtforms.validators import Email
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        email = sa.Column(
+            sa.Unicode(255),
+            nullable=False
+        )
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+        email = TextField(validators=[Optional()])
+        age = IntegerField()
+
+Now the UserForm would have three fields:
+    * name, a required TextField
+    * email, an optional TextField
+    * age, IntegerField
+
+
+Form inheritance
+----------------
+
+ModelForm's configuration support inheritance. This means that child classes inherit
+parents Meta properties.
+
+Example::
+
+    from wtfroms.validators import Email
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            validators = {'email': [Email()]}
+
+
+    class UserUpdateForm(UserForm):
+        class Meta:
+            all_fields_optional = True
+
+
+Here UserUpdateForm inherits the configuration properties of UserForm, hence it would
+use model User and have additional Email validator on column 'email'.
+
+
 Configuration
--------------
+=============
+
+ModelForm meta parameters
+-------------------------
 
 The following configuration options are available for ModelForm's Meta subclass.
 
@@ -191,49 +355,6 @@ Whether or not to assign non-nullable fields as required.
 Change this if you want to use custom form generator class.
 
 
-Adding column descriptions
---------------------------
-
-Example::
-
-    class User(Base):
-        __tablename__ = 'user'
-
-        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
-        email = sa.Column(
-            sa.Unicode(255),
-            nullable=False,
-            info={'description': 'This is the description of email.'}
-        )
-
-
-
-Form inheritance
-----------------
-
-ModelForm's configuration support inheritance. This means that child classes inherit
-parents Meta properties.
-
-Example::
-
-    from wtfroms.validators import Email
-
-
-    class UserForm(ModelForm):
-        class Meta:
-            model = User
-            validators = {'email': [Email()]}
-
-
-    class UserUpdateForm(UserForm):
-        class Meta:
-            all_fields_optional = True
-
-
-Here UserUpdateForm inherits the configuration properties of UserForm, hence it would
-use model User and have additional Email validator on column 'email'.
-
-
 Custom form base class
 ----------------------
 
@@ -251,10 +372,15 @@ form as a parent form for ModelForm. ::
 
 
 Forms with relations
+====================
+
+WTForms-Alchemy undestands ModelForm relations and is smart enough to populate related
+objects accordingly.
+
+One-to-one relations
 --------------------
 
-WTForms-Alchemy undestands Form relations and is smart enough to populate related
-objects accordingly. Consider the following example. We have Event and Location
+Consider the following example. We have Event and Location
 classes with each event having one location. ::
 
     from sqlalchemy.ext.declarative import declarative_base
@@ -293,8 +419,59 @@ location too. ::
     form.populate_obj(event)
 
 
+
+One-to-many relations
+---------------------
+
+Consider the following example. We have Event and Location
+classes with each event having many location. ::
+
+    from sqlalchemy.ext.declarative import declarative_base
+    from wtforms_alchemy import ModelForm
+
+    Base = declarative_base()
+
+
+    class Event(Base):
+        __tablename__ = 'event'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255), nullable=False)
+
+
+    class Location(Base):
+        __tablename__ = 'location'
+        id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
+        name = sa.Column(sa.Unicode(255), nullable=True)
+
+        event_id = sa.Column(sa.Integer, sa.ForeignKey(Location.id))
+        event = sa.orm.relationship(
+            Location,
+            backref='locations'  # the event needs to have this
+        )
+
+
+    class LocationForm(ModelForm):
+        class Meta:
+            model = Location
+
+
+    class EventForm(ModelForm):
+        class Meta:
+            model = Event
+
+        locations = FormField(LocationForm)
+
+Now if we populate the EventForm, WTForms-Alchemy is smart enough to populate related
+locations too. ::
+
+    event = Event()
+    form = EventForm(request.POST)
+    form.populate_obj(event)
+
+
+
 API reference
--------------
+=============
 
 .. module:: wtforms_alchemy
 

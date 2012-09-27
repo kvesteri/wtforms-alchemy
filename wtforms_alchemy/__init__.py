@@ -22,6 +22,7 @@ from wtforms.validators import (
 )
 from sqlalchemy import types
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm.util import has_identity
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -390,9 +391,11 @@ def model_form_factory(base=Form):
             if (isinstance(field, FormField) and
                     isinstance(field.form, ModelForm)):
                 try:
-                    old_value = getattr(obj, name)
-                    if old_value:
-                        session.delete(old_value)
+                    item = getattr(obj, name)
+                    if item:
+                        # only delete persistent objects
+                        # if has_identity(item):
+                        session.delete(item)
                         setattr(obj, name, None)
                 except AttributeError:
                     pass
@@ -410,7 +413,10 @@ def model_form_factory(base=Form):
                     try:
                         items = getattr(obj, name)
                         while items:
-                            session.delete(items.pop())
+                            item = items.pop()
+                            # only delete persistent objects
+                            # if has_identity(item):
+                            session.delete(item)
                     except AttributeError:
                         pass
                     model = unbound.args[0].Meta.model

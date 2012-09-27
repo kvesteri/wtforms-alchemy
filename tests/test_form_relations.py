@@ -103,6 +103,26 @@ class TestOneToOneModelFormRelations(FormRelationsTestCase):
             'unknown_field-name': u'Some location',
         })
 
+    def test_only_deletes_persistent_objects(self):
+        data = {
+            'name': u'Some event',
+            'location-name': u'Some location'
+        }
+
+        event = self.Event()
+        form = self.EventForm(MultiDict(data))
+        form.validate()
+        form.populate_obj(event)
+        self.session.add(event)
+        self.session.commit()
+        event = self.session.query(self.Event).first()
+        self.session.delete(self.Location())
+        form = self.EventForm(
+            MultiDict(data), obj=event
+        )
+        form.populate_obj(event)
+        self.session.commit()
+
 
 class TestOneToManyModelFormRelations(FormRelationsTestCase):
     def create_models(self):
@@ -177,6 +197,19 @@ class TestOneToManyModelFormRelations(FormRelationsTestCase):
                 'name': u'Some event',
                 'unknown_field-0-name': u'Some location',
             })
+
+    def test_only_deletes_persistent_objects(self):
+        data = {
+            'name': u'Some event',
+            'location-0-name': u'Some location',
+        }
+
+        event = self.Event(locations=[self.Location()])
+        form = self.EventForm(MultiDict(data))
+        form.validate()
+        form.populate_obj(event)
+        self.session.add(event)
+        self.session.commit()
 
 
 class TestDeepFormRelationsOneToManyToOne(FormRelationsTestCase):
