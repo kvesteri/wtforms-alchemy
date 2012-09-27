@@ -1,3 +1,5 @@
+from pytest import raises
+
 import sqlalchemy as sa
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -61,11 +63,12 @@ class TestOneToOneModelFormRelations(FormRelationsTestCase):
         self.LocationForm = LocationForm
         self.EventForm = EventForm
 
-    def save(self):
-        data = {
-            'name': u'Some event',
-            'location-name': u'Some location',
-        }
+    def save(self, data={}):
+        if not data:
+            data = {
+                'name': u'Some event',
+                'location-name': u'Some location',
+            }
         event = self.Event()
         form = self.EventForm(MultiDict(data))
         form.validate()
@@ -95,7 +98,10 @@ class TestOneToOneModelFormRelations(FormRelationsTestCase):
             unknown_field = FormField(self.LocationForm)
 
         self.EventForm = EventForm
-        self.save()
+        self.save({
+            'name': u'Some event',
+            'unknown_field-name': u'Some location',
+        })
 
 
 class TestOneToManyModelFormRelations(FormRelationsTestCase):
@@ -130,11 +136,12 @@ class TestOneToManyModelFormRelations(FormRelationsTestCase):
         self.LocationForm = LocationForm
         self.EventForm = EventForm
 
-    def save(self):
-        data = {
-            'name': u'Some event',
-            'locations-0-name': u'Some location',
-        }
+    def save(self, data={}):
+        if not data:
+            data = {
+                'name': u'Some event',
+                'locations-0-name': u'Some location',
+            }
         event = self.Event()
         form = self.EventForm(MultiDict(data))
         form.validate()
@@ -164,7 +171,12 @@ class TestOneToManyModelFormRelations(FormRelationsTestCase):
             unknown_field = FieldList(FormField(self.LocationForm))
 
         self.EventForm = EventForm
-        self.save()
+
+        with raises(TypeError):
+            self.save({
+                'name': u'Some event',
+                'unknown_field-0-name': u'Some location',
+            })
 
 
 class TestDeepFormRelationsOneToManyToOne(FormRelationsTestCase):

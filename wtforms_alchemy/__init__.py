@@ -415,7 +415,10 @@ def model_form_factory(base=Form):
                         pass
                     model = unbound.args[0].Meta.model
                     for _ in xrange(len(field.entries)):
-                        getattr(obj, name).append(model())
+                        try:
+                            getattr(obj, name).append(model())
+                        except AttributeError:
+                            pass
 
         def populate_obj(self, obj):
             """
