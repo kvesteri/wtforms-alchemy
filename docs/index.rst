@@ -71,6 +71,8 @@ Probably the easiest way to achieve this is by using choices parameter for the c
 info dictionary.
 
 Example ::
+
+
     class User(Base):
         __tablename__ = 'user'
 
@@ -246,6 +248,49 @@ form as a parent form for ModelForm. ::
     class UserForm(model_form_factory(Form)):
         class Meta:
             model = User
+
+
+Forms with relations
+--------------------
+
+WTForms-Alchemy undestands Form relations and is smart enough to populate related
+objects accordingly. Consider the following example. We have Event and Location
+classes with each event having one location. ::
+
+    from sqlalchemy.ext.declarative import declarative_base
+    from wtforms_alchemy import ModelForm
+
+    Base = declarative_base()
+
+
+    class Location(Base):
+        __tablename__ = 'location'
+        id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
+        name = sa.Column(sa.Unicode(255), nullable=True)
+
+    class Event(Base):
+        __tablename__ = 'event'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255), nullable=False)
+        location_id = sa.Column(sa.Integer, sa.ForeignKey(Location.id))
+        location = sa.orm.relationship(Location)
+
+    class LocationForm(ModelForm):
+        class Meta:
+            model = Location
+
+    class EventForm(ModelForm):
+        class Meta:
+            model = Event
+
+        location = FormField(LocationForm)
+
+Now if we populate the EventForm, WTForms-Alchemy is smart enough to populate related
+location too. ::
+
+    event = Event()
+    form = EventForm(request.POST)
+    form.populate_obj(event)
 
 
 API reference

@@ -11,6 +11,7 @@ from wtforms import (
     TextField,
     SelectField as _SelectField,
 )
+from wtforms.fields import FormField, FieldList
 from wtforms.form import FormMeta
 from wtforms.validators import (
     Length,
@@ -20,6 +21,7 @@ from wtforms.validators import (
     ValidationError
 )
 from sqlalchemy import types
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -381,6 +383,55 @@ def model_form_factory(base=Form):
             if 'obj' in kwargs:
                 self._obj = kwargs['obj']
             super(ModelForm, self).__init__(*args, **kwargs)
+
+        def populate_one_to_one_relations(self, obj, field):
+            session = object_session(obj)
+
+            if isinstance(field, FormField):
+                if isinstance(field.form, ModelForm):
+                    old_value = getattr(obj, field.name)
+                    if old_value:
+                        session.delete(old_value)
+                        setattr(obj, field.name, None)
+                    if field.data:
+                        setattr(obj, field.name, field.form.Meta.model())
+
+        def populate_one_to_many_relations(self, obj, field):
+            session = object_session(obj)
+
+            if isinstance(field, FieldList):
+                unbound = field.unbound_field
+                if issubclass(unbound.field_class, FormField):
+                    if issubclass(unbound.args[0], ModelForm):
+                        items = getattr(obj, field.name)
+                        while items:
+                            session.delete(items.pop())
+
+                        model = unbound.args[0].Meta.model
+                        for _ in xrange(len(field.entries)):
+                            getattr(obj, field.name).append(model())
+
+        def populate_obj(self, obj):
+            """
+            Populates the attributes of the passed `obj` with data from the
+            form's fields.
+
+            :note: This is a destructive operation; Any attribute with the same
+                   name as a field will be overridden. Use with caution.
+            """
+            for name, field in self._fields.items():
+                self.populate_one_to_one_relations(obj, field)
+                self.populate_one_to_many_relations(obj, field)
+
+            # for name in self.types.data:
+            #     obj.types.append(PropertyType(name=name, rescue_plan=obj))
+            # self.types.data = []
+
+            # for entry in self.substances_stored.entries:
+            #     obj.substances_stored.append(
+            #         SubstanceStorage(substance=entry.substance.data)
+            #     )
+            super(ModelForm, self).populate_obj(obj)
 
     return ModelForm
 
