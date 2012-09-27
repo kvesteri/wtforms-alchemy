@@ -71,6 +71,14 @@ type table. So for example if an Unicode column would be converted to TextField.
     UnicodeText             TextAreaField
 ========================    =================
 
+Excluded fields
+---------------
+By default WTForms-Alchemy excludes a column from the ModelForm if one of the following conditions is True:
+    * Column is primary key
+    * Column is foreign key
+    * Column is DateTime field which has default value (usually this is a generated value)
+    * Column is set as model inheritance discriminator field
+
 Using choices parameter
 -----------------------
 
@@ -308,6 +316,15 @@ Foreign keys can be included in the form by setting include_foreign_keys to True
 
 When setting this option to True, only fields that have an index will be included in
 the form. This is very useful when creating forms for searching a specific model.
+
+
+**include_datetimes_with_default** (default: False)
+
+When setting this option to True, datetime with default values will be included in the
+form. By default this is False since usually datetime fields that have default values
+are generated columns such as "created_at" or "updated_at", which should not be included
+in the form.
+
 
 **validators**
 
