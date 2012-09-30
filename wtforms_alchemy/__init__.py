@@ -194,10 +194,11 @@ class FormGenerator(object):
             else:
                 if not column.nullable:
                     kwargs['default'] = self.meta.default
-
-                if (not column.nullable and self.meta.assign_required and not
-                        isinstance(column.type, types.Boolean)):
-                    validators.append(DataRequired())
+                    if (self.meta.assign_required and not
+                            isinstance(column.type, types.Boolean)):
+                        validators.append(DataRequired())
+                else:
+                    validators.append(Optional())
 
         validators.extend(self.create_validators(column))
         kwargs['validators'] = validators

@@ -27,6 +27,10 @@ class TestAutoAssignedValidators(ModelFormTestCase):
         self.init(sa.Boolean, nullable=False)
         self.assert_not_required('test_column')
 
-    def test_non_nullable_fields_with_defaults_are_not_required(self):
+    def test_not_nullable_fields_with_defaults_are_not_required(self):
         self.init(nullable=False, default=u'default')
         self.assert_not_required('test_column')
+
+    def test_assigns_not_nullable_integers_as_optional(self):
+        self.init(sa.Integer, nullable=True)
+        self.assert_optional('test_column')
