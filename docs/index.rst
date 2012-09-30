@@ -32,16 +32,23 @@ Lets say we have a model called User with couple of fields::
         email = sa.Column(sa.Unicode(255), nullable=False)
 
 
-Now the following forms are essentially the same::
+Now we can create our first ModelForm for the User model. ModelForm behaves almost
+like your ordinary WTForms Form except it accepts special Meta arguments. Every ModelForm
+must define model parameter in the Meta arguments.::
 
     class UserForm(ModelForm):
         class Meta:
             model = User
 
 
+Now this ModelForm is essentially the same as:
+
     class User(Form):
-        name = TextField(validators=[Required(), Length(max=100)])
-        email = TextField(validators=[Required(), Length(max=255)])
+        name = TextField(validators=[DataRequired(), Length(max=100)])
+        email = TextField(validators=[DataRequired(), Length(max=255)])
+
+In the following chapters you'll learn how WTForms-Alchemy converts SQLAlchemy model
+columns to form fields.
 
 
 Converting model columns to form fields
@@ -257,7 +264,8 @@ Example::
 
 
 Here UserUpdateForm inherits the configuration properties of UserForm, hence it would
-use model User and have additional Email validator on column 'email'.
+use model User and have additional Email validator on column 'email'. Also it assigns
+all fields as optional.
 
 
 Configuration

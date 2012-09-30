@@ -14,10 +14,10 @@ from wtforms import (
 from wtforms.fields import FormField, FieldList
 from wtforms.form import FormMeta
 from wtforms.validators import (
+    DataRequired,
     Length,
-    Optional,
     NumberRange,
-    Required,
+    Optional,
     ValidationError
 )
 from sqlalchemy import types
@@ -195,8 +195,9 @@ class FormGenerator(object):
                 if not column.nullable:
                     kwargs['default'] = self.meta.default
 
-                if not column.nullable and self.meta.assign_required:
-                    validators.append(Required())
+                if (not column.nullable and self.meta.assign_required and not
+                        isinstance(column.type, types.Boolean)):
+                    validators.append(DataRequired())
 
         validators.extend(self.create_validators(column))
         kwargs['validators'] = validators
