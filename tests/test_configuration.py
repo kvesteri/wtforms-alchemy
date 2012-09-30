@@ -1,7 +1,8 @@
 import sqlalchemy as sa
+from wtforms import Form
 from wtforms.fields import IntegerField
 from wtforms.validators import Email
-from wtforms_alchemy import ModelForm
+from wtforms_alchemy import ModelForm, model_form_factory
 from tests import ModelFormTestCase
 
 
@@ -89,3 +90,43 @@ class TestModelFormConfiguration(ModelFormTestCase):
 
         self.form_class = ModelTestForm
         self.assert_has_validator('test_column', Email)
+
+    def test_inherits_config_params_from_parent_meta(self):
+        self.init()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+                only = ['test_column']
+
+        class AnotherModelTestForm(ModelTestForm):
+            class Meta:
+                pass
+
+        assert AnotherModelTestForm.Meta.only == ['test_column']
+
+    def test_child_classes_override_parents_config_params(self):
+        self.init()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+                only = ['test_column']
+
+        class AnotherModelTestForm(ModelTestForm):
+            class Meta:
+                only = []
+
+        assert AnotherModelTestForm.Meta.only == []
+
+    def test_supports_custom_base_class_with_model_form_factory(self):
+        self.init()
+
+        class SomeForm(Form):
+            pass
+
+        class TestCustomBase(model_form_factory(SomeForm)):
+            class Meta:
+                model = self.ModelTest
+
+        assert isinstance(TestCustomBase(), SomeForm)
