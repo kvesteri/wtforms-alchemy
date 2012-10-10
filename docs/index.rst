@@ -399,7 +399,8 @@ form as a parent form for ModelForm. ::
 Forms with relations
 ====================
 
-WTForms-Alchemy undestands ModelForm relations and is smart enough to populate related
+WTForms-Alchemy provides special Field subtypes ModelFormField and ModelFieldList.
+When using these types WTForms-Alchemy undestands model relations and is smart enough to populate related
 objects accordingly.
 
 One-to-one relations
@@ -409,7 +410,7 @@ Consider the following example. We have Event and Location
 classes with each event having one location. ::
 
     from sqlalchemy.ext.declarative import declarative_base
-    from wtforms_alchemy import ModelForm
+    from wtforms_alchemy import ModelForm, ModelFormField
 
     Base = declarative_base()
 
@@ -434,7 +435,7 @@ classes with each event having one location. ::
         class Meta:
             model = Event
 
-        location = FormField(LocationForm)
+        location = ModelFormField(LocationForm)
 
 Now if we populate the EventForm, WTForms-Alchemy is smart enough to populate related
 location too. ::
@@ -449,10 +450,12 @@ One-to-many relations
 ---------------------
 
 Consider the following example. We have Event and Location
-classes with each event having many location. ::
+classes with each event having many location. Notice we are using FormField along
+with ModelFieldList. ::
 
     from sqlalchemy.ext.declarative import declarative_base
-    from wtforms_alchemy import ModelForm
+    from wtforms_alchemy import ModelForm, ModelFieldList
+    from wtforms.fields import FormField
 
     Base = declarative_base()
 
@@ -484,7 +487,7 @@ classes with each event having many location. ::
         class Meta:
             model = Event
 
-        locations = FormField(LocationForm)
+        locations = ModelFieldList(FormField(LocationForm))
 
 Now if we populate the EventForm, WTForms-Alchemy is smart enough to populate related
 locations too. ::

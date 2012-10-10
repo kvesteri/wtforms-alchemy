@@ -387,73 +387,55 @@ def model_form_factory(base=Form):
                 self._obj = kwargs['obj']
             super(ModelForm, self).__init__(*args, **kwargs)
 
-        def session(self, obj):
-            session = object_session(obj)
-            if not session:
-                raise Exception(
-                    'Object %s is not bound the session. Use session.add() to '
-                    'add this object into session.' % str(obj)
-                )
-            return session
-
-        def init_one_to_one(self, obj, name, field):
-            if (not isinstance(field, FormField) or not
-                    isinstance(field.form, ModelForm)):
-                return False
-
-            session = self.session(obj)
-
-            item = getattr(obj, name, None)
-            if item:
-                # only delete persistent objects
-                if has_identity(item):
-                    session.delete(item)
-                    setattr(obj, name, None)
-
-            if field.data:
-                setattr(obj, name, field.form.Meta.model())
-            return True
-
-        def init_one_to_many(self, obj, name, field):
-            if not isinstance(field, FieldList):
-                return False
-
-            unbound = field.unbound_field
-            if (not issubclass(unbound.field_class, FormField) or not
-                    issubclass(unbound.args[0], ModelForm)):
-                return False
-
-            session = self.session(obj)
-            items = getattr(obj, name, set([]))
-            while items:
-                item = items.pop()
-                # only delete persistent objects
-                if has_identity(item):
-                    session.delete(item)
-
-            model = unbound.args[0].Meta.model
-            for _ in xrange(len(field.entries)):
-                try:
-                    getattr(obj, name).append(model())
-                except AttributeError:
-                    pass
-            return True
-
-        def populate_obj(self, obj):
-            """
-            Populates the attributes of the passed `obj` with data from the
-            form's fields.
-
-            :note: This is a destructive operation; Any attribute with the same
-                   name as a field will be overridden. Use with caution.
-            """
-            for name, field in self._fields.items():
-                self.init_one_to_one(obj, name, field)
-                self.init_one_to_many(obj, name, field)
-
-            super(ModelForm, self).populate_obj(obj)
-
     return ModelForm
+
+
+def session(obj):
+    session = object_session(obj)
+    if not session:
+        raise Exception(
+            'Object %s is not bound the session. Use session.add() to '
+            'add this object into session.' % str(obj)
+        )
+    return session
+
+
+class ModelFormField(FormField):
+    def populate_obj(self, obj, name):
+        sess = session(obj)
+
+        item = getattr(obj, name, None)
+        if item:
+            # only delete persistent objects
+            if has_identity(item):
+                sess.delete(item)
+            else:
+                sess.expunge(item)
+            setattr(obj, name, None)
+
+        if self.data:
+            setattr(obj, name, self.form.Meta.model())
+
+        FormField.populate_obj(self, obj, name)
+
+
+class ModelFieldList(FieldList):
+    def populate_obj(self, obj, name):
+        sess = session(obj)
+        items = getattr(obj, name, set([]))
+        while items:
+            item = items.pop()
+            # only delete persistent objects
+            if has_identity(item):
+                sess.delete(item)
+
+        model = self.unbound_field.args[0].Meta.model
+        for _ in xrange(len(self.entries)):
+            try:
+                getattr(obj, name).append(model())
+            except AttributeError:
+                pass
+        FieldList.populate_obj(self, obj, name)
 
 
 ModelForm = model_form_factory(Form)

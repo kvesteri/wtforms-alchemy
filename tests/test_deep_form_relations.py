@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from wtforms_alchemy import ModelForm
+from wtforms_alchemy import ModelForm, ModelFormField, ModelFieldList
 from wtforms.fields import FormField, FieldList
 from tests import FormRelationsTestCase, MultiDict
 
@@ -40,13 +40,13 @@ class TestDeepFormRelationsOneToManyToOne(FormRelationsTestCase):
             class Meta:
                 model = self.Location
 
-            address = FormField(AddressForm)
+            address = ModelFormField(AddressForm)
 
         class EventForm(ModelForm):
             class Meta:
                 model = self.Event
 
-            locations = FieldList(FormField(LocationForm))
+            locations = ModelFieldList(FormField(LocationForm))
 
         self.LocationForm = LocationForm
         self.EventForm = EventForm
@@ -116,13 +116,13 @@ class TestDeepFormRelationsOneToOneToMany(FormRelationsTestCase):
             class Meta:
                 model = self.Location
 
-            addresses = FieldList(FormField(AddressForm))
+            addresses = ModelFieldList(FormField(AddressForm))
 
         class EventForm(ModelForm):
             class Meta:
                 model = self.Event
 
-            location = FormField(LocationForm)
+            location = ModelFormField(LocationForm)
 
         self.LocationForm = LocationForm
         self.EventForm = EventForm

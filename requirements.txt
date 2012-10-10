@@ -1,3 +1,2 @@
 WTForms==1.0.1
-pysqlite==2.6.3
 SQLAlchemy==0.7.8
