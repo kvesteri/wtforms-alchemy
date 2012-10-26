@@ -15,6 +15,26 @@ your form, because you’ve already defined the fields in your model.
 WTForms-Alchemy provides a helper class that let you create a Form class from a
 SQLAlchemy model.
 
+Differences with wtforms.ext.sqlalchemy model_form
+--------------------------------------------------
+
+WTForms-Alchemy does not try to replace all the functionality of wtforms.ext.sqlalchemy.
+It only tries to replace the model_form function of wtforms.ext.sqlalchemy by a much better solution.
+Other functionality of .ext.sqlalchemy such as QuerySelectField and QuerySelectMultipleField can be used
+along with WTForms-Alchemy.
+
+Now how is WTForms-Alchemy ModelForm better than wtforms.ext.sqlachemy's model_form?
+
+* Provides explicit declaration of ModelForms (much easier to override certain columns)
+* Form generation supports Unique and NumberRange validators
+* Form inheritance support (along with form configuration inheritance)
+* Supports ModelForm model relations population
+* Smarter field exclusion
+* Smarter field conversion
+* Understands join table inheritance
+* Better configuration
+
+
 QuickStart
 ----------
 
