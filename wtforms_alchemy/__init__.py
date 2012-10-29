@@ -402,16 +402,16 @@ def session(obj):
 
 class ModelFormField(FormField):
     def populate_obj(self, obj, name):
-        sess = session(obj)
-
-        item = getattr(obj, name, None)
-        if item:
-            # only delete persistent objects
-            if has_identity(item):
-                sess.delete(item)
-            else:
-                sess.expunge(item)
-            setattr(obj, name, None)
+        if has_identity(obj):
+            sess = session(obj)
+            item = getattr(obj, name, None)
+            if item:
+                # only delete persistent objects
+                if has_identity(item):
+                    sess.delete(item)
+                else:
+                    sess.expunge(item)
+                setattr(obj, name, None)
 
         if self.data:
             setattr(obj, name, self.form.Meta.model())
@@ -421,13 +421,14 @@ class ModelFormField(FormField):
 
 class ModelFieldList(FieldList):
     def populate_obj(self, obj, name):
-        sess = session(obj)
-        items = getattr(obj, name, set([]))
-        while items:
-            item = items.pop()
-            # only delete persistent objects
-            if has_identity(item):
-                sess.delete(item)
+        if has_identity(obj):
+            sess = session(obj)
+            items = getattr(obj, name, set([]))
+            while items:
+                item = items.pop()
+                # only delete persistent objects
+                if has_identity(item):
+                    sess.delete(item)
 
         model = self.unbound_field.args[0].Meta.model
         for _ in xrange(len(self.entries)):
