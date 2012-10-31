@@ -68,7 +68,7 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     def test_column_with_choices_converts_to_select_field(self):
         choices = [(u'1', '1'), (u'2', '2')]
-        self.init(info={'choices': choices})
+        self.init(type_=sa.Integer, info={'choices': choices})
         self.assert_type('test_column', SelectField)
         form = self.form_class()
         assert form.test_column.choices == choices

@@ -28,6 +28,9 @@ Now how is WTForms-Alchemy ModelForm better than wtforms.ext.sqlachemy's model_f
 * Provides explicit declaration of ModelForms (much easier to override certain columns)
 * Form generation supports Unique and NumberRange validators
 * Form inheritance support (along with form configuration inheritance)
+* Automatic SelectField type coercing based on underlying column type
+* Provides special SelectField that understands None values
+* Provides better Unique validator
 * Supports ModelForm model relations population
 * Smarter field exclusion
 * Smarter field conversion
@@ -61,7 +64,7 @@ must define model parameter in the Meta arguments.::
             model = User
 
 
-Now this ModelForm is essentially the same as:
+Now this ModelForm is essentially the same as ::
 
     class User(Form):
         name = TextField(validators=[DataRequired(), Length(max=100)])
@@ -106,8 +109,8 @@ By default WTForms-Alchemy excludes a column from the ModelForm if one of the fo
     * Column is DateTime field which has default value (usually this is a generated value)
     * Column is set as model inheritance discriminator field
 
-Using choices parameter
------------------------
+Forcing the use of SelectField
+------------------------------
 
 Sometimes you may want to have integer and unicode fields convert to SelectFields.
 Probably the easiest way to achieve this is by using choices parameter for the column
@@ -122,7 +125,7 @@ Example ::
         name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
         age = sa.Column(
             sa.Integer,
-            info={'choices': [i for i in xrange(13, 99)]},
+            info={'choices': [(i, i) for i in xrange(13, 99)]},
             nullable=False
         )
 
@@ -133,6 +136,17 @@ Example ::
 
 Here the UserForm would have two fields. One TextField for the name column and one
 SelectField for the age column containing range of choices from 13 to 99.
+
+Notice that WTForms-Alchemy is smart enough to use the right coerce function based on
+the underlying column type, hence in the previous example the age column would convert
+to the following SelectField. ::
+
+
+    SelectField('Age', coerce=int, choices=[(i, i) for i in xrange(13, 99)])
+
+
+For nullable unicode and string columns WTForms-Alchemy uses special null_or_unicode
+coerce function, which converts empty strings to None values.
 
 
 Field descriptions

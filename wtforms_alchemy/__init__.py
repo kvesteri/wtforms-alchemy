@@ -1,4 +1,5 @@
 #import pytz
+from decimal import Decimal
 from wtforms import (
     BooleanField,
     DateField,
@@ -76,6 +77,13 @@ def null_or_unicode(value):
     return unicode(value) or None
 
 
+def null_or_int(value):
+    try:
+        return int(value)
+    except TypeError:
+        return None
+
+
 class SelectField(_SelectField):
     def pre_validate(self, form):
         if self.data is None and u'' in [v[0] for v in self.choices]:
@@ -102,6 +110,17 @@ class FormGenerator(object):
         types.Numeric: DecimalField,
         types.Boolean: BooleanField,
         types.Enum: SelectField,
+    }
+
+    COERCE_TYPE_MAP = {
+        types.BigInteger: int,
+        types.SmallInteger: int,
+        types.Integer: int,
+        types.Text: str,
+        types.Unicode: unicode,
+        types.UnicodeText: unicode,
+        types.Float: float,
+        types.Numeric: Decimal,
     }
 
     def __init__(self, model_class, meta):
@@ -218,15 +237,7 @@ class FormGenerator(object):
             validators.append(NumberRange(min=min_, max=max_))
 
         if hasattr(column.type, 'enums') or 'choices' in column.info:
-            if column.nullable:
-                kwargs['coerce'] = null_or_unicode
-
-            if 'choices' in column.info and column.info['choices']:
-                kwargs['choices'] = column.info['choices']
-            else:
-                kwargs['choices'] = [
-                    (enum, enum) for enum in column.type.enums
-                ]
+            kwargs = self.select_field_kwargs(column, kwargs)
 
         if isinstance(column.type, types.DateTime):
             kwargs['format'] = self.meta.datetime_format
@@ -236,7 +247,32 @@ class FormGenerator(object):
 
         return field_class(**kwargs)
 
+    def select_field_kwargs(self, column, kwargs):
+        """
+        Create key value args for SelectField based on SQLAlchemy column
+        definitions.
+        """
+        kwargs['coerce'] = null_or_unicode
+        for type_ in self.COERCE_TYPE_MAP:
+            if isinstance(column.type, type_):
+                kwargs['coerce'] = (
+                    self.COERCE_TYPE_MAP[column.type.__class__]
+                )
+                if column.nullable and kwargs['coerce'] in (unicode, str):
+                    kwargs['coerce'] = null_or_unicode
+
+        if 'choices' in column.info and column.info['choices']:
+            kwargs['choices'] = column.info['choices']
+        else:
+            kwargs['choices'] = [
+                (enum, enum) for enum in column.type.enums
+            ]
+        return kwargs
+
     def create_validators(self, column):
+        """
+        Create validators for given column
+        """
         validators = []
         validator = self.length_validator(column)
         if validator:
