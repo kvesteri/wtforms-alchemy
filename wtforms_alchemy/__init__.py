@@ -106,6 +106,7 @@ class FormGenerator(object):
         types.Text: TextAreaField,
         types.Unicode: TextField,
         types.UnicodeText: TextAreaField,
+        types.String: TextField,
         types.Float: FloatField,
         types.Numeric: DecimalField,
         types.Boolean: BooleanField,
@@ -119,6 +120,7 @@ class FormGenerator(object):
         types.Text: str,
         types.Unicode: unicode,
         types.UnicodeText: unicode,
+        types.String: str,
         types.Float: float,
         types.Numeric: Decimal,
     }
@@ -253,11 +255,9 @@ class FormGenerator(object):
         definitions.
         """
         kwargs['coerce'] = null_or_unicode
-        for type_ in self.COERCE_TYPE_MAP:
+        for type_, coerce_func in self.COERCE_TYPE_MAP.items():
             if isinstance(column.type, type_):
-                kwargs['coerce'] = (
-                    self.COERCE_TYPE_MAP[column.type.__class__]
-                )
+                kwargs['coerce'] = coerce_func
                 if column.nullable and kwargs['coerce'] in (unicode, str):
                     kwargs['coerce'] = null_or_unicode
 

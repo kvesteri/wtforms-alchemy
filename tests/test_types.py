@@ -18,6 +18,10 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init()
         self.assert_type('test_column', TextField)
 
+    def test_string_converts_to_text_field(self):
+        self.init(type_=sa.String)
+        self.assert_type('test_column', TextField)
+
     def test_integer_converts_to_integer_field(self):
         self.init(type_=sa.Integer)
         self.assert_type('test_column', IntegerField)
