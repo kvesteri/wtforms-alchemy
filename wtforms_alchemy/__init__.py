@@ -460,7 +460,7 @@ class ModelFormField(FormField):
 
 
 class ModelFieldList(FieldList):
-    def pre_append_object(self, obj, name):
+    def pre_append_object(self, obj, name, counter):
         pass
 
     def delete_existing(self, obj, name):
@@ -477,9 +477,9 @@ class ModelFieldList(FieldList):
         self.delete_existing(obj, name)
 
         model = self.unbound_field.args[0].Meta.model
-        for _ in xrange(len(self.entries)):
+        for counter in xrange(len(self.entries)):
             try:
-                self.pre_append_object(obj, name)
+                self.pre_append_object(obj, name, counter)
                 try:
                     getattr(obj, name).append(model())
                 except AttributeError:
