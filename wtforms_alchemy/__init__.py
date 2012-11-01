@@ -436,6 +436,10 @@ def session(obj):
     return session
 
 
+class SkipOperation(Exception):
+    pass
+
+
 class ModelFormField(FormField):
     def populate_obj(self, obj, name):
         if has_identity(obj):
@@ -456,7 +460,10 @@ class ModelFormField(FormField):
 
 
 class ModelFieldList(FieldList):
-    def populate_obj(self, obj, name):
+    def pre_append_object(self, obj, name):
+        pass
+
+    def delete_existing(self, obj, name):
         if has_identity(obj):
             sess = session(obj)
             items = getattr(obj, name, set([]))
@@ -466,11 +473,18 @@ class ModelFieldList(FieldList):
                 if has_identity(item):
                     sess.delete(item)
 
+    def populate_obj(self, obj, name):
+        self.delete_existing(obj, name)
+
         model = self.unbound_field.args[0].Meta.model
         for _ in xrange(len(self.entries)):
             try:
-                getattr(obj, name).append(model())
-            except AttributeError:
+                self.pre_append_object(obj, name)
+                try:
+                    getattr(obj, name).append(model())
+                except AttributeError:
+                    pass
+            except SkipOperation:
                 pass
         FieldList.populate_obj(self, obj, name)
 
