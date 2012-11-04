@@ -18,6 +18,8 @@ class ModelFormTestCase(FormTestCase):
 
     def teardown_method(self, method):
         self.engine.dispose()
+        self.ModelTest = None
+        self.form_class = None
 
     def init(self, type_=sa.Unicode(255), **kwargs):
         kwargs.setdefault('nullable', False)

@@ -26,6 +26,7 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm.util import has_identity
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.exc import NoResultFound
+from .fields import SelectField
 
 
 class Unique(object):
@@ -82,14 +83,6 @@ def null_or_int(value):
         return int(value)
     except TypeError:
         return None
-
-
-class SelectField(_SelectField):
-    def pre_validate(self, form):
-        if self.data is None and u'' in [v[0] for v in self.choices]:
-            return True
-
-        _SelectField.pre_validate(self, form)
 
 
 class UnknownTypeException(Exception):
