@@ -29,7 +29,8 @@ Now how is WTForms-Alchemy ModelForm better than wtforms.ext.sqlachemy's model_f
 * Form generation supports Unique and NumberRange validators
 * Form inheritance support (along with form configuration inheritance)
 * Automatic SelectField type coercing based on underlying column type
-* Provides special SelectField that understands None values
+* Provides special SelectField that understands None values. This SelectField also renders
+nested datastructures as optgroups
 * Provides better Unique validator
 * Supports ModelForm model relations population
 * Smarter field exclusion
@@ -90,7 +91,7 @@ type table. So for example if an Unicode column would be converted to TextField.
     BigInteger              IntegerField
     Date                    DateField
     DateTime                DateTimeField
-    Enum                    SelectField
+    Enum                    wtforms_alchemy.fields.SelectField
     Float                   FloatField
     Integer                 IntegerField
     Integer                 IntegerField
