@@ -25,44 +25,27 @@ from sqlalchemy import types
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.util import has_identity
 from sqlalchemy.orm.properties import ColumnProperty
-from .fields import SelectField
+from .fields import SelectField, SelectMultipleField
 from .validators import DateRange, Unique
+from .utils import (
+    is_date_column,
+    is_integer_column,
+    is_scalar,
+    null_or_int,
+    null_or_unicode,
+)
 
 
 __all__ = (
     DateRange,
-    Unique
+    SelectMultipleField,
+    Unique,
+    is_date_column,
+    is_integer_column,
+    is_scalar,
+    null_or_int,
+    null_or_unicode,
 )
-
-
-def is_scalar(value):
-    return isinstance(value, (type(None), str, int, float, bool, unicode))
-
-
-def null_or_unicode(value):
-    return unicode(value) or None
-
-
-def null_or_int(value):
-    try:
-        return int(value)
-    except TypeError:
-        return None
-
-
-def is_integer_column(column):
-    return (
-        isinstance(column.type, types.Integer) or
-        isinstance(column.type, types.SmallInteger) or
-        isinstance(column.type, types.BigInteger)
-    )
-
-
-def is_date_column(column):
-    return (
-        isinstance(column.type, types.Date) or
-        isinstance(column.type, types.DateTime)
-    )
 
 
 class UnknownTypeException(Exception):

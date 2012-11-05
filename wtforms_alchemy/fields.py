@@ -70,6 +70,17 @@ class SelectField(_SelectField):
         for value, label in self.choices:
             yield (value, label, (self.coerce, self.data))
 
+    @property
+    def choice_values(self):
+        values = []
+        for value, label in self.choices:
+            if isinstance(label, (list, tuple)):
+                for subvalue, sublabel in label:
+                    values.append(subvalue)
+            else:
+                values.append(value)
+        return values
+
     def pre_validate(self, form, choices=None):
         """
         Don't forget to validate also values from embedded lists.
@@ -93,3 +104,41 @@ class SelectField(_SelectField):
             return False
 
         raise ValidationError(self.gettext(u'Not a valid choice'))
+
+
+class SelectMultipleField(SelectField):
+    """
+    No different from a normal select field, except this one can take (and
+    validate) multiple choices.  You'll need to specify the HTML `rows`
+    attribute to the select field when rendering.
+    """
+    widget = SelectWidget(multiple=True)
+
+    def process_data(self, value):
+        try:
+            self.data = list(self.coerce(v) for v in value)
+        except (ValueError, TypeError):
+            self.data = None
+
+    def process_formdata(self, valuelist):
+        try:
+            self.data = list(self.coerce(x) for x in valuelist)
+        except ValueError:
+            raise ValueError(
+                self.gettext(
+                    'Invalid choice(s): one or more data'
+                    ' inputs could not be coerced'
+                )
+            )
+
+    def pre_validate(self, form):
+        if self.data:
+            values = self.choice_values
+            for value in self.data:
+                if value not in values:
+                    raise ValueError(
+                        self.gettext(
+                            "'%(value)s' is not a valid"
+                            " choice for this field"
+                        ) % dict(value=value)
+                    )
