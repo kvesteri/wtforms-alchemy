@@ -4,6 +4,10 @@ from wtforms import Form
 from werkzeug.datastructures import MultiDict
 
 
+class Dummy(object):
+    fruits = []
+
+
 class TestSelectMultipleField(FormTestCase):
     choices = (
         ('Fruits', (
@@ -38,3 +42,16 @@ class TestSelectMultipleField(FormTestCase):
         assert form.errors == {
             'fruits': [u"'invalid' is not a valid choice for this field"]
         }
+
+    def test_option_selected(self):
+        form_class = self.init_form(choices=self.choices)
+
+        obj = Dummy()
+        obj.fruits = ['peach']
+        form = form_class(
+            obj=obj
+        )
+        assert (
+            '<option selected="selected" value="peach">Peach</option>' in
+            str(form.fruits)
+        )

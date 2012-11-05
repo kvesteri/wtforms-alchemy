@@ -27,7 +27,10 @@ class SelectWidget(BaseSelectWidget):
             data = (escape(unicode(value)), u'\n'.join(children))
         else:
             coerce_func, data = mixed
-            selected = coerce_func(value) == data
+            if isinstance(data, list) or isinstance(data, tuple):
+                selected = coerce_func(value) in data
+            else:
+                selected = coerce_func(value) == data
 
             options = {'value': value}
 
@@ -113,6 +116,14 @@ class SelectMultipleField(SelectField):
     attribute to the select field when rendering.
     """
     widget = SelectWidget(multiple=True)
+
+    # def iter_choices(self):
+    #     """
+    #     We should update how choices are iter to make sure that value from
+    #     internal list or tuple should be selected.
+    #     """
+    #     for value, label in self.choices:
+    #         yield (value, label, (self.coerce, self.data))
 
     def process_data(self, value):
         try:
