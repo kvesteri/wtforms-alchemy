@@ -75,6 +75,26 @@ In the following chapters you'll learn how WTForms-Alchemy converts SQLAlchemy m
 columns to form fields.
 
 
+Custom fields and validators
+============================
+
+While the main purpose of WTForms-Alchemy is to provide a bridge between SQLAlchemy
+models and WTForms forms. It also provides some additional fields and validators missing
+from WTForms.
+
+wtforms_alchemy.fields.SelectField
+----------------------------------
+
+This SelectField provides support for optgroups.
+
+
+wtforms_alchemy.validators.DateRange
+----------------------------------
+
+The DateRange validator is essentially the same as wtforms.validators.NumberRange validator but validates
+dates.
+
+
 Converting model columns to form fields
 =======================================
 

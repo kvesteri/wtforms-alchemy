@@ -25,49 +25,14 @@ from sqlalchemy import types
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.util import has_identity
 from sqlalchemy.orm.properties import ColumnProperty
-from sqlalchemy.orm.exc import NoResultFound
 from .fields import SelectField
+from .validators import DateRange, Unique
 
 
-class Unique(object):
-    """Checks field value unicity against specified table field.
-
-    Currently only supports Flask-SQLAlchemy style models which have the query
-    class.
-
-    We must require models to have query class so that unique validators can be
-    generated without the need of explicitly setting the SQLAlchemy session.
-
-    :param model:
-        The model to check unicity against.
-    :param column:
-        The unique column.
-    :param message:
-        The error message.
-    """
-    field_flags = ('unique', )
-
-    def __init__(self, model, column, message=None):
-        self.model = model
-        self.column = column
-        self.message = message
-
-        if not hasattr(self.model, 'query'):
-            raise Exception('Model classes must have query class.')
-
-    def __call__(self, form, field):
-        try:
-            obj = (
-                self.model.query
-                .filter(self.column == field.data).one()
-            )
-
-            if not hasattr(form, '_obj') or not form._obj == obj:
-                if self.message is None:
-                    self.message = field.gettext(u'Already exists.')
-                raise ValidationError(self.message)
-        except NoResultFound:
-            pass
+__all__ = (
+    DateRange,
+    Unique
+)
 
 
 def is_scalar(value):
