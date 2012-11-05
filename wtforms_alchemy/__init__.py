@@ -50,6 +50,21 @@ def null_or_int(value):
         return None
 
 
+def is_integer_column(column):
+    return (
+        isinstance(column.type, types.Integer) or
+        isinstance(column.type, types.SmallInteger) or
+        isinstance(column.type, types.BigInteger)
+    )
+
+
+def is_date_column(column):
+    return (
+        isinstance(column.type, types.Date) or
+        isinstance(column.type, types.DateTime)
+    )
+
+
 class UnknownTypeException(Exception):
     pass
 
@@ -130,7 +145,9 @@ class FormGenerator(object):
         return form
 
     def skip_column(self, column_property):
-        """Whether or not to skip column in the generation process."""
+        """
+        Whether or not to skip column in the generation process.
+        """
         column = column_property.columns[0]
         if (not self.meta.include_primary_keys and column.primary_key or
                 column.foreign_keys):
@@ -161,25 +178,16 @@ class FormGenerator(object):
     def create_field(self, column_property):
         column = column_property.columns[0]
         name = column.name
-        validators = []
         kwargs = {}
         field_class = self.get_field_class(column)
 
-        if self.meta.all_fields_optional:
-            validators.append(Optional())
+        if column.default and is_scalar(column.default.arg):
+            kwargs['default'] = column.default.arg
         else:
-            if column.default and is_scalar(column.default.arg):
-                kwargs['default'] = column.default.arg
-            else:
-                if not column.nullable:
-                    kwargs['default'] = self.meta.default
-                    if (self.meta.assign_required and not
-                            isinstance(column.type, types.Boolean)):
-                        validators.append(DataRequired())
-                else:
-                    validators.append(Optional())
+            if not column.nullable:
+                kwargs['default'] = self.meta.default
 
-        validators.extend(self.create_validators(column))
+        validators = self.create_validators(column)
         kwargs['validators'] = validators
 
         if 'description' in column.info:
@@ -189,12 +197,6 @@ class FormGenerator(object):
             kwargs['label'] = column.info['label']
         else:
             kwargs['label'] = name
-
-        min_ = column.info['min'] if 'min' in column.info else None
-        max_ = column.info['max'] if 'max' in column.info else None
-
-        if min_ or max_:
-            validators.append(NumberRange(min=min_, max=max_))
 
         if hasattr(column.type, 'enums') or 'choices' in column.info:
             kwargs = self.select_field_kwargs(column, kwargs)
@@ -213,11 +215,11 @@ class FormGenerator(object):
         definitions.
         """
         kwargs['coerce'] = null_or_unicode
-        for type_, coerce_func in self.COERCE_TYPE_MAP.items():
-            if isinstance(column.type, type_):
-                kwargs['coerce'] = coerce_func
-                if column.nullable and kwargs['coerce'] in (unicode, str):
-                    kwargs['coerce'] = null_or_unicode
+        if column.type.__class__ in self.COERCE_TYPE_MAP:
+            coerce_func = self.COERCE_TYPE_MAP[column.type.__class__]
+            kwargs['coerce'] = coerce_func
+            if column.nullable and kwargs['coerce'] in (unicode, str):
+                kwargs['coerce'] = null_or_unicode
 
         if 'choices' in column.info and column.info['choices']:
             kwargs['choices'] = column.info['choices']
@@ -229,26 +231,43 @@ class FormGenerator(object):
 
     def create_validators(self, column):
         """
-        Create validators for given column
+        Creates validators for given column
+        """
+        validators = [
+            self.required_validator(column),
+            self.length_validator(column),
+            self.unique_validator(column),
+            self.range_validator(column)
+        ]
+        validators = [v for v in validators if v is not None]
+        validators.extend(self.additional_validators(column))
+        return validators
+
+    def required_validator(self, column):
+        """
+        Returns required / optional validator for given column based on column
+        nullability and form configuration.
+        """
+        if (not self.meta.all_fields_optional and
+            not column.default and
+            not column.nullable and
+            self.meta.assign_required and not
+                isinstance(column.type, types.Boolean)):
+            return DataRequired()
+        return Optional()
+
+    def additional_validators(self, column):
+        """
+        Returns additional validators for given column
         """
         validators = []
-        validator = self.length_validator(column)
-        if validator:
-            validators.append(validator)
         name = column.name
         if name in self.meta.validators:
-            if isinstance(self.meta.validators[name], list):
+            try:
                 validators.extend(self.meta.validators[name])
-            else:
+            except TypeError:
                 validators.append(self.meta.validators[name])
 
-        if column.unique:
-            validators.append(
-                Unique(
-                    self.model_class,
-                    getattr(self.model_class, name)
-                )
-            )
         if 'validators' in column.info and column.info['validators']:
             try:
                 validators.extend(column.info['validators'])
@@ -256,9 +275,33 @@ class FormGenerator(object):
                 validators.append(column.info['validators'])
         return validators
 
+    def unique_validator(self, column):
+        """
+        Returns unique validator for given column if column has a unique index
+        """
+        if column.unique:
+            return Unique(
+                self.model_class,
+                getattr(self.model_class, column.name)
+            )
+
+    def range_validator(self, column):
+        """
+        Returns range validator based on column type and column info min and
+        max arguments
+        """
+        min_ = column.info['min'] if 'min' in column.info else None
+        max_ = column.info['max'] if 'max' in column.info else None
+
+        if min_ or max_:
+            if is_integer_column(column):
+                return NumberRange(min=min_, max=max_)
+            elif is_date_column(column):
+                return DateRange(min=min_, max=max_)
+
     def length_validator(self, column):
         """
-        Returns colander length validator for given column
+        Returns length validator for given column
         """
         if hasattr(column.type, 'length') and column.type.length:
             return Length(max=column.type.length)

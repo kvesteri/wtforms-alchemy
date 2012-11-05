@@ -237,6 +237,7 @@ Auto-assigned validators
 By default WTForms-Alchemy ModelForm assigns the following validators:
     * DataRequired validator if your column is not nullable and has no default value
     * NumberRange validator if column info parameter has min or max arguments defined
+    * DateRange validator if column info parameter has min or max arguments defined
     * Unique validator if column has a unique index
     * Length validator for String/Unicode columns with max length
 
