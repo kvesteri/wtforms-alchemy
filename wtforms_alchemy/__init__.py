@@ -296,15 +296,9 @@ class FormGenerator(object):
         """
         if 'choices' in column.info:
             return SelectField
-        for class_ in self.TYPE_MAP:
-            # Float type in sqlalchemy inherits numeric type, hence we need
-            # the following check
-            if column.type.__class__ is types.Float:
-                if isinstance(column.type, types.Float):
-                    return self.TYPE_MAP[types.Float]
-            if isinstance(column.type, class_):
-                return self.TYPE_MAP[class_]
-        raise UnknownTypeException(column.type)
+        if column.type.__class__ not in self.TYPE_MAP:
+            raise UnknownTypeException(column.type)
+        return self.TYPE_MAP[column.type.__class__]
 
 
 def class_list(cls):

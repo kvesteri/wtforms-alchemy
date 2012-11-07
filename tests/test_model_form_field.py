@@ -1,7 +1,6 @@
 from flexmock import flexmock
 import sqlalchemy as sa
 from wtforms_alchemy import ModelForm, ModelFormField
-from wtforms.fields import FormField
 from tests import FormRelationsTestCase, MultiDict
 
 

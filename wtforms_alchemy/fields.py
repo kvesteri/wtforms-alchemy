@@ -71,6 +71,7 @@ class SelectField(_SelectField):
             ))
         )
 
+    Also supports lazy choices (callables that return an iterable)
     """
     widget = SelectWidget()
 
@@ -79,13 +80,19 @@ class SelectField(_SelectField):
         We should update how choices are iter to make sure that value from
         internal list or tuple should be selected.
         """
-        for value, label in self.choices:
+        for value, label in self.concrete_choices:
             yield (value, label, (self.coerce, self.data))
+
+    @property
+    def concrete_choices(self):
+        if callable(self.choices):
+            return self.choices()
+        return self.choices
 
     @property
     def choice_values(self):
         values = []
-        for value, label in self.choices:
+        for value, label in self.concrete_choices:
             if isinstance(label, (list, tuple)):
                 for subvalue, sublabel in label:
                     values.append(subvalue)
@@ -93,27 +100,16 @@ class SelectField(_SelectField):
                 values.append(value)
         return values
 
-    def pre_validate(self, form, choices=None):
+    def pre_validate(self, form):
         """
         Don't forget to validate also values from embedded lists.
         """
-        if self.data is None and u'' in [v[0] for v in self.choices]:
+        values = self.choice_values
+        if self.data is None and u'' in values:
             return True
 
-        default_choices = choices is None
-        choices = choices or self.choices
-
-        for value, label in choices:
-            found = False
-
-            if isinstance(label, (list, tuple)):
-                found = self.pre_validate(form, label)
-
-            if found or value == self.data:
-                return True
-
-        if not default_choices:
-            return False
+        if self.data in values:
+            return True
 
         raise ValidationError(self.gettext(u'Not a valid choice'))
 
@@ -125,14 +121,6 @@ class SelectMultipleField(SelectField):
     attribute to the select field when rendering.
     """
     widget = SelectWidget(multiple=True)
-
-    # def iter_choices(self):
-    #     """
-    #     We should update how choices are iter to make sure that value from
-    #     internal list or tuple should be selected.
-    #     """
-    #     for value, label in self.choices:
-    #         yield (value, label, (self.coerce, self.data))
 
     def process_data(self, value):
         try:
