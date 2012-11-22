@@ -11,8 +11,8 @@ class TestIfValidator(FormTestCase):
         class MyForm(Form):
             name = TextField(validators=[
                 If(
+                    lambda form, field: False,
                     DataRequired(),
-                    lambda form, field: False
                 )
             ])
 
@@ -24,8 +24,8 @@ class TestIfValidator(FormTestCase):
         class MyForm(Form):
             name = TextField(validators=[
                 If(
+                    lambda form, field: True,
                     DataRequired(),
-                    lambda form, field: True
                 )
             ])
 
@@ -37,8 +37,8 @@ class TestIfValidator(FormTestCase):
         class MyForm(Form):
             name = TextField(validators=[
                 If(
-                    DataRequired(),
                     lambda form, field: True,
+                    DataRequired(),
                     message='Validation failed.'
                 )
             ])

@@ -120,7 +120,7 @@ validate field email if field user_id is provided. ::
     class SomeForm(Form):
         user_id = IntegerField()
         email = TextField(validators=[
-            If(Email(), lambda form, field: field.user_id.data)
+            If(lambda form, field: field.user_id.data, Email())
         ])
 
 
@@ -139,7 +139,10 @@ to provide nested conditional validations. ::
     class SomeForm(Form):
         user_id = IntegerField()
         email = TextField(validators=[
-            If(Chain(DataRequired(), Email()), lambda form, field: field.user_id.data)
+            If(
+                lambda form, field: field.user_id.data,
+                Chain(DataRequired(), Email())
+            )
         ])
 
 

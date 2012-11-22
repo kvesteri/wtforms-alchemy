@@ -48,18 +48,16 @@ class If(ControlStructure):
     """
     Conditional validator.
 
+    :param condition: callable which takes two arguments form and field
     :param validator: encapsulated validator, this validator is validated
                       only if given condition returns true
-    :param condition: callable which takes two arguments form and field
     :param message: custom message, which overrides child validator's
                     validation error message
     """
-    def __init__(self, validator, condition, message=None):
-        """
-
-        """
-        self.validator = validator
+    def __init__(self, condition, validator, message=None):
         self.condition = condition
+        self.validator = validator
+
         if message:
             self.message = message
 
