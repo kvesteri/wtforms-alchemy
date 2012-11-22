@@ -110,7 +110,7 @@ If validator
 ------------
 
 The If validator provides means for having conditional validations. In the following example we only
-validate field email if field user_id is provided:
+validate field email if field user_id is provided. ::
 
 
     from wtforms import Form
@@ -129,7 +129,7 @@ Chain validator
 
 
 Chain validator chains validators together. Chain validator can be combined with If validator
-to provide nested conditional validations.
+to provide nested conditional validations. ::
 
 
     from wtforms import Form
