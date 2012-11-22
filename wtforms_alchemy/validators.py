@@ -1,11 +1,94 @@
 from wtforms import ValidationError
+from wtforms.validators import StopValidation
 from sqlalchemy.orm.exc import NoResultFound
+
+
+class ControlStructure(object):
+    """
+    Base object for validator control structures
+    """
+
+    message = None
+
+    def reraise(self, exc):
+        if not self.message:
+            raise exc
+        else:
+            raise type(exc)(self.message)
+
+
+class Chain(ControlStructure):
+    """
+    Represents a chain of validators, useful when using multiple validators
+    with If control structure.
+
+    :param validators:
+        list of validator objects
+    :param message:
+        custom validation error message, if this message is set and some of the
+        child validators raise a ValidationError, an exception is being raised
+        again with this custom message.
+    """
+    def __init__(self, validators, message=None):
+        self.validators = validators
+        if message:
+            self.message = message
+
+    def __call__(self, form, field):
+        for validator in self.validators:
+            try:
+                validator(form, field)
+            except ValidationError, exc:
+                self.reraise(exc)
+            except StopValidation, exc:
+                self.reraise(exc)
+
+
+class If(ControlStructure):
+    """
+    Conditional validator.
+
+    :param validator: encapsulated validator, this validator is validated
+                      only if given condition returns true
+    :param condition: callable which takes two arguments form and field
+    :param message: custom message, which overrides child validator's
+                    validation error message
+    """
+    def __init__(self, validator, condition, message=None):
+        """
+
+        """
+        self.validator = validator
+        self.condition = condition
+        if message:
+            self.message = message
+
+    def __call__(self, form, field):
+        if self.condition(form, field):
+            try:
+                self.validator(form, field)
+            except ValidationError, exc:
+                self.reraise(exc)
+            except StopValidation, exc:
+                self.reraise(exc)
 
 
 class DateRange(object):
     """
     Same as wtforms.validators.NumberRange but validates date.
+
+    :param min:
+        The minimum required value of the date. If not provided, minimum
+        value will not be checked.
+    :param max:
+        The maximum value of the date. If not provided, maximum value
+        will not be checked.
+    :param message:
+        Error message to raise in case of a validation error. Can be
+        interpolated using `%(min)s` and `%(max)s` if desired. Useful defaults
+        are provided depending on the existence of min and max.
     """
+
     date_greater_than = u'Date must be greater than %(min)s.'
 
     date_less_than = u'Date must be less than %(max)s.'

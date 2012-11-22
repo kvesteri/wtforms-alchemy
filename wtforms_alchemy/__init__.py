@@ -10,7 +10,6 @@ from wtforms import (
     IntegerField,
     TextAreaField,
     TextField,
-    SelectField as _SelectField,
 )
 from wtforms.fields import FormField, FieldList
 from wtforms.form import FormMeta
@@ -19,14 +18,13 @@ from wtforms.validators import (
     Length,
     NumberRange,
     Optional,
-    ValidationError
 )
 from sqlalchemy import types
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.util import has_identity
 from sqlalchemy.orm.properties import ColumnProperty
 from .fields import SelectField, SelectMultipleField
-from .validators import DateRange, Unique
+from .validators import DateRange, Unique, If, Chain
 from .utils import (
     is_date_column,
     is_integer_column,
@@ -37,7 +35,9 @@ from .utils import (
 
 
 __all__ = (
+    Chain,
     DateRange,
+    If,
     SelectMultipleField,
     Unique,
     is_date_column,
