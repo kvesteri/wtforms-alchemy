@@ -3,4 +3,4 @@ flexmock==0.9.6
 pysqlite==2.6.3
 pytest==2.2.3
 Werkzeug==0.8.3
--e git+https://github.com/kvesteri/wtforms-test.git@7574f8c4cbc924573a197a83da386c14d87dcee5#egg=wtforms-test-dev
+-e git+https://github.com/kvesteri/wtforms-test.git@52a0523f6078d5b5493d27ef9b219d3f7a2ce80e#egg=wtforms-test-dev

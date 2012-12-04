@@ -353,7 +353,7 @@ def model_form_factory(base=Form):
             assign_required = True
 
             #: Whether or not to assign all fields as optional, useful when
-            #: creating update forms
+            #: creating update forms for patch requests
             all_fields_optional = False
 
             validators = {}

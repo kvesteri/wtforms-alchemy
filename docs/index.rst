@@ -45,8 +45,16 @@ QuickStart
 Lets say we have a model called User with couple of fields::
 
     import sqlalchemy as sa
-    from wtforms import Form
+    from sqlalchemy import create_engine
+    from sqlalchemy.ext.declarative import declarative_base
+    from sqlalchemy.orm import sessionmaker
     from wtforms_alchemy import ModelForm
+
+
+    engine = create_engine('sqlite:///:memory:')
+    Base = declarative_base(engine)
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
     class User(Base):
         __tablename__ = 'user'

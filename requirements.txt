@@ -1,2 +1,2 @@
-WTForms==1.0.1
+WTForms==1.0.2
 SQLAlchemy==0.7.8
