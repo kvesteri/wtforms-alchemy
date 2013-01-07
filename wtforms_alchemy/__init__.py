@@ -427,7 +427,7 @@ class ModelFormField(FormField):
                 # only delete persistent objects
                 if has_identity(item):
                     sess.delete(item)
-                else:
+                elif item in sess:
                     sess.expunge(item)
                 setattr(obj, name, None)
 
