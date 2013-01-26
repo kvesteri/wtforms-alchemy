@@ -23,8 +23,8 @@ class PyTest(Command):
         raise SystemExit(errno)
 
 setup(
-    name='wtforms-alchemy',
-    version='0.2.2',
+    name='WTForms-Alchemy',
+    version='0.2.3',
     url='https://github.com/kvesteri/wtforms-alchemy',
     license='BSD',
     author='Konsta Vesterinen',
@@ -37,7 +37,7 @@ setup(
     platforms='any',
     install_requires=[
         'SQLAlchemy==0.7.8',
-        'WTForms>=1.0.2'
+        'WTForms==1.0.2'
     ],
     cmdclass={'test': PyTest},
     classifiers=[

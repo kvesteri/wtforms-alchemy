@@ -3,6 +3,12 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
+0.2.3 (2012-11-26)
+^^^^^^^^^^^^^^^^^^
+
+- Another fix for empty choices handling
+
+
 0.2.2 (2012-11-26)
 ^^^^^^^^^^^^^^^^^^
 
