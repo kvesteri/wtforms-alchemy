@@ -2,6 +2,7 @@ import time
 from datetime import datetime
 from cgi import escape
 from wtforms import widgets, Form
+from wtforms.compat import text_type
 from wtforms.fields import (
     Field,
     DateField,
@@ -74,6 +75,17 @@ class SelectField(_SelectField):
     Also supports lazy choices (callables that return an iterable)
     """
     widget = SelectWidget()
+
+    # def __init__(
+    #         self, label=None, validators=None, coerce=text_type,
+    #         choices=None, sort=False, **kwargs):
+    #     _SelectField.__init__(
+    #         self,
+    #         label=label,
+    #         validators=validators,
+    #         coerce=coerce,
+    #         **kwargs
+    #     )
 
     def iter_choices(self):
         """

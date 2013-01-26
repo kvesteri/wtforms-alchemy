@@ -29,8 +29,7 @@ Now how is WTForms-Alchemy ModelForm better than wtforms.ext.sqlachemy's model_f
 * Form generation supports Unique and NumberRange validators
 * Form inheritance support (along with form configuration inheritance)
 * Automatic SelectField type coercing based on underlying column type
-* Provides special SelectField that understands None values. This SelectField also renders
-nested datastructures as optgroups
+* Provides special SelectField that understands None values. This SelectField also renders nested datastructures as optgroups
 * Provides better Unique validator
 * Supports ModelForm model relations population
 * Smarter field exclusion
@@ -49,7 +48,6 @@ Lets say we have a model called User with couple of fields::
     from sqlalchemy.ext.declarative import declarative_base
     from sqlalchemy.orm import sessionmaker
     from wtforms_alchemy import ModelForm
-
 
     engine = create_engine('sqlite:///:memory:')
     Base = declarative_base(engine)

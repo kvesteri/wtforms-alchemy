@@ -38,6 +38,39 @@ class TestSelectField(FormTestCase):
 
         assert len(form.errors['fruit']) == 1
 
+    def test_understands_mixing_of_choice_types(self):
+        choices = (
+            ('Fruits', (
+                ('apple', 'Apple'),
+                ('peach', 'Peach'),
+                ('pear', 'Pear')
+            )),
+            ('cucumber', 'Cucumber'),
+        )
+
+        form_class = self.init_form(choices=choices)
+        form = form_class(MultiDict([('fruit', 'cucumber')]))
+        form.validate()
+        assert len(form.errors) == 0
+
+    # def test_sorting(self):
+    #     choices = (
+    #         ('raspberry', 'Raspberry'),
+    #         ('Vegetables', (
+    #             ('cucumber', 'Cucumber'),
+    #             ('potato', 'Potato'),
+    #             ('tomato', 'Tomato'),
+    #         )),
+    #         ('Fruits', (
+    #             ('apple', 'Apple'),
+    #             ('peach', 'Peach'),
+    #             ('pear', 'Pear')
+    #         )),
+    #     )
+
+    #     form_class = self.init_form(choices=choices, sort=True)
+    #     print form_class().fruit.choices
+
     def test_understands_functions_as_choices(self):
         form_class = self.init_form(choices=lambda: [])
         form = form_class(

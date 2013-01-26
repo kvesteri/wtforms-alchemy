@@ -181,7 +181,8 @@ class FormGenerator(object):
         else:
             kwargs['label'] = name
 
-        if hasattr(column.type, 'enums') or 'choices' in column.info:
+        if (hasattr(column.type, 'enums') or
+                ('choices' in column.info and column.info['choices'])):
             kwargs = self.select_field_kwargs(column, kwargs)
 
         if isinstance(column.type, types.DateTime):
@@ -273,8 +274,8 @@ class FormGenerator(object):
         Returns range validator based on column type and column info min and
         max arguments
         """
-        min_ = column.info['min'] if 'min' in column.info else None
-        max_ = column.info['max'] if 'max' in column.info else None
+        min_ = column.info.get('min', None)
+        max_ = column.info.get('max', None)
 
         if min_ or max_:
             if is_integer_column(column):
@@ -358,13 +359,13 @@ def model_form_factory(base=Form):
 
             validators = {}
 
-            #: Whether or not to include only indexed fields
+            #: Whether or not to include only indexed fields.
             only_indexed_fields = False
 
             #: Whether or not to include primary keys.
             include_primary_keys = False
 
-            #: Whether or not to include primary keys. By default this is False
+            #: Whether or not to include foreign keys. By default this is False
             #: indicating that foreign keys are not included in the generated
             #: form.
             include_foreign_keys = False
