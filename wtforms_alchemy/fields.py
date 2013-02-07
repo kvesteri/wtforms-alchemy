@@ -4,8 +4,9 @@ from cgi import escape
 from wtforms import widgets, Form
 from wtforms.compat import text_type
 from wtforms.fields import (
-    Field,
     DateField,
+    Field,
+    FieldList,
     FormField,
     SelectField as _SelectField,
 )
@@ -146,8 +147,8 @@ class SelectMultipleField(SelectField):
         except ValueError:
             raise ValueError(
                 self.gettext(
-                    'Invalid choice(s): one or more data'
-                    ' inputs could not be coerced'
+                    'Invalid choice(s): one or more data inputs '
+                    'could not be coerced'
                 )
             )
 

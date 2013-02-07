@@ -92,3 +92,18 @@ class TestSelectField(FormTestCase):
             '<option selected="selected" value="peach">Peach</option>' in
             str(form.fruit)
         )
+
+    def test_data_coercing(self):
+        choices = (
+            ('Fruits', (
+                (0, 'Apple'),
+                (1, 'Peach'),
+                (2, 'Pear')
+            )),
+            (3, 'Cucumber'),
+        )
+
+        form_class = self.init_form(choices=choices, coerce=int)
+        form = form_class(MultiDict([('fruit', '1')]))
+        form.validate()
+        assert not form.errors

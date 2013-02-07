@@ -1,7 +1,7 @@
 from pytest import raises
 
 import sqlalchemy as sa
-from wtforms_alchemy import ModelForm, ModelFieldList, ModelFormField
+from wtforms_alchemy import ModelForm, ModelFieldList
 from wtforms.fields import FormField
 from tests import FormRelationsTestCase, MultiDict
 
