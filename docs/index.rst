@@ -302,7 +302,7 @@ By default WTForms-Alchemy ModelForm assigns the following validators:
 Unique validator
 ----------------
 
-WTForms-Alchemy automatically assigns unique validators for columns which have unique indexes defined. Unique validator raises ValidationError exception whenever a non-unique value for given column is assigned. Consider the following model/form definition:
+WTForms-Alchemy automatically assigns unique validators for columns which have unique indexes defined. Unique validator raises ValidationError exception whenever a non-unique value for given column is assigned. Consider the following model/form definition. Notice how you need to define get_session() classmethod for your form. Unique validator uses this method for getting the appropriate SQLAlchemy session.
 
 
     engine = create_engine('sqlite:///:memory:')
@@ -333,7 +333,6 @@ WTForms-Alchemy automatically assigns unique validators for columns which have u
             # this method should return sqlalchemy session
             return session
 
-
 Here UserForm would behave the same as the following form:
 
 
@@ -347,6 +346,10 @@ Here UserForm would behave the same as the following form:
                 Unique(User, User.email, get_session=lambda: session)
             ]
         )
+
+
+If you are using Flask-SQLAlchemy or similar tool, which assigns session-bound query property to your declarative models, you don't need to define the get_session() method. Simply use:
+
 
 Additional field validators
 ---------------------------
