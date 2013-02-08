@@ -299,6 +299,55 @@ By default WTForms-Alchemy ModelForm assigns the following validators:
     * Length validator for String/Unicode columns with max length
 
 
+Unique validator
+----------------
+
+WTForms-Alchemy automatically assigns unique validators for columns which have unique indexes defined. Unique validator raises ValidationError exception whenever a non-unique value for given column is assigned. Consider the following model/form definition:
+
+
+    engine = create_engine('sqlite:///:memory:')
+
+    Base = declarative_base()
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(100), nullable=False)
+        email = sa.Column(
+            sa.Unicode(255),
+            nullable=False,
+            unique=True
+        )
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+        @classmethod
+        def get_session():
+            # this method should return sqlalchemy session
+            return session
+
+
+Here UserForm would behave the same as the following form:
+
+
+    class UserForm(Form):
+        name = TextField('Name', validators=[DataRequired(), Length(max=100)])
+        email = TextField(
+            'Email',
+            validators=[
+                DataRequired(),
+                Length(max=255),
+                Unique(User, User.email, get_session=lambda: session)
+            ]
+        )
+
 Additional field validators
 ---------------------------
 

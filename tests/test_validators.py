@@ -1,9 +1,10 @@
+from pytest import raises
 import sqlalchemy as sa
 from wtforms.validators import (
     Email
 )
-from wtforms_alchemy import Unique
-from tests import ModelFormTestCase
+from wtforms_alchemy import Unique, ModelForm
+from tests import ModelFormTestCase, FormRelationsTestCase
 
 
 class TestAutoAssignedValidators(ModelFormTestCase):
@@ -18,6 +19,19 @@ class TestAutoAssignedValidators(ModelFormTestCase):
     def test_assigns_unique_validator_for_unique_fields(self):
         self.init(unique=True)
         self.assert_has_validator('test_column', Unique)
+
+    def test_raises_exception_if_no_session_set_for_unique_validators(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(sa.Unicode(255), unique=True)
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+
+        with raises(Exception):
+            ModelTestForm()
 
     def test_assigns_non_nullable_fields_as_required(self):
         self.init(nullable=False)
@@ -34,3 +48,27 @@ class TestAutoAssignedValidators(ModelFormTestCase):
     def test_assigns_not_nullable_integers_as_optional(self):
         self.init(sa.Integer, nullable=True)
         self.assert_optional('test_column')
+
+
+class TestUniqueValidator(FormRelationsTestCase):
+    def create_models(self):
+        pass
+
+    def create_forms(self):
+        pass
+
+    def test_does_raise_exception_if_session_set_and_uses_unique_index(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(sa.Unicode(255), unique=True)
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+
+            @classmethod
+            def get_session(cls):
+                return self.session
+
+        ModelTestForm()

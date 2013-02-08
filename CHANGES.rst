@@ -3,6 +3,13 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
+0.2.4 (2012-02-08)
+^^^^^^^^^^^^^^^^^^
+
+- Enhanced unique validator
+- Documented new unique validator
+
+
 0.2.3 (2012-11-26)
 ^^^^^^^^^^^^^^^^^^
 

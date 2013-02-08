@@ -81,9 +81,10 @@ class FormGenerator(object):
         types.Numeric: Decimal,
     }
 
-    def __init__(self, model_class, meta):
-        self.model_class = model_class
-        self.meta = meta
+    def __init__(self, form_class):
+        self.form_class = form_class
+        self.model_class = self.form_class.Meta.model
+        self.meta = self.form_class.Meta
 
     def create_form(self, form):
         fields = set(self.model_class._sa_class_manager.values())
@@ -266,7 +267,8 @@ class FormGenerator(object):
         if column.unique:
             return Unique(
                 self.model_class,
-                getattr(self.model_class, column.name)
+                getattr(self.model_class, column.name),
+                get_session=self.form_class.get_session
             )
 
     def range_validator(self, column):
@@ -328,12 +330,14 @@ class ModelFormMeta(FormMeta):
         for class_ in reversed(class_list(cls)):
             if hasattr(class_, 'Meta'):
                 property_dict.update(properties(class_.Meta))
+
         cls.Meta = type('Meta', (object, ), property_dict)
+
         return FormMeta.__init__(cls, *args, **kwargs)
 
     def __call__(cls, *args, **kwargs):
         if cls.Meta.model:
-            generator = cls.Meta.form_generator(cls.Meta.model, cls.Meta)
+            generator = cls.Meta.form_generator(cls)
             generator.create_form(cls)
 
         return FormMeta.__call__(cls, *args, **kwargs)
@@ -344,6 +348,14 @@ def model_form_factory(base=Form):
 
     class ModelForm(base):
         __metaclass__ = ModelFormMeta
+
+        """
+        A function that returns SQLAlchemy session. This should be
+        assigned if you wish to use Unique validator. If you are using
+        Flask-SQLAlchemy along with WTForms-Alchemy you don't need to
+        set this.
+        """
+        get_session = None
 
         class Meta:
             model = None
