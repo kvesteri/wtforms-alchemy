@@ -1,14 +1,5 @@
 from decimal import Decimal
 import sqlalchemy as sa
-from wtforms.fields import (
-    TextField,
-    DateTimeField,
-    IntegerField,
-    TextAreaField,
-    BooleanField,
-    FloatField,
-    DecimalField,
-)
 from wtforms_alchemy import SelectField
 from tests import ModelFormTestCase
 
