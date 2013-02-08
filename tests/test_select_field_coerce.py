@@ -55,7 +55,7 @@ class TestSelectFieldCoerce(ModelFormTestCase):
         choices = [(u'1.0', '1.0'), (u'2.0', '2.0')]
         self.init(type_=sa.Numeric, info={'choices': choices})
         form = self.form_class(MultiDict({'test_column': '2.0'}))
-        assert form.test_column.data == Decimal(2.0)
+        assert form.test_column.data == Decimal('2.0')
 
     def test_float_coerces_values_to_floats(self):
         choices = [(u'1.0', '1.0'), (u'2.0', '2.0')]
