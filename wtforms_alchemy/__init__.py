@@ -53,6 +53,10 @@ class UnknownTypeException(Exception):
 
 
 class FormGenerator(object):
+    """
+    Base form generator, you can make your own form generators by inheriting
+    this class.
+    """
     TYPE_MAP = {
         types.BigInteger: IntegerField,
         types.SmallInteger: IntegerField,
@@ -82,11 +86,22 @@ class FormGenerator(object):
     }
 
     def __init__(self, form_class):
+        """
+        Initializes the form generator
+
+        :param form_class: ModelForm class to be used as the base of generation
+                           process
+        """
         self.form_class = form_class
         self.model_class = self.form_class.Meta.model
         self.meta = self.form_class.Meta
 
     def create_form(self, form):
+        """
+        Creates the form.
+
+        :param form: ModelForm instance
+        """
         fields = set(self.model_class._sa_class_manager.values())
         tmp = []
         for field in fields:
@@ -114,9 +129,15 @@ class FormGenerator(object):
 
         return self.create_fields(form, fields)
 
-    def create_fields(self, form, fields):
-        for field in fields:
-            column = field.property
+    def create_fields(self, form, attributes):
+        """
+        Creates fields for given form based on given model attributes.
+
+        :param form: form to attach the generated fields into
+        :param attributes: model attributes to generate the form fields from
+        """
+        for attribute in attributes:
+            column = attribute.property
 
             if not isinstance(column, ColumnProperty):
                 continue
@@ -131,6 +152,8 @@ class FormGenerator(object):
     def skip_column(self, column_property):
         """
         Whether or not to skip column in the generation process.
+
+        :param column_property: SQLAlchemy ColumnProperty object
         """
         column = column_property.columns[0]
         if (not self.meta.include_primary_keys and column.primary_key or
@@ -150,7 +173,11 @@ class FormGenerator(object):
         return False
 
     def has_index(self, column):
-        """Whether or not this column has an index."""
+        """
+        Whether or not given column has an index.
+
+        :param column: Column object to inspect the indexes from
+        """
         if column.primary_key or column.foreign_keys:
             return True
         table = column.table

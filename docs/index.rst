@@ -665,13 +665,20 @@ locations too. ::
     form.populate_obj(event)
 
 
-
-API reference
-=============
-
-.. module:: wtforms_alchemy
+API Documentation
+=================
 
 This part of the documentation covers all the public classes and functions
 in WTForms-Alchemy.
 
-.. autoclass:: ModelForm
+.. module:: wtforms_alchemy
+.. autoclass:: FormGenerator
+    :members:
+
+.. include:: ../CHANGES.rst
+
+
+License
+=======
+
+.. include:: ../LICENSE
