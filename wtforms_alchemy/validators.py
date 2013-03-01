@@ -125,19 +125,19 @@ class DateRange(object):
 class Unique(object):
     """Checks field value unicity against specified table field.
 
-    :param model:
-        The model to check unicity against.
     :param column:
-        The unique column.
+        InstrumentedAttribute object, eg. User.name
     :param get_session:
-        A function that returns a SQAlchemy Session.
+        A function that returns a SQAlchemy Session. This parameter is not
+        needed if the given model supports Flask-SQLAlchemy styled query
+        parameter.
     :param message:
         The error message.
     """
     field_flags = ('unique', )
 
-    def __init__(self, model, column, get_session=None, message=None):
-        self.model = model
+    def __init__(self, column, get_session=None, message=None):
+        self.model = column.class_
         self.column = column
         self.message = message
         self.get_session = get_session
@@ -147,6 +147,8 @@ class Unique(object):
 
     @property
     def query(self):
+        if hasattr(self.model, 'query'):
+            return getattr(self.model, 'query')
         return self.get_session().query(self.model)
 
     def __call__(self, form, field):

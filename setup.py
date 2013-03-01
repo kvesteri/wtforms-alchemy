@@ -1,6 +1,6 @@
 """
-wtforms-alchemy
--------------------
+WTForms-Alchemy
+---------------
 
 Generates WTForms forms from SQLAlchemy models.
 """
@@ -24,7 +24,7 @@ class PyTest(Command):
 
 setup(
     name='WTForms-Alchemy',
-    version='0.2.5',
+    version='0.3.0',
     url='https://github.com/kvesteri/wtforms-alchemy',
     license='BSD',
     author='Konsta Vesterinen',

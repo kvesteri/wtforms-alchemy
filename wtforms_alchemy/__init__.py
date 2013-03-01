@@ -293,7 +293,6 @@ class FormGenerator(object):
         """
         if column.unique:
             return Unique(
-                self.model_class,
                 getattr(self.model_class, column.name),
                 get_session=self.form_class.get_session
             )
