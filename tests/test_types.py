@@ -1,3 +1,4 @@
+from pytest import raises
 import sqlalchemy as sa
 from wtforms.fields import (
     TextField,
@@ -9,11 +10,20 @@ from wtforms.fields import (
     FloatField,
     DecimalField,
 )
-from wtforms_alchemy import SelectField, null_or_unicode
+from wtforms_alchemy import SelectField, UnknownTypeException, null_or_unicode
 from tests import ModelFormTestCase
 
 
+class CustomType(sa.types.TypeDecorator):
+    impl = sa.types.UnicodeText
+
+
 class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
+    def test_raises_exception_for_unknown_type(self):
+        with raises(UnknownTypeException):
+            self.init(type_=CustomType)
+            self.form_class()
+
     def test_unicode_converts_to_text_field(self):
         self.init()
         self.assert_type('test_column', TextField)

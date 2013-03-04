@@ -346,12 +346,15 @@ Here UserForm would behave the same as the following form:
             validators=[
                 DataRequired(),
                 Length(max=255),
-                Unique(User, User.email, get_session=lambda: session)
+                Unique(User.email, get_session=lambda: session)
             ]
         )
 
 
 If you are using Flask-SQLAlchemy or similar tool, which assigns session-bound query property to your declarative models, you don't need to define the get_session() method. Simply use:
+
+
+    Unique(User.email)
 
 
 Additional field validators

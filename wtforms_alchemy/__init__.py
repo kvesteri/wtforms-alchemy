@@ -49,7 +49,21 @@ __all__ = (
 
 
 class UnknownTypeException(Exception):
-    pass
+    def __init__(self, column):
+        Exception.__init__(
+            self,
+            "Unknown type '%s' for column '%s'" %
+            (column.type, column.name)
+        )
+
+
+class InvalidAttributeException(Exception):
+    def __init__(self, attr_name):
+        Exception.__init__(
+            self,
+            "Model attribute '%s' is not a valid sqlalchemy column." %
+            attr_name
+        )
 
 
 class FormGenerator(object):
@@ -106,22 +120,28 @@ class FormGenerator(object):
         tmp = []
         for field in fields:
             column = field.property
-            if isinstance(column, ColumnProperty) and self.skip_column(column):
+            if not isinstance(column, ColumnProperty):
+                continue
+            if self.skip_column(column):
                 continue
             tmp.append(field)
         fields = set(tmp)
 
+        def valid_attribute(attr_name):
+            attr = getattr(self.model_class, attr_name)
+            if not hasattr(attr, 'property'):
+                raise InvalidAttributeException(attr_name)
+
+            if not isinstance(attr.property, ColumnProperty):
+                raise InvalidAttributeException(attr_name)
+
+            return attr
+
         if self.meta.only:
-            fields = set([
-                getattr(self.model_class, field)
-                for field in self.meta.only
-            ])
+            fields = set(map(valid_attribute, self.meta.only))
         else:
             if self.meta.include:
-                fields.update(set([
-                    getattr(self.model_class, field)
-                    for field in self.meta.include
-                ]))
+                fields.update(map(valid_attribute, self.meta.include))
 
             if self.meta.exclude:
                 func = lambda a: a.key not in self.meta.exclude
@@ -138,9 +158,6 @@ class FormGenerator(object):
         """
         for attribute in attributes:
             column = attribute.property
-
-            if not isinstance(column, ColumnProperty):
-                continue
 
             name = column.columns[0].name
             form_field = self.create_field(column)
@@ -326,7 +343,7 @@ class FormGenerator(object):
         if 'choices' in column.info and column.info['choices']:
             return SelectField
         if column.type.__class__ not in self.TYPE_MAP:
-            raise UnknownTypeException(column.type)
+            raise UnknownTypeException(column)
         return self.TYPE_MAP[column.type.__class__]
 
 

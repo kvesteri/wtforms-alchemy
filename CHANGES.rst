@@ -3,6 +3,12 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
+0.3.1 (2012-03-01)
+^^^^^^^^^^^^^^^^^^
+
+- Better exception messages
+
+
 0.3.0 (2012-03-01)
 ^^^^^^^^^^^^^^^^^^
 

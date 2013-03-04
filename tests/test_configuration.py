@@ -1,8 +1,11 @@
+from pytest import raises
 import sqlalchemy as sa
 from wtforms import Form
 from wtforms.fields import IntegerField
 from wtforms.validators import Email
-from wtforms_alchemy import ModelForm, model_form_factory
+from wtforms_alchemy import (
+    InvalidAttributeException, ModelForm, model_form_factory
+)
 from tests import ModelFormTestCase
 
 
@@ -17,6 +20,28 @@ class TestModelFormConfiguration(ModelFormTestCase):
 
         self.form_class = ModelTestForm
         assert not self.has_field('test_column')
+
+    def test_throws_exception_for_unknown_excluded_column(self):
+        self.init()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+                include = ['some_unknown_column']
+
+        with raises(AttributeError):
+            self.form_class = ModelTestForm()
+
+    def test_throws_exception_for_non_column_fields(self):
+        self.init()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+                include = ['some_property']
+
+        with raises(InvalidAttributeException):
+            self.form_class = ModelTestForm()
 
     def test_supports_field_inclusion(self):
         self.init()

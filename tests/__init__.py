@@ -29,6 +29,7 @@ class ModelFormTestCase(FormTestCase):
             query = None
             id = sa.Column(sa.Integer, primary_key=True)
             test_column = sa.Column(type_, **kwargs)
+            some_property = 'something'
 
         self.ModelTest = ModelTest
         self.init_form()
