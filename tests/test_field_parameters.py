@@ -61,3 +61,25 @@ class TestFieldParameters(ModelFormTestCase):
 
         form = ModelTestForm()
         assert 'type="color"' in str(form.test_column)
+
+    def test_accepts_none_custom_field_class(self):
+        class InputTest(widgets.Input):
+            input_type = 'color'
+
+        class FieldTest(StringField):
+            widget = InputTest()
+
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            query = None
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(
+                sa.UnicodeText,
+                info={'form_field_class': None}
+            )
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+
+        assert ModelTestForm()

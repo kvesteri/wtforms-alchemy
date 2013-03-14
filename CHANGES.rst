@@ -3,6 +3,12 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
+0.3.3 (2012-03-14)
+^^^^^^^^^^^^^^^^^^
+
+- Added handling of form_field_class = None
+
+
 0.3.2 (2012-03-14)
 ^^^^^^^^^^^^^^^^^^
 
