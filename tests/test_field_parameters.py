@@ -1,6 +1,8 @@
 from datetime import date
 import sqlalchemy as sa
-from wtforms_alchemy import DateRange
+from wtforms import widgets
+from wtforms_alchemy import DateRange, ModelForm
+from wtforms.fields import StringField
 from wtforms.validators import NumberRange
 from tests import ModelFormTestCase
 
@@ -36,3 +38,26 @@ class TestFieldParameters(ModelFormTestCase):
         validator = self.get_validator('test_column', DateRange)
         assert validator.min == date(1990, 1, 1)
         assert validator.max == date(2000, 1, 1)
+
+    def test_uses_custom_field_class(self):
+        class InputTest(widgets.Input):
+            input_type = 'color'
+
+        class FieldTest(StringField):
+            widget = InputTest()
+
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            query = None
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(
+                sa.UnicodeText,
+                info={'form_field_class': FieldTest}
+            )
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+
+        form = ModelTestForm()
+        assert 'type="color"' in str(form.test_column)
