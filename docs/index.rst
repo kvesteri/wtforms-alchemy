@@ -187,6 +187,30 @@ By default WTForms-Alchemy excludes a column from the ModelForm if one of the fo
     * Column is DateTime field which has default value (usually this is a generated value)
     * Column is set as model inheritance discriminator field
 
+Custom fields
+-------------
+If you want to use a custom field class, you can pass it by using
+form_field_class parameter for the column info dictionary.
+
+Example ::
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        color = sa.Column(
+            sa.String(7),
+            info={'form_field_class': ColorField},
+            nullable=False
+        )
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+Now the 'color' field of UserForm would be a custom ColorField.
+
 Forcing the use of SelectField
 ------------------------------
 

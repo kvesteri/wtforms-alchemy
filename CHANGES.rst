@@ -3,6 +3,12 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
+0.3.2 (2012-03-14)
+^^^^^^^^^^^^^^^^^^
+
+- Added custom field class attribute
+
+
 0.3.1 (2012-03-01)
 ^^^^^^^^^^^^^^^^^^
 
