@@ -337,9 +337,11 @@ class FormGenerator(object):
 
     def get_field_class(self, column):
         """
-        Returns WTForms field class that corresponds to given SQLAlchemy column
-        type.
+        Returns WTForms field class. Class is based on a custom field class
+        attribute or SQLAlchemy column type.
         """
+        if 'form_field_class' in column.info:
+            return column.info['form_field_class']
         if 'choices' in column.info and column.info['choices']:
             return SelectField
         if column.type.__class__ not in self.TYPE_MAP:
