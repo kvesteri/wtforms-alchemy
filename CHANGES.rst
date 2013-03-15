@@ -3,6 +3,12 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
+0.4 (2012-03-15)
+^^^^^^^^^^^^^^^^
+
+- Moved custome fields, validators and widgets to WTForms-Components package
+
+
 0.3.3 (2012-03-14)
 ^^^^^^^^^^^^^^^^^^
 

@@ -24,7 +24,7 @@ class PyTest(Command):
 
 setup(
     name='WTForms-Alchemy',
-    version='0.3.3',
+    version='0.4',
     url='https://github.com/kvesteri/wtforms-alchemy',
     license='BSD',
     author='Konsta Vesterinen',
@@ -36,8 +36,9 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'SQLAlchemy==0.7.8',
-        'WTForms==1.0.2'
+        'SQLAlchemy>=0.7.8',
+        'WTForms>=1.0.2',
+        'WTForms-Components>=0.1'
     ],
     cmdclass={'test': PyTest},
     classifiers=[
