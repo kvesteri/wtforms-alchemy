@@ -91,22 +91,24 @@ By default WTForms-Alchemy converts SQLAlchemy model columns using the following
 type table. So for example if an Unicode column would be converted to TextField.
 
 
-========================    =================
- SQAlchemy column type      WTForms Field
-------------------------    -----------------
-    BigInteger              IntegerField
-    Date                    DateField
-    DateTime                DateTimeField
-    Enum                    wtforms_alchemy.fields.SelectField
-    Float                   FloatField
-    Integer                 IntegerField
-    Integer                 IntegerField
-    Numeric                 DecimalField
-    SmallInteger            IntegerField
-    Text                    TextAreaField
-    Unicode                 TextField
-    UnicodeText             TextAreaField
-========================    =================
+
+====================================    =================
+ **SQAlchemy column type**              **WTForms Field**
+------------------------------------    -----------------
+    BigInteger                          IntegerField
+    Date                                DateField
+    DateTime                            DateTimeField
+    Enum                                wtforms_components.fields.SelectField
+    Float                               FloatField
+    Integer                             IntegerField
+    Integer                             IntegerField
+    Numeric                             DecimalField
+    sqlalchemy_utils.PhoneNumberType    wtforms_components.fields.PhoneNumberField
+    SmallInteger                        IntegerField
+    Text                                TextAreaField
+    Unicode                             TextField
+    UnicodeText                         TextAreaField
+====================================    =================
 
 Excluded fields
 ---------------

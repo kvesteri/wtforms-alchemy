@@ -3,6 +3,13 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
+
+0.4.1 (2012-03-21)
+^^^^^^^^^^^^^^^^
+
+- Added conversion from PhoneNumberType to PhoneNumberField
+
+
 0.4 (2012-03-15)
 ^^^^^^^^^^^^^^^^
 
