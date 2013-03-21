@@ -23,11 +23,13 @@ from sqlalchemy import types
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.util import has_identity
 from sqlalchemy.orm.properties import ColumnProperty
+from sqlalchemy_utils import PhoneNumberType
 from wtforms_components import (
     SelectField,
     SelectMultipleField,
     DateRange,
     Unique,
+    PhoneNumberField
 )
 from .utils import (
     is_date_column,
@@ -87,6 +89,7 @@ class FormGenerator(object):
         types.Numeric: DecimalField,
         types.Boolean: BooleanField,
         types.Enum: SelectField,
+        PhoneNumberType: PhoneNumberField
     }
 
     COERCE_TYPE_MAP = {
@@ -237,6 +240,9 @@ class FormGenerator(object):
 
         if isinstance(column.type, types.Date):
             kwargs['format'] = self.meta.date_format
+
+        if hasattr(column.type, 'country_code'):
+            kwargs['country_code'] = column.type.country_code
 
         return field_class(**kwargs)
 

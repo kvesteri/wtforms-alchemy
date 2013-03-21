@@ -10,7 +10,13 @@ from wtforms.fields import (
     FloatField,
     DecimalField,
 )
-from wtforms_alchemy import SelectField, UnknownTypeException, null_or_unicode
+from sqlalchemy_utils import PhoneNumberType
+from wtforms_alchemy import (
+    PhoneNumberField,
+    SelectField,
+    UnknownTypeException,
+    null_or_unicode
+)
 from tests import ModelFormTestCase
 
 
@@ -86,3 +92,12 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.assert_type('test_column', SelectField)
         form = self.form_class()
         assert form.test_column.choices == choices
+
+    def test_phone_number_converts_to_phone_number_field(self):
+        self.init(type_=PhoneNumberType)
+        self.assert_type('test_column', PhoneNumberField)
+
+    def test_phone_number_country_code_passed_to_field(self):
+        self.init(type_=PhoneNumberType(country_code='SE'))
+        form = self.form_class()
+        assert form.test_column.country_code == 'SE'
