@@ -10,14 +10,15 @@ from wtforms.fields import (
     FloatField,
     DecimalField,
 )
+from wtforms.validators import Length
 from sqlalchemy_utils import PhoneNumberType, NumberRangeType
 from wtforms_components import NumberRangeField
 from wtforms_alchemy import (
-    PhoneNumberField,
     SelectField,
     UnknownTypeException,
     null_or_unicode
 )
+from wtforms_components import PhoneNumberField
 from tests import ModelFormTestCase
 
 
@@ -102,6 +103,12 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init(type_=PhoneNumberType(country_code='SE'))
         form = self.form_class()
         assert form.test_column.country_code == 'SE'
+
+    def test_phone_number_type_has_no_length_validation(self):
+        self.init(type_=PhoneNumberType(country_code='FI'))
+        field = self._get_field('test_column')
+        for validator in field.validators:
+            assert validator.__class__ != Length
 
     def test_number_range_converts_to_number_range_field(self):
         self.init(type_=NumberRangeType)

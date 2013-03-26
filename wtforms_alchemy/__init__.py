@@ -342,6 +342,8 @@ class FormGenerator(object):
         """
         Returns length validator for given column
         """
+        if column.type.__class__ == PhoneNumberType:
+            return
         if hasattr(column.type, 'length') and column.type.length:
             return Length(max=column.type.length)
 

@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.4.3 (2012-03-26)
+^^^^^^^^^^^^^^^^
+
+- Disalbed length validation for PhoneNumberType
+
+
 0.4.2 (2012-03-26)
 ^^^^^^^^^^^^^^^^
 
