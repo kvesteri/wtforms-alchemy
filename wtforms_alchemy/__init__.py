@@ -23,13 +23,14 @@ from sqlalchemy import types
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.util import has_identity
 from sqlalchemy.orm.properties import ColumnProperty
-from sqlalchemy_utils import PhoneNumberType
+from sqlalchemy_utils import PhoneNumberType, NumberRangeType
 from wtforms_components import (
+    DateRange,
+    NumberRangeField,
+    PhoneNumberField,
     SelectField,
     SelectMultipleField,
-    DateRange,
     Unique,
-    PhoneNumberField
 )
 from .utils import (
     is_date_column,
@@ -89,7 +90,8 @@ class FormGenerator(object):
         types.Numeric: DecimalField,
         types.Boolean: BooleanField,
         types.Enum: SelectField,
-        PhoneNumberType: PhoneNumberField
+        PhoneNumberType: PhoneNumberField,
+        NumberRangeType: NumberRangeField
     }
 
     COERCE_TYPE_MAP = {

@@ -10,7 +10,8 @@ from wtforms.fields import (
     FloatField,
     DecimalField,
 )
-from sqlalchemy_utils import PhoneNumberType
+from sqlalchemy_utils import PhoneNumberType, NumberRangeType
+from wtforms_components import NumberRangeField
 from wtforms_alchemy import (
     PhoneNumberField,
     SelectField,
@@ -101,3 +102,7 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init(type_=PhoneNumberType(country_code='SE'))
         form = self.form_class()
         assert form.test_column.country_code == 'SE'
+
+    def test_number_range_converts_to_number_range_field(self):
+        self.init(type_=NumberRangeType)
+        self.assert_type('test_column', NumberRangeField)

@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.4.2 (2012-03-26)
+^^^^^^^^^^^^^^^^
+
+- Added conversion from NumberRangeType to NumberRangeField
+
+
 0.4.1 (2012-03-21)
 ^^^^^^^^^^^^^^^^
 
