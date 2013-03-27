@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.4.4 (2012-03-27)
+^^^^^^^^^^^^^^^^
+
+- Updated WTForms-Components and SQLAlchemy-Utils dependencies
+
+
 0.4.3 (2012-03-26)
 ^^^^^^^^^^^^^^^^
 
