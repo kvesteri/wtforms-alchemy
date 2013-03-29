@@ -38,7 +38,7 @@ setup(
     install_requires=[
         'SQLAlchemy>=0.7.8',
         'WTForms>=1.0.2',
-        'WTForms-Components>=0.4.5',
+        'WTForms-Components>=0.4.6',
         'SQLAlchemy-Utils>=0.7.7'
     ],
     cmdclass={'test': PyTest},
