@@ -15,6 +15,8 @@ from .utils import (
     is_scalar,
     null_or_int,
     null_or_unicode,
+    class_list,
+    properties,
 )
 from .exc import InvalidAttributeException, UnknownTypeException
 from .fields import ModelFieldList, ModelFormField
@@ -38,20 +40,6 @@ __all__ = (
     null_or_int,
     null_or_unicode,
 )
-
-
-def class_list(cls):
-    """Simple recursive function for listing the parent classes of given class.
-    Used by the ModelFormMeta class.
-    """
-    list_of_parents = [cls]
-    for parent in cls.__bases__:
-        list_of_parents.extend(class_list(parent))
-    return list_of_parents
-
-
-def properties(cls):
-    return dict((name, getattr(cls, name)) for name in dir(cls))
 
 
 class ModelFormMeta(FormMeta):

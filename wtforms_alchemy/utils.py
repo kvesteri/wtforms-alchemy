@@ -1,4 +1,6 @@
+import sqlalchemy as sa
 from sqlalchemy import types
+from .exc import UnknownIdentityException
 
 
 def is_scalar(value):
@@ -29,3 +31,52 @@ def is_date_column(column):
         isinstance(column.type, types.Date) or
         isinstance(column.type, types.DateTime)
     )
+
+
+def class_list(cls):
+    """Simple recursive function for listing the parent classes of given class.
+    Used by the ModelFormMeta class.
+    """
+    list_of_parents = [cls]
+    for parent in cls.__bases__:
+        list_of_parents.extend(class_list(parent))
+    return list_of_parents
+
+
+def properties(cls):
+    return dict((name, getattr(cls, name)) for name in dir(cls))
+
+
+def table(model):
+    if isinstance(model, sa.schema.Table):
+        return model
+    else:
+        return model.__table__
+
+
+def primary_keys(model):
+    for column in table(model).c:
+        if column.primary_key:
+            yield column
+
+
+def has_entity(obj, name, model, data):
+    for column in primary_keys(model):
+        if not column.name in data or not data[column.name]:
+            return False
+
+        found = False
+        coerce_func = column.type.python_type
+        for related_obj in getattr(obj, name):
+            value = getattr(related_obj, column.name)
+
+            try:
+                if value == coerce_func(data[column.name]):
+                    found = True
+            except ValueError:
+                # coerce failed
+                pass
+
+        if not found:
+            raise UnknownIdentityException()
+    return True

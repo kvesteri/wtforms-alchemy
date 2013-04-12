@@ -14,3 +14,7 @@ class InvalidAttributeException(Exception):
             "Model attribute '%s' is not a valid sqlalchemy column." %
             attr_name
         )
+
+
+class UnknownIdentityException(Exception):
+    pass

@@ -1,5 +1,4 @@
 #import pytz
-from decimal import Decimal
 from wtforms import (
     BooleanField,
     DateField,
@@ -56,18 +55,6 @@ class FormGenerator(object):
         types.Enum: SelectField,
         PhoneNumberType: PhoneNumberField,
         NumberRangeType: NumberRangeField
-    }
-
-    COERCE_TYPE_MAP = {
-        types.BigInteger: int,
-        types.SmallInteger: int,
-        types.Integer: int,
-        types.Text: str,
-        types.Unicode: unicode,
-        types.UnicodeText: unicode,
-        types.String: str,
-        types.Float: float,
-        types.Numeric: Decimal,
     }
 
     def __init__(self, form_class):
@@ -217,12 +204,12 @@ class FormGenerator(object):
         Create key value args for SelectField based on SQLAlchemy column
         definitions.
         """
-        kwargs['coerce'] = null_or_unicode
-        if column.type.__class__ in self.COERCE_TYPE_MAP:
-            coerce_func = self.COERCE_TYPE_MAP[column.type.__class__]
-            kwargs['coerce'] = coerce_func
-            if column.nullable and kwargs['coerce'] in (unicode, str):
-                kwargs['coerce'] = null_or_unicode
+        try:
+            kwargs['coerce'] = column.type.python_type
+        except NotImplementedError:
+            kwargs['coerce'] = null_or_unicode
+        if column.nullable and kwargs['coerce'] in (unicode, str):
+            kwargs['coerce'] = null_or_unicode
 
         if 'choices' in column.info and column.info['choices']:
             kwargs['choices'] = column.info['choices']
