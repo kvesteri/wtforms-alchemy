@@ -4,6 +4,14 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+
+0.5.0 (2012-04-12)
+^^^^^^^^^^^^^^^^
+
+- Updated SQLAlchemy dependency to 0.8
+- Completely rewritten ModelFieldList implementation
+
+
 0.4.5 (2012-03-27)
 ^^^^^^^^^^^^^^^^
 
