@@ -10,8 +10,11 @@ class SkipOperation(Exception):
 class ModelFormField(FormField):
     def populate_obj(self, obj, name):
         if self.data:
-            setattr(obj, name, self.form.Meta.model())
-
+            try:
+                if getattr(obj, name) is None:
+                    setattr(obj, name, self.form.Meta.model())
+            except AttributeError:
+                pass
         FormField.populate_obj(self, obj, name)
 
 

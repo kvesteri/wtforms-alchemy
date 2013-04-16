@@ -1,4 +1,5 @@
 #import pytz
+from collections import OrderedDict
 from wtforms import (
     BooleanField,
     DateField,
@@ -15,14 +16,16 @@ from wtforms.validators import (
     NumberRange,
     Optional,
 )
-from sqlalchemy import types
+import sqlalchemy as sa
 from sqlalchemy.orm.properties import ColumnProperty
-from sqlalchemy_utils import PhoneNumberType, NumberRangeType
+from sqlalchemy_utils import types
 from wtforms_components import (
     DateRange,
+    Email,
     NumberRangeField,
     PhoneNumberField,
     SelectField,
+    TimeField,
     Unique,
 )
 from .exc import InvalidAttributeException, UnknownTypeException
@@ -39,23 +42,29 @@ class FormGenerator(object):
     Base form generator, you can make your own form generators by inheriting
     this class.
     """
-    TYPE_MAP = {
-        types.BigInteger: IntegerField,
-        types.SmallInteger: IntegerField,
-        types.Integer: IntegerField,
-        types.DateTime: DateTimeField,
-        types.Date: DateField,
-        types.Text: TextAreaField,
-        types.Unicode: TextField,
-        types.UnicodeText: TextAreaField,
-        types.String: TextField,
-        types.Float: FloatField,
-        types.Numeric: DecimalField,
-        types.Boolean: BooleanField,
-        types.Enum: SelectField,
-        PhoneNumberType: PhoneNumberField,
-        NumberRangeType: NumberRangeField
-    }
+
+    # We care about the order here since some types (for example UnicodeText)
+    # inherit another type which converts to different field than the type in
+    # question.
+    TYPE_MAP = OrderedDict((
+        (sa.types.UnicodeText, TextAreaField),
+        (sa.types.BigInteger, IntegerField),
+        (sa.types.SmallInteger, IntegerField),
+        (sa.types.Text, TextAreaField),
+        (sa.types.Boolean, BooleanField),
+        (sa.types.Date, DateField),
+        (sa.types.DateTime, DateTimeField),
+        (sa.types.Enum, SelectField),
+        (sa.types.Float, FloatField),
+        (sa.types.Integer, IntegerField),
+        (sa.types.Numeric, DecimalField),
+        (sa.types.String, TextField),
+        (sa.types.Time, TimeField),
+        (sa.types.Unicode, TextField),
+        (types.EmailType, TextField),
+        (types.NumberRangeType, NumberRangeField),
+        (types.PhoneNumberType, PhoneNumberField),
+    ))
 
     def __init__(self, form_class):
         """
@@ -139,7 +148,7 @@ class FormGenerator(object):
             return True
 
         if (not self.meta.include_datetimes_with_default and
-                isinstance(column.type, types.DateTime) and
+                isinstance(column.type, sa.types.DateTime) and
                 column.default):
             return True
 
@@ -188,10 +197,10 @@ class FormGenerator(object):
                 ('choices' in column.info and column.info['choices'])):
             kwargs = self.select_field_kwargs(column, kwargs)
 
-        if isinstance(column.type, types.DateTime):
+        if isinstance(column.type, sa.types.DateTime):
             kwargs['format'] = self.meta.datetime_format
 
-        if isinstance(column.type, types.Date):
+        if isinstance(column.type, sa.types.Date):
             kwargs['format'] = self.meta.date_format
 
         if hasattr(column.type, 'country_code'):
@@ -230,6 +239,8 @@ class FormGenerator(object):
             self.range_validator(column)
         ]
         validators = [v for v in validators if v is not None]
+        if isinstance(column.type, types.EmailType):
+            validators.append(Email())
         validators.extend(self.additional_validators(column))
         return validators
 
@@ -242,7 +253,7 @@ class FormGenerator(object):
             not column.default and
             not column.nullable and
             self.meta.assign_required and not
-                isinstance(column.type, types.Boolean)):
+                isinstance(column.type, sa.types.Boolean)):
             return DataRequired()
         return Optional()
 
@@ -293,7 +304,7 @@ class FormGenerator(object):
         """
         Returns length validator for given column
         """
-        if column.type.__class__ == PhoneNumberType:
+        if isinstance(column.type, types.PhoneNumberType):
             return
         if hasattr(column.type, 'length') and column.type.length:
             return Length(max=column.type.length)
@@ -308,6 +319,7 @@ class FormGenerator(object):
             return column.info['form_field_class']
         if 'choices' in column.info and column.info['choices']:
             return SelectField
-        if column.type.__class__ not in self.TYPE_MAP:
-            raise UnknownTypeException(column)
-        return self.TYPE_MAP[column.type.__class__]
+        for type_ in self.TYPE_MAP:
+            if isinstance(column.type, type_):
+                return self.TYPE_MAP[type_]
+        raise UnknownTypeException(column)

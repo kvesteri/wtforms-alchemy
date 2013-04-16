@@ -11,8 +11,8 @@ from wtforms.fields import (
     DecimalField,
 )
 from wtforms.validators import Length
-from sqlalchemy_utils import PhoneNumberType, NumberRangeType
-from wtforms_components import NumberRangeField
+from sqlalchemy_utils import PhoneNumberType, NumberRangeType, EmailType
+from wtforms_components import NumberRangeField, Email, TimeField
 from wtforms_alchemy import (
     SelectField,
     UnknownTypeException,
@@ -94,6 +94,30 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.assert_type('test_column', SelectField)
         form = self.form_class()
         assert form.test_column.choices == choices
+
+    def test_assigns_email_validator_for_email_type(self):
+        self.init(type_=EmailType)
+        self.assert_has_validator('test_column', Email)
+
+    def test_time_converts_to_time_field(self):
+        self.init(type_=sa.types.Time)
+        self.assert_type('test_column', TimeField)
+
+    def test_varchar_converts_to_text_field(self):
+        self.init(type_=sa.types.VARCHAR)
+        self.assert_type('test_column', TextField)
+
+    def test_text_converts_to_textarea_field(self):
+        self.init(type_=sa.types.TEXT)
+        self.assert_type('test_column', TextAreaField)
+
+    def test_char_converts_to_text_field(self):
+        self.init(type_=sa.types.CHAR)
+        self.assert_type('test_column', TextField)
+
+    def test_real_converts_to_float_field(self):
+        self.init(type_=sa.types.REAL)
+        self.assert_type('test_column', FloatField)
 
     def test_phone_number_converts_to_phone_number_field(self):
         self.init(type_=PhoneNumberType)

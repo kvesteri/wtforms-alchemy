@@ -4,41 +4,50 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.5.1 (2012-04-16)
+^^^^^^^^^^^^^^^^^^
+
+- Updated SQLAlchemy-Utils dependency to 0.9.1
+- Updated WTForms-Components dependency to 0.5.2
+- Fixed Email validator auto-assigning for EmailType
+- Smarter type conversion for subclassed types
+- Fixed ModelFormField update handling
+
 
 0.5.0 (2012-04-12)
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 - Updated SQLAlchemy dependency to 0.8
 - Completely rewritten ModelFieldList implementation
 
 
 0.4.5 (2012-03-27)
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 - Updated WTForms-Components dependencies
 - Updated docs
 
 
 0.4.4 (2012-03-27)
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 - Updated WTForms-Components and SQLAlchemy-Utils dependencies
 
 
 0.4.3 (2012-03-26)
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 - Disalbed length validation for PhoneNumberType
 
 
 0.4.2 (2012-03-26)
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 - Added conversion from NumberRangeType to NumberRangeField
 
 
 0.4.1 (2012-03-21)
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 - Added conversion from PhoneNumberType to PhoneNumberField
 

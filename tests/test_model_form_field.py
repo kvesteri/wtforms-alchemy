@@ -1,4 +1,4 @@
-from flexmock import flexmock
+from pytest import raises
 import sqlalchemy as sa
 from wtforms_alchemy import ModelForm, ModelFormField
 from tests import FormRelationsTestCase, MultiDict
@@ -35,18 +35,20 @@ class TestOneToOneModelFormRelations(FormRelationsTestCase):
         self.LocationForm = LocationForm
         self.EventForm = EventForm
 
-    def save(self, data={}):
+    def save(self, event=None, data={}):
         if not data:
             data = {
                 'name': u'Some event',
                 'location-name': u'Some location',
             }
-        event = self.Event()
+        if not event:
+            event = self.Event()
         self.session.add(event)
         form = self.EventForm(MultiDict(data))
         form.validate()
         form.populate_obj(event)
         self.session.commit()
+        return event
 
     def test_assigment_and_deletion(self):
         self.save()
@@ -70,20 +72,16 @@ class TestOneToOneModelFormRelations(FormRelationsTestCase):
             unknown_field = ModelFormField(self.LocationForm)
 
         self.EventForm = EventForm
-        self.save({
-            'name': u'Some event',
-            'unknown_field-name': u'Some location',
-        })
 
-    def test_only_deletes_persistent_objects(self):
-        data = {
-            'name': u'Some event',
-            'location-name': u'Some location'
-        }
-        flexmock(self.session).should_receive('delete').never()
-        event = self.Event(location=self.Location())
-        self.session.add(event)
-        form = self.EventForm(MultiDict(data))
-        form.validate()
-        form.populate_obj(event)
-        self.session.commit()
+        with raises(TypeError):
+            self.save(data={
+                'name': u'Some event',
+                'unknown_field-name': u'Some location',
+            })
+
+    def test_updating_related_object(self):
+        event = self.save()
+        location_id = event.location.id
+        self.save(event, {'location-name': u'Some other location'})
+
+        assert event.location.id == location_id
