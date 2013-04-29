@@ -4,14 +4,14 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
-0.5.2 (2012-04-25)
+0.5.2 (2013-04-25)
 ^^^^^^^^^^^^^^^^^^
 
 - Added custom widget support
 - Added custom filters support
 
 
-0.5.1 (2012-04-16)
+0.5.1 (2013-04-16)
 ^^^^^^^^^^^^^^^^^^
 
 - Updated SQLAlchemy-Utils dependency to 0.9.1
@@ -21,81 +21,81 @@ Here you can see the full list of changes between each WTForms-Alchemy release.
 - Fixed ModelFormField update handling
 
 
-0.5.0 (2012-04-12)
+0.5.0 (2013-04-12)
 ^^^^^^^^^^^^^^^^^^
 
 - Updated SQLAlchemy dependency to 0.8
 - Completely rewritten ModelFieldList implementation
 
 
-0.4.5 (2012-03-27)
+0.4.5 (2013-03-27)
 ^^^^^^^^^^^^^^^^^^
 
 - Updated WTForms-Components dependencies
 - Updated docs
 
 
-0.4.4 (2012-03-27)
+0.4.4 (2013-03-27)
 ^^^^^^^^^^^^^^^^^^
 
 - Updated WTForms-Components and SQLAlchemy-Utils dependencies
 
 
-0.4.3 (2012-03-26)
+0.4.3 (2013-03-26)
 ^^^^^^^^^^^^^^^^^^
 
 - Disalbed length validation for PhoneNumberType
 
 
-0.4.2 (2012-03-26)
+0.4.2 (2013-03-26)
 ^^^^^^^^^^^^^^^^^^
 
 - Added conversion from NumberRangeType to NumberRangeField
 
 
-0.4.1 (2012-03-21)
+0.4.1 (2013-03-21)
 ^^^^^^^^^^^^^^^^^^
 
 - Added conversion from PhoneNumberType to PhoneNumberField
 
 
-0.4 (2012-03-15)
+0.4 (2013-03-15)
 ^^^^^^^^^^^^^^^^
 
 - Moved custome fields, validators and widgets to WTForms-Components package
 
 
-0.3.3 (2012-03-14)
+0.3.3 (2013-03-14)
 ^^^^^^^^^^^^^^^^^^
 
 - Added handling of form_field_class = None
 
 
-0.3.2 (2012-03-14)
+0.3.2 (2013-03-14)
 ^^^^^^^^^^^^^^^^^^
 
 - Added custom field class attribute
 
 
-0.3.1 (2012-03-01)
+0.3.1 (2013-03-01)
 ^^^^^^^^^^^^^^^^^^
 
 - Better exception messages
 
 
-0.3.0 (2012-03-01)
+0.3.0 (2013-03-01)
 ^^^^^^^^^^^^^^^^^^
 
 - New unique validator syntax
 
 
-0.2.5 (2012-02-16)
+0.2.5 (2013-02-16)
 ^^^^^^^^^^^^^^^^^^
 
 - API documentation
 
 
-0.2.4 (2012-02-08)
+0.2.4 (2013-02-08)
 ^^^^^^^^^^^^^^^^^^
 
 - Enhanced unique validator
