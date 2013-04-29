@@ -12,6 +12,17 @@ class TestFieldParameters(ModelFormTestCase):
         self.init(info={'label': 'Test Column'})
         self.assert_label('test_column', 'Test Column')
 
+    def test_accepts_custom_widgets(self):
+        self.init(info={'widget': widgets.HiddenInput()})
+        form = self.form_class()
+        assert isinstance(form.test_column.widget, widgets.HiddenInput)
+
+    def test_accepts_custom_filters(self):
+        test_filter = lambda a: a
+        self.init(info={'filters': [test_filter]})
+        form = self.form_class()
+        assert test_filter in form.test_column.filters
+
     def test_assigns_description_from_column_info(self):
         self.init(info={'description': 'Description'})
         self.assert_description('test_column', 'Description')

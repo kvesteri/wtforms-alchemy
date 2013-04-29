@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.5.2 (2012-04-25)
+^^^^^^^^^^^^^^^^^^
+
+- Added custom widget support
+- Added custom filters support
+
+
 0.5.1 (2012-04-16)
 ^^^^^^^^^^^^^^^^^^
 

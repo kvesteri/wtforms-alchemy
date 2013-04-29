@@ -1,4 +1,5 @@
 from wtforms.fields import FieldList, FormField
+from wtforms_components import PassiveHiddenField
 from .exc import UnknownIdentityException
 from .utils import has_entity
 

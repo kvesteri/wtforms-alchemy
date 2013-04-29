@@ -43,9 +43,9 @@ class FormGenerator(object):
     this class.
     """
 
-    # We care about the order here since some types (for example UnicodeText)
-    # inherit another type which converts to different field than the type in
-    # question.
+    # When converting SQLAlchemy types to fields this ordered dict is iterated
+    # in given order. This allows smart type conversion of different inherited
+    # type objects.
     TYPE_MAP = OrderedDict((
         (sa.types.UnicodeText, TextAreaField),
         (sa.types.BigInteger, IntegerField),
@@ -205,6 +205,12 @@ class FormGenerator(object):
 
         if hasattr(column.type, 'country_code'):
             kwargs['country_code'] = column.type.country_code
+
+        if 'filters' in column.info:
+            kwargs['filters'] = column.info['filters']
+
+        if 'widget' in column.info:
+            kwargs['widget'] = column.info['widget']
 
         return field_class(**kwargs)
 

@@ -29,8 +29,9 @@ Now how is WTForms-Alchemy ModelForm better than wtforms.ext.sqlachemy's model_f
 * Form generation supports Unique and NumberRange validators
 * Form inheritance support (along with form configuration inheritance)
 * Automatic SelectField type coercing based on underlying column type
-* Provides special SelectField that understands None values. This SelectField also renders nested datastructures as optgroups
+* By default uses wtforms_components SelectField for fields with choices. This field understands None values and renders nested datastructures as optgroups.
 * Provides better Unique validator
+* Supports SQLAlchemy-Utils datatypes
 * Supports ModelForm model relations population
 * Smarter field exclusion
 * Smarter field conversion
@@ -91,24 +92,36 @@ By default WTForms-Alchemy converts SQLAlchemy model columns using the following
 type table. So for example if an Unicode column would be converted to TextField.
 
 
-
 ====================================    =================
- **SQAlchemy column type**              **WTForms Field**
+ **SQAlchemy column type**              **Form field**
 ------------------------------------    -----------------
     BigInteger                          IntegerField
+    Boolean                             BooleanField
     Date                                DateField
     DateTime                            DateTimeField
     Enum                                wtforms_components.fields.SelectField
     Float                               FloatField
     Integer                             IntegerField
-    Integer                             IntegerField
     Numeric                             DecimalField
-    sqlalchemy_utils.PhoneNumberType    wtforms_components.fields.PhoneNumberField
     SmallInteger                        IntegerField
+    String                              TextField
     Text                                TextAreaField
+    Time                                wtforms_components.fields.TimeField
     Unicode                             TextField
     UnicodeText                         TextAreaField
 ====================================    =================
+
+
+WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
+
+
+====================================    =================
+ **SQAlchemy-Utils type**               **Form field**
+------------------------------------    -----------------
+    sqlalchemy_utils.PhoneNumberType    wtforms_components.fields.PhoneNumberField
+    sqlalchemy_utils.EmailType          wtforms_components.fields.EmailField
+    sqlalchemy_utils.NumberRangeType    wtforms_components.fields.NumberRangeField
+
 
 Excluded fields
 ---------------
@@ -222,6 +235,52 @@ Example::
             model = User
 
 Now the 'name' field of UserForm would have label 'Name'.
+
+
+Custom widgets
+--------------
+
+Example::
+
+    from wtforms import widgets
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(
+            sa.Unicode(100), primary_key=True, nullable=False,
+            info={'widget': widgets.HiddenInput()}
+        )
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+Now the 'name' field of UserForm would use HiddenInput widget instead of TextInput.
+
+
+Custom widgets
+--------------
+
+Example::
+
+    from wtforms import widgets
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(
+            sa.Unicode(100), primary_key=True, nullable=False,
+            info={'widget': widgets.HiddenInput()}
+        )
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+Now the 'name' field of UserForm would use HiddenInput widget instead of TextInput.
 
 
 Default values
@@ -621,6 +680,43 @@ locations too. ::
     event = Event()
     form = EventForm(request.POST)
     form.populate_obj(event)
+
+
+Advanced concepts
+=================
+
+Using WTForms-Alchemy with SQLAlchemy-Defaults
+----------------------------------------------
+
+WTForms-Alchemy works wonderfully with SQLAlchemy-Defaults. When using SQLAlchemy-Defaults with WTForms-Alchemy you
+can define your models and model forms with much more robust syntax. For more information see SQLAlchemy-Defaults documentation.
+
+
+Example ::
+
+    from sqlalchemy_defaults import LazyConfigured
+
+
+    class User(Base, LazyConfigured):
+        __tablename__ = 'user'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(
+            sa.Unicode(255),
+            nullable=False,
+            label=u'Name'
+        )
+        age = sa.Column(
+            sa.Integer,
+            nullable=False,
+            min=18,
+            max=100,
+            label=u'Age'
+        )
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
 
 
 API Documentation
