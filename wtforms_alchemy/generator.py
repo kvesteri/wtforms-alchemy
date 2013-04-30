@@ -20,6 +20,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy_utils import types
 from wtforms_components import (
+    ColorField,
     DateRange,
     Email,
     NumberRangeField,
@@ -64,6 +65,7 @@ class FormGenerator(object):
         (types.EmailType, TextField),
         (types.NumberRangeType, NumberRangeField),
         (types.PhoneNumberType, PhoneNumberField),
+        (types.ColorType, ColorField),
     ))
 
     def __init__(self, form_class):

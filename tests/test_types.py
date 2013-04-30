@@ -11,8 +11,18 @@ from wtforms.fields import (
     DecimalField,
 )
 from wtforms.validators import Length
-from sqlalchemy_utils import PhoneNumberType, NumberRangeType, EmailType
-from wtforms_components import NumberRangeField, Email, TimeField
+from sqlalchemy_utils import (
+    ColorType,
+    PhoneNumberType,
+    NumberRangeType,
+    EmailType
+)
+from wtforms_components import (
+    ColorField,
+    Email,
+    NumberRangeField,
+    TimeField,
+)
 from wtforms_alchemy import (
     SelectField,
     UnknownTypeException,
@@ -137,3 +147,7 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
     def test_number_range_converts_to_number_range_field(self):
         self.init(type_=NumberRangeType)
         self.assert_type('test_column', NumberRangeField)
+
+    def test_color_type_converts_to_color_field(self):
+        self.init(type_=ColorType)
+        self.assert_type('test_column', ColorField)

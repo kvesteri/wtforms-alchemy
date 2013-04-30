@@ -4,6 +4,14 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.5.3 (2013-04-30)
+^^^^^^^^^^^^^^^^^^
+
+- Updated SQLAlchemy-Utils dependency to 0.10.0
+- Updated WTForms-Components dependency to 0.5.4
+- Added support for ColorType
+
+
 0.5.2 (2013-04-25)
 ^^^^^^^^^^^^^^^^^^
 
