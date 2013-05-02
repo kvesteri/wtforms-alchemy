@@ -121,6 +121,7 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
     sqlalchemy_utils.PhoneNumberType    wtforms_components.fields.PhoneNumberField
     sqlalchemy_utils.EmailType          wtforms_components.fields.EmailField
     sqlalchemy_utils.NumberRangeType    wtforms_components.fields.NumberRangeField
+====================================    =================
 
 
 Excluded fields
