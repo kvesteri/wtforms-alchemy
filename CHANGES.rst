@@ -4,6 +4,14 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+
+0.5.4 (2013-05-02)
+^^^^^^^^^^^^^^^^^^
+
+- Possibility to give default configuration for model_form_factory function
+- strip_string_fields configuration option
+
+
 0.5.3 (2013-04-30)
 ^^^^^^^^^^^^^^^^^^
 

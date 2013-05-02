@@ -67,7 +67,7 @@ class ModelFormMeta(FormMeta):
         return FormMeta.__call__(cls, *args, **kwargs)
 
 
-def model_form_factory(base=Form):
+def model_form_factory(base=Form, **defaults):
     """Creates new model form, with given base class."""
 
     class ModelForm(base):
@@ -87,40 +87,49 @@ def model_form_factory(base=Form):
             default = None
 
             #: Whether or not to assign non-nullable fields as required
-            assign_required = True
+            assign_required = defaults.get('assign_required', True)
 
             #: Whether or not to assign all fields as optional, useful when
             #: creating update forms for patch requests
-            all_fields_optional = False
+            all_fields_optional = defaults.get('all_fields_optional', False)
 
             validators = {}
 
             #: Whether or not to include only indexed fields.
-            only_indexed_fields = False
+            only_indexed_fields = defaults.get('only_indexed_fields', False)
 
             #: Whether or not to include primary keys.
-            include_primary_keys = False
+            include_primary_keys = defaults.get('include_primary_keys', False)
 
             #: Whether or not to include foreign keys. By default this is False
             #: indicating that foreign keys are not included in the generated
             #: form.
-            include_foreign_keys = False
+            include_foreign_keys = defaults.get('include_foreign_keys', False)
+
+            #: Whether or not to strip string fields
+            strip_string_fields = defaults.get('strip_string_fields', False)
 
             #: Whether or not to include datetime columns that have a default
             #: value. A good example is created_at column which has a default
             #: value of datetime.utcnow.
-            include_datetimes_with_default = False
+            include_datetimes_with_default = defaults.get(
+                'include_datetimes_with_default', False
+            )
 
             #: Which form generator to use. Only override this if you have a
             #: valid form generator which you want to use instead of the
             #: default one.
-            form_generator = FormGenerator
+            form_generator = defaults.get(
+                'form_generator', FormGenerator
+            )
 
             #: Default date format
-            date_format = '%Y-%m-%d'
+            date_format = defaults.get('date_format', '%Y-%m-%d')
 
             #: Default datetime format
-            datetime_format = '%Y-%m-%d %H:%M:%S'
+            datetime_format = defaults.get(
+                'datetime_format', '%Y-%m-%d %H:%M:%S'
+            )
 
             #: Additional fields to include in the generated form.
             include = []

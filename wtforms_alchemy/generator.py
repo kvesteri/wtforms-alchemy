@@ -35,6 +35,7 @@ from .utils import (
     is_integer_column,
     is_scalar,
     null_or_unicode,
+    trim,
 )
 
 
@@ -174,7 +175,6 @@ class FormGenerator(object):
 
     def create_field(self, column_property):
         column = column_property.columns[0]
-        name = column.name
         kwargs = {}
         field_class = self.get_field_class(column)
 
@@ -186,15 +186,7 @@ class FormGenerator(object):
 
         validators = self.create_validators(column)
         kwargs['validators'] = validators
-
-        if 'description' in column.info:
-            kwargs['description'] = column.info['description']
-
-        if 'label' in column.info:
-            kwargs['label'] = column.info['label']
-        else:
-            kwargs['label'] = name
-
+        kwargs.update(self.type_agnostic_parameters(column))
         if (hasattr(column.type, 'enums') or
                 ('choices' in column.info and column.info['choices'])):
             kwargs = self.select_field_kwargs(column, kwargs)
@@ -208,13 +200,21 @@ class FormGenerator(object):
         if hasattr(column.type, 'country_code'):
             kwargs['country_code'] = column.type.country_code
 
-        if 'filters' in column.info:
-            kwargs['filters'] = column.info['filters']
-
-        if 'widget' in column.info:
-            kwargs['widget'] = column.info['widget']
-
         return field_class(**kwargs)
+
+    def type_agnostic_parameters(self, column):
+        """
+        Returns all type agnostic form field parameters for given column.
+        """
+        name = column.name
+        kwargs = {}
+        kwargs['description'] = column.info.get('description', '')
+        kwargs['label'] = column.info.get('label', name)
+        kwargs['widget'] = column.info.get('widget', None)
+        kwargs['filters'] = column.info.get('filters', [])
+        if self.meta.strip_string_fields:
+            kwargs['filters'].append(trim)
+        return kwargs
 
     def select_field_kwargs(self, column, kwargs):
         """
