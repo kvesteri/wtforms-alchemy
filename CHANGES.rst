@@ -4,6 +4,11 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.5.5 (2013-05-02)
+^^^^^^^^^^^^^^^^^^
+
+- Bug fix: strip_string_fields applied only for string fields
+
 
 0.5.4 (2013-05-02)
 ^^^^^^^^^^^^^^^^^^

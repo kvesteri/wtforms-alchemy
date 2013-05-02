@@ -200,6 +200,10 @@ class FormGenerator(object):
         if hasattr(column.type, 'country_code'):
             kwargs['country_code'] = column.type.country_code
 
+        if (isinstance(column.type, sa.types.String) and
+                self.meta.strip_string_fields):
+            kwargs['filters'].append(trim)
+
         return field_class(**kwargs)
 
     def type_agnostic_parameters(self, column):
@@ -212,8 +216,6 @@ class FormGenerator(object):
         kwargs['label'] = column.info.get('label', name)
         kwargs['widget'] = column.info.get('widget', None)
         kwargs['filters'] = column.info.get('filters', [])
-        if self.meta.strip_string_fields:
-            kwargs['filters'].append(trim)
         return kwargs
 
     def select_field_kwargs(self, column, kwargs):
