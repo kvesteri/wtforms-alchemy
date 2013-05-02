@@ -560,6 +560,27 @@ Defines all generated fields as optional (useful for update forms).
 
 Whether or not to assign non-nullable fields as required.
 
+**strip_string_fields** (default: False)
+
+Whether or not to add stripping filter to all string fields.
+
+Example ::
+
+
+    from werkzeug.datastructures import MultiDict
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            strip_string_fields = True
+
+
+    form = UserForm(MultiDict([('name', 'someone     ')]))
+
+    assert form.name.data == 'someone'
+
+
 **form_generator** (default: FormGenerator class)
 
 Change this if you want to use custom form generator class.
@@ -572,13 +593,29 @@ You can use custom base class for your model forms by using model_form_factory
 function. In the following example we have a UserForm which uses Flask-WTF
 form as a parent form for ModelForm. ::
 
+
     from flask.ext.wtf import Form
     from wtforms_alchemy import model_form_factory
 
 
-    class UserForm(model_form_factory(Form)):
+    ModelForm = model_form_factory(Form)
+
+
+    class UserForm(ModelForm):
         class Meta:
             model = User
+
+
+You can also pass any form genrerator option to model_form_factory. ::
+
+
+    ModelForm = model_form_factory(Form, strip_string_fields=True)
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
 
 
 Forms with relations
