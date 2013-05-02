@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.5.6 (2013-05-02)
+^^^^^^^^^^^^^^^^^^
+
+- Column trim option added for fine-grained control of string field trimming
+
+
 0.5.5 (2013-05-02)
 ^^^^^^^^^^^^^^^^^^
 

@@ -200,8 +200,15 @@ class FormGenerator(object):
         if hasattr(column.type, 'country_code'):
             kwargs['country_code'] = column.type.country_code
 
-        if (isinstance(column.type, sa.types.String) and
-                self.meta.strip_string_fields):
+        should_trim = column.info.get('trim', None)
+
+        if (
+            (
+                isinstance(column.type, sa.types.String) and
+                self.meta.strip_string_fields and
+                should_trim is None
+            ) or should_trim is True
+        ):
             kwargs['filters'].append(trim)
 
         return field_class(**kwargs)

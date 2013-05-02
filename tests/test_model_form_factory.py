@@ -25,3 +25,15 @@ class TestModelFormFactory(ModelFormTestCase):
         ModelForm = model_form_factory(Form, **defaults)
         for key, value in defaults.items():
             assert getattr(ModelForm.Meta, key) == value
+
+    def test_supports_custom_base_class_with_model_form_factory(self):
+        self.init()
+
+        class SomeForm(Form):
+            pass
+
+        class TestCustomBase(model_form_factory(SomeForm)):
+            class Meta:
+                model = self.ModelTest
+
+        assert isinstance(TestCustomBase(), SomeForm)

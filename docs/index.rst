@@ -582,6 +582,27 @@ Example ::
     assert form.name.data == 'someone'
 
 
+You can also fine-grain field stripping by using trim argument for columns. In the example
+below the field 'name' would have its values stripped whereas field 'password' would not. ::
+
+
+    from wtfroms.validators import Email
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(100))
+        password = sa.Column(sa.Unicode(100), info={'trim': False})
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            strip_string_fields = True
+
+
 **form_generator** (default: FormGenerator class)
 
 Change this if you want to use custom form generator class.
