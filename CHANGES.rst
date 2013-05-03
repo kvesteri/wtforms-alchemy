@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.5.7 (2013-05-03)
+^^^^^^^^^^^^^^^^^^
+
+- Fixed trim function for None values
+
+
 0.5.6 (2013-05-02)
 ^^^^^^^^^^^^^^^^^^
 
