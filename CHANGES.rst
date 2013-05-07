@@ -4,6 +4,18 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.6.0 (2013-05-07)
+^^^^^^^^^^^^^^^^^^
+
+- Updated WTForms dependency to 1.0.4
+- Updated WTForms-Components dependency to 0.5.5
+- EmailType now converts to HTML5 EmailField
+- Integer now converts to HTML5 IntegerField
+- Numeric now converts to HTML5 DecimalField
+- Date now converts to HTML5 DateField
+- DateTime now converts to HTML5 DateTimeField
+
+
 0.5.7 (2013-05-03)
 ^^^^^^^^^^^^^^^^^^
 
