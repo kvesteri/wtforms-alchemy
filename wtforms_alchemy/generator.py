@@ -171,22 +171,73 @@ class FormGenerator(object):
         return False
 
     def create_field(self, column_property):
+        """
+        Create form field for given column property.
+
+        :param column_property: SQLAlchemy ColumnProperty object.
+        """
         column = column_property.columns[0]
         kwargs = {}
         field_class = self.get_field_class(column)
+        kwargs['default'] = self.default(column)
+        kwargs['validators'] = self.create_validators(column)
+        kwargs.update(self.type_agnostic_parameters(column))
+        kwargs.update(self.type_specific_parameters(column))
+        kwargs.setdefault('filters', [])
+        kwargs['filters'] += self.filters(column)
+        return field_class(**kwargs)
 
+    def format(self, column):
+        """
+        Return field format for given column.
+
+        :param column: SQLAlchemy Column object
+        """
+        if isinstance(column.type, sa.types.DateTime):
+            return self.meta.datetime_format
+
+        if isinstance(column.type, sa.types.Date):
+            return self.meta.date_format
+
+    def default(self, column):
+        """
+        Return field default for given column.
+
+        :param column: SQLAlchemy Column object
+        """
         if column.default and is_scalar(column.default.arg):
-            kwargs['default'] = column.default.arg
+            return column.default.arg
         else:
             if not column.nullable:
-                kwargs['default'] = self.meta.default
+                return self.meta.default
 
-        validators = self.create_validators(column)
-        kwargs['validators'] = validators
-        kwargs.update(self.type_agnostic_parameters(column))
-        if (hasattr(column.type, 'enums') or
-                ('choices' in column.info and column.info['choices'])):
-            kwargs = self.select_field_kwargs(column, kwargs)
+    def filters(self, column):
+        """
+        Return filters for given column.
+
+        :param column: SQLAlchemy Column object
+        """
+        should_trim = column.info.get('trim', None)
+        filters = column.info.get('filters', [])
+        if (
+            (
+                isinstance(column.type, sa.types.String) and
+                self.meta.strip_string_fields and
+                should_trim is None
+            ) or should_trim is True
+        ):
+            filters.append(trim)
+        return filters
+
+    def type_specific_parameters(self, column):
+        """
+        Returns type specific parameters for given column.
+
+        :param column: SQLAlchemy Column object
+        """
+        kwargs = {}
+        if (hasattr(column.type, 'enums') or column.info.get('choices')):
+            kwargs.update(self.select_field_kwargs(column))
 
         if isinstance(column.type, sa.types.DateTime):
             kwargs['format'] = self.meta.datetime_format
@@ -196,37 +247,29 @@ class FormGenerator(object):
 
         if hasattr(column.type, 'country_code'):
             kwargs['country_code'] = column.type.country_code
-
-        should_trim = column.info.get('trim', None)
-
-        if (
-            (
-                isinstance(column.type, sa.types.String) and
-                self.meta.strip_string_fields and
-                should_trim is None
-            ) or should_trim is True
-        ):
-            kwargs['filters'].append(trim)
-
-        return field_class(**kwargs)
+        return kwargs
 
     def type_agnostic_parameters(self, column):
         """
         Returns all type agnostic form field parameters for given column.
+
+        :param column: SQLAlchemy Column object
         """
         name = column.name
         kwargs = {}
         kwargs['description'] = column.info.get('description', '')
         kwargs['label'] = column.info.get('label', name)
         kwargs['widget'] = column.info.get('widget', None)
-        kwargs['filters'] = column.info.get('filters', [])
         return kwargs
 
-    def select_field_kwargs(self, column, kwargs):
+    def select_field_kwargs(self, column):
         """
-        Create key value args for SelectField based on SQLAlchemy column
+        Returns key value args for SelectField based on SQLAlchemy column
         definitions.
+
+        :param column: SQLAlchemy Column object
         """
+        kwargs = {}
         try:
             kwargs['coerce'] = column.type.python_type
         except NotImplementedError:
@@ -244,7 +287,9 @@ class FormGenerator(object):
 
     def create_validators(self, column):
         """
-        Creates validators for given column
+        Returns validators for given column
+
+        :param column: SQLAlchemy Column object
         """
         validators = [
             self.required_validator(column),
@@ -262,6 +307,8 @@ class FormGenerator(object):
         """
         Returns required / optional validator for given column based on column
         nullability and form configuration.
+
+        :param column: SQLAlchemy Column object
         """
         if (not self.meta.all_fields_optional and
             not column.default and
@@ -274,6 +321,8 @@ class FormGenerator(object):
     def additional_validators(self, column):
         """
         Returns additional validators for given column
+
+        :param column: SQLAlchemy Column object
         """
         validators = []
         name = column.name
@@ -293,6 +342,8 @@ class FormGenerator(object):
     def unique_validator(self, column):
         """
         Returns unique validator for given column if column has a unique index
+
+        :param column: SQLAlchemy Column object
         """
         if column.unique:
             return Unique(
@@ -304,6 +355,8 @@ class FormGenerator(object):
         """
         Returns range validator based on column type and column info min and
         max arguments
+
+        :param column: SQLAlchemy Column object
         """
         min_ = column.info.get('min', None)
         max_ = column.info.get('max', None)
@@ -317,6 +370,8 @@ class FormGenerator(object):
     def length_validator(self, column):
         """
         Returns length validator for given column
+
+        :param column: SQLAlchemy Column object
         """
         if isinstance(column.type, types.PhoneNumberType):
             return
@@ -327,6 +382,8 @@ class FormGenerator(object):
         """
         Returns WTForms field class. Class is based on a custom field class
         attribute or SQLAlchemy column type.
+
+        :param column: SQLAlchemy Column object
         """
         if ('form_field_class' in column.info
                 and column.info['form_field_class']):
