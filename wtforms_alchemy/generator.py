@@ -83,38 +83,83 @@ class FormGenerator(object):
 
         :param form: ModelForm instance
         """
-        fields = set(self.model_class._sa_class_manager.values())
+        attrs = set(self.model_class._sa_class_manager.values())
         tmp = []
-        for field in fields:
-            column = field.property
-            if not isinstance(column, ColumnProperty):
+        for attr in attrs:
+            property_ = attr.property
+            if not isinstance(property_, ColumnProperty):
                 continue
-            if self.skip_column(column):
+            if self.skip_column_property(property_):
                 continue
-            tmp.append(field)
-        fields = set(tmp)
+            tmp.append(attr)
+        tmp += self.translated_attributes
+        attrs = set(tmp)
 
-        def valid_attribute(attr_name):
-            attr = getattr(self.model_class, attr_name)
-            if not hasattr(attr, 'property'):
-                raise InvalidAttributeException(attr_name)
+        return self.create_fields(form, self.filter_attributes(attrs))
 
-            if not isinstance(attr.property, ColumnProperty):
-                raise InvalidAttributeException(attr_name)
+    def filter_attributes(self, attrs):
+        """
+        Filter set of model attributes based on only, exclude and include
+        meta parameters.
 
-            return attr
-
+        :param attrs: Set of attributes
+        """
         if self.meta.only:
-            fields = set(map(valid_attribute, self.meta.only))
+            attrs = set(map(self.validate_attribute, self.meta.only))
         else:
             if self.meta.include:
-                fields.update(map(valid_attribute, self.meta.include))
+                attrs.update(map(self.validate_attribute, self.meta.include))
 
             if self.meta.exclude:
                 func = lambda a: a.key not in self.meta.exclude
-                fields = filter(func, fields)
+                attrs = filter(func, attrs)
+        return attrs
 
-        return self.create_fields(form, fields)
+    def validate_attribute(self, attr_name):
+        """
+        Finds out whether or not given sqlalchemy model attribute name is
+        valid.
+
+        :param attr_name: Attribute name
+        """
+        try:
+            attr = getattr(self.model_class, attr_name)
+        except AttributeError:
+            try:
+                translation_class = (
+                    self.model_class.__translatable__['class']
+                )
+                attr = getattr(translation_class, attr_name)
+            except AttributeError:
+                raise InvalidAttributeException(attr_name)
+
+        try:
+            if not isinstance(attr.property, ColumnProperty):
+                raise InvalidAttributeException(attr_name)
+        except AttributeError:
+            raise InvalidAttributeException(attr_name)
+        return attr
+
+    @property
+    def translated_attributes(self):
+        """
+        Return translated attributes for current model class. See
+        `SQLAlchemy-i18n package`_ for more information about translatable
+        attributes.
+
+        .. _SQLAlchemy-i18n package:
+       https://github.com/kvesteri/sqlalchemy-i18n
+        """
+        try:
+            columns = self.model_class.__translated_columns__
+        except AttributeError:
+            return []
+        else:
+            translation_class = self.model_class.__translatable__['class']
+            return [
+                getattr(translation_class, column.name)
+                for column in columns
+            ]
 
     def create_fields(self, form, attributes):
         """
@@ -124,27 +169,32 @@ class FormGenerator(object):
         :param attributes: model attributes to generate the form fields from
         """
         for attribute in attributes:
-            column = attribute.property
-
-            name = column.columns[0].name
+            column_property = attribute.property
+            column = column_property.columns[0]
             form_field = self.create_field(column)
 
-            if not hasattr(form, name):
-                setattr(form, name, form_field)
-        return form
+            if not hasattr(form, column.name):
+                setattr(form, column.name, form_field)
 
-    def skip_column(self, column_property):
+    def skip_column_property(self, column_property):
         """
-        Whether or not to skip column in the generation process.
+        Whether or not to skip column property in the generation process.
 
         :param column_property: SQLAlchemy ColumnProperty object
         """
-        column = column_property.columns[0]
-        if (not self.meta.include_primary_keys and column.primary_key or
-                column.foreign_keys):
+        if column_property._is_polymorphic_discriminator:
             return True
 
-        if column_property._is_polymorphic_discriminator:
+        return self.skip_column(column_property.columns[0])
+
+    def skip_column(self, column):
+        """
+        Whether or not to skip column in the generation process.
+
+        :param column_property: SQLAlchemy Column object
+        """
+        if (not self.meta.include_primary_keys and column.primary_key or
+                column.foreign_keys):
             return True
 
         if (not self.meta.include_datetimes_with_default and
@@ -170,13 +220,12 @@ class FormGenerator(object):
                 return True
         return False
 
-    def create_field(self, column_property):
+    def create_field(self, column):
         """
-        Create form field for given column property.
+        Create form field for given column.
 
-        :param column_property: SQLAlchemy ColumnProperty object.
+        :param column: SQLAlchemy Column object.
         """
-        column = column_property.columns[0]
         kwargs = {}
         field_class = self.get_field_class(column)
         kwargs['default'] = self.default(column)

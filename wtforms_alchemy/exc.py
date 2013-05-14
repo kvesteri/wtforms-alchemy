@@ -11,7 +11,7 @@ class InvalidAttributeException(Exception):
     def __init__(self, attr_name):
         Exception.__init__(
             self,
-            "Model attribute '%s' is not a valid sqlalchemy column." %
+            "Model does not contain attribute named '%s'." %
             attr_name
         )
 

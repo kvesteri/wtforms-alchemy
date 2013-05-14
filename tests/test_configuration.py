@@ -28,7 +28,7 @@ class TestModelFormConfiguration(ModelFormTestCase):
                 model = self.ModelTest
                 include = ['some_unknown_column']
 
-        with raises(AttributeError):
+        with raises(InvalidAttributeException):
             self.form_class = ModelTestForm()
 
     def test_throws_exception_for_non_column_fields(self):

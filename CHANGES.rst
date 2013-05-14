@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.7.0 (2013-05-14)
+^^^^^^^^^^^^^^^^^^
+
+- SQLAlchemy-i18n support added
+
+
 0.6.0 (2013-05-07)
 ^^^^^^^^^^^^^^^^^^
 
