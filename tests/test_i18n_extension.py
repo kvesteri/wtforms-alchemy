@@ -2,7 +2,7 @@ from pytest import raises
 import sqlalchemy as sa
 from sqlalchemy_i18n import Translatable
 from wtforms_alchemy import ModelForm
-from tests import ModelFormTestCase
+from tests import ModelFormTestCase, MultiDict
 
 
 class TestInternationalizationExtension(ModelFormTestCase):
@@ -39,3 +39,18 @@ class TestInternationalizationExtension(ModelFormTestCase):
 
         with raises(AttributeError):
             ModelTestForm().name
+
+    def test_model_population(self):
+        self.init()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+
+        form = ModelTestForm(
+            MultiDict([('name', u'something'), ('content', u'something')])
+        )
+        obj = self.ModelTest()
+        form.populate_obj(obj)
+        assert obj.name == u'something'
+        assert obj.content == u'something'
