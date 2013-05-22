@@ -261,29 +261,6 @@ Example::
 Now the 'name' field of UserForm would use HiddenInput widget instead of TextInput.
 
 
-Custom widgets
---------------
-
-Example::
-
-    from wtforms import widgets
-
-
-    class User(Base):
-        __tablename__ = 'user'
-
-        name = sa.Column(
-            sa.Unicode(100), primary_key=True, nullable=False,
-            info={'widget': widgets.HiddenInput()}
-        )
-
-    class UserForm(ModelForm):
-        class Meta:
-            model = User
-
-Now the 'name' field of UserForm would use HiddenInput widget instead of TextInput.
-
-
 Default values
 --------------
 
