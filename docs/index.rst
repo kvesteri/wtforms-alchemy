@@ -412,7 +412,7 @@ parents Meta properties.
 
 Example::
 
-    from wtfroms.validators import Email
+    from wtforms.validators import Email
 
 
     class UserForm(ModelForm):
@@ -503,7 +503,7 @@ A dict containing additional validators for the generated form field objects.
 
 Example::
 
-    from wtfroms.validators import Email
+    from wtforms.validators import Email
 
 
     class User(Base):
@@ -563,7 +563,7 @@ You can also fine-grain field stripping by using trim argument for columns. In t
 below the field 'name' would have its values stripped whereas field 'password' would not. ::
 
 
-    from wtfroms.validators import Email
+    from wtforms.validators import Email
 
 
     class User(Base):
