@@ -4,7 +4,7 @@ from wtforms.validators import (
     Email
 )
 from wtforms_alchemy import Unique, ModelForm
-from tests import ModelFormTestCase, FormRelationsTestCase
+from tests import ModelFormTestCase
 
 
 class TestAutoAssignedValidators(ModelFormTestCase):
@@ -37,9 +37,9 @@ class TestAutoAssignedValidators(ModelFormTestCase):
         self.init(nullable=False)
         self.assert_required('test_column')
 
-    def test_does_not_add_required_validators_to_non_nullable_booleans(self):
+    def test_not_nullable_booleans_are_required(self):
         self.init(sa.Boolean, nullable=False)
-        self.assert_not_required('test_column')
+        self.assert_required('test_column')
 
     def test_not_nullable_fields_with_defaults_are_not_required(self):
         self.init(nullable=False, default=u'default')
@@ -48,27 +48,3 @@ class TestAutoAssignedValidators(ModelFormTestCase):
     def test_assigns_not_nullable_integers_as_optional(self):
         self.init(sa.Integer, nullable=True)
         self.assert_optional('test_column')
-
-
-class TestUniqueValidator(FormRelationsTestCase):
-    def create_models(self):
-        pass
-
-    def create_forms(self):
-        pass
-
-    def test_does_raise_exception_if_session_set_and_uses_unique_index(self):
-        class ModelTest(self.base):
-            __tablename__ = 'model_test'
-            id = sa.Column(sa.Integer, primary_key=True)
-            test_column = sa.Column(sa.Unicode(255), unique=True)
-
-        class ModelTestForm(ModelForm):
-            class Meta:
-                model = ModelTest
-
-            @classmethod
-            def get_session(cls):
-                return self.session
-
-        ModelTestForm()

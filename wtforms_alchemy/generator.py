@@ -360,10 +360,9 @@ class FormGenerator(object):
         :param column: SQLAlchemy Column object
         """
         if (not self.meta.all_fields_optional and
-            not column.default and
-            not column.nullable and
-            self.meta.assign_required and not
-                isinstance(column.type, sa.types.Boolean)):
+                not column.default and
+                not column.nullable and
+                self.meta.assign_required):
             return DataRequired()
         return Optional()
 
