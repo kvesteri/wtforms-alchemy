@@ -82,8 +82,8 @@ In the following chapters you'll learn how WTForms-Alchemy converts SQLAlchemy m
 columns to form fields.
 
 
-Converting model columns to form fields
-=======================================
+Column to form field conversion
+===============================
 
 Basic type conversion
 ---------------------
@@ -91,19 +91,22 @@ Basic type conversion
 By default WTForms-Alchemy converts SQLAlchemy model columns using the following
 type table. So for example if an Unicode column would be converted to TextField.
 
+The reason why so many types here convert to wtforms_components based fields is that
+wtforms_components provides better HTML5 compatible type handling than WTForms at the moment.
+
 
 ====================================    =================
  **SQAlchemy column type**              **Form field**
 ------------------------------------    -----------------
-    BigInteger                          IntegerField
+    BigInteger                          wtforms_components.fields.IntegerField
     Boolean                             BooleanField
-    Date                                DateField
-    DateTime                            DateTimeField
+    Date                                wtforms_components.fields.DateField
+    DateTime                            wtforms_components.fields.DateTimeField
     Enum                                wtforms_components.fields.SelectField
     Float                               FloatField
-    Integer                             IntegerField
-    Numeric                             DecimalField
-    SmallInteger                        IntegerField
+    Integer                             wtforms_components.fields.IntegerField
+    Numeric                             wtforms_components.fields.DecimalField
+    SmallInteger                        wtforms_components.fields.IntegerField
     String                              TextField
     Text                                TextAreaField
     Time                                wtforms_components.fields.TimeField
@@ -132,6 +135,40 @@ By default WTForms-Alchemy excludes a column from the ModelForm if one of the fo
     * Column is DateTime field which has default value (usually this is a generated value)
     * Column is set as model inheritance discriminator field
 
+
+Adding/overriding fields
+------------------------
+
+Example::
+
+    from wtforms.fields import TextField, IntegerField
+    from wtforms.validators import Email
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        email = sa.Column(
+            sa.Unicode(255),
+            nullable=False
+        )
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+        email = TextField(validators=[Optional()])
+        age = IntegerField()
+
+Now the UserForm would have three fields:
+    * name, a required TextField
+    * email, an optional TextField
+    * age, IntegerField
+
+
+Form customization
+==================
+
 Custom fields
 -------------
 If you want to use a custom field class, you can pass it by using
@@ -155,6 +192,7 @@ Example ::
             model = User
 
 Now the 'color' field of UserForm would be a custom ColorField.
+
 
 Forcing the use of SelectField
 ------------------------------
@@ -280,6 +318,10 @@ Example ::
 Now the UseForm 'level' field default value would be 1.
 
 
+Validators
+==========
+
+
 Auto-assigned validators
 ------------------------
 
@@ -345,6 +387,7 @@ Here UserForm would behave the same as the following form:
 
 If you are using Flask-SQLAlchemy or similar tool, which assigns session-bound query property to your declarative models, you don't need to define the get_session() method. Simply use:
 
+::
 
     Unique(User.email)
 
@@ -372,63 +415,6 @@ Example::
 
 Now the 'email' field of UserForm would have Email validator.
 
-
-
-Adding/overriding fields
-------------------------
-
-Example::
-
-    from wtforms.fields import TextField, IntegerField
-    from wtforms.validators import Email
-
-    class User(Base):
-        __tablename__ = 'user'
-
-        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
-        email = sa.Column(
-            sa.Unicode(255),
-            nullable=False
-        )
-
-    class UserForm(ModelForm):
-        class Meta:
-            model = User
-
-        email = TextField(validators=[Optional()])
-        age = IntegerField()
-
-Now the UserForm would have three fields:
-    * name, a required TextField
-    * email, an optional TextField
-    * age, IntegerField
-
-
-Form inheritance
-----------------
-
-ModelForm's configuration support inheritance. This means that child classes inherit
-parents Meta properties.
-
-Example::
-
-    from wtforms.validators import Email
-
-
-    class UserForm(ModelForm):
-        class Meta:
-            model = User
-            validators = {'email': [Email()]}
-
-
-    class UserUpdateForm(UserForm):
-        class Meta:
-            all_fields_optional = True
-
-
-Here UserUpdateForm inherits the configuration properties of UserForm, hence it would
-use model User and have additional Email validator on column 'email'. Also it assigns
-all fields as optional.
 
 
 Configuration
@@ -583,6 +569,34 @@ below the field 'name' would have its values stripped whereas field 'password' w
 **form_generator** (default: FormGenerator class)
 
 Change this if you want to use custom form generator class.
+
+
+Form inheritance
+----------------
+
+ModelForm's configuration support inheritance. This means that child classes inherit
+parents Meta properties.
+
+Example::
+
+    from wtforms.validators import Email
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            validators = {'email': [Email()]}
+
+
+    class UserUpdateForm(UserForm):
+        class Meta:
+            all_fields_optional = True
+
+
+Here UserUpdateForm inherits the configuration properties of UserForm, hence it would
+use model User and have additional Email validator on column 'email'. Also it assigns
+all fields as optional.
+
 
 
 Custom form base class

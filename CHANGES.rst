@@ -4,7 +4,14 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
-0.7.1 (2013-05-14)
+0.7.2 (2013-05-24)
+^^^^^^^^^^^^^^^^^^
+
+- Updated WTForms-Components dependency to 0.6.3
+- Made type conversion use WTForms-Components HTML5 fields
+
+
+0.7.1 (2013-05-23)
 ^^^^^^^^^^^^^^^^^^
 
 - DataRequired validator now added to not nullable booleans by default

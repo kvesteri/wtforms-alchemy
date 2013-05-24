@@ -6,7 +6,6 @@ from wtforms import (
     TextAreaField,
     TextField,
 )
-from wtforms.fields import html5
 from wtforms.validators import (
     DataRequired,
     Length,
@@ -18,8 +17,13 @@ from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy_utils import types
 from wtforms_components import (
     ColorField,
+    DateField,
     DateRange,
+    DateTimeField,
+    DecimalField,
     Email,
+    EmailField,
+    IntegerField,
     NumberRangeField,
     PhoneNumberField,
     SelectField,
@@ -47,20 +51,20 @@ class FormGenerator(object):
     # type objects.
     TYPE_MAP = OrderedDict((
         (sa.types.UnicodeText, TextAreaField),
-        (sa.types.BigInteger, html5.IntegerField),
-        (sa.types.SmallInteger, html5.IntegerField),
+        (sa.types.BigInteger, IntegerField),
+        (sa.types.SmallInteger, IntegerField),
         (sa.types.Text, TextAreaField),
         (sa.types.Boolean, BooleanField),
-        (sa.types.Date, html5.DateField),
-        (sa.types.DateTime, html5.DateTimeField),
+        (sa.types.Date, DateField),
+        (sa.types.DateTime, DateTimeField),
         (sa.types.Enum, SelectField),
         (sa.types.Float, FloatField),
-        (sa.types.Integer, html5.IntegerField),
-        (sa.types.Numeric, html5.DecimalField),
+        (sa.types.Integer, IntegerField),
+        (sa.types.Numeric, DecimalField),
         (sa.types.String, TextField),
         (sa.types.Time, TimeField),
         (sa.types.Unicode, TextField),
-        (types.EmailType, html5.EmailField),
+        (types.EmailType, EmailField),
         (types.NumberRangeType, NumberRangeField),
         (types.PhoneNumberType, PhoneNumberField),
         (types.ColorType, ColorField),

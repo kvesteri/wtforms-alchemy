@@ -6,7 +6,6 @@ from wtforms.fields import (
     BooleanField,
     FloatField,
 )
-from wtforms.fields import html5
 from wtforms.validators import Length
 from sqlalchemy_utils import (
     ColorType,
@@ -16,7 +15,12 @@ from sqlalchemy_utils import (
 )
 from wtforms_components import (
     ColorField,
+    DateField,
+    DateTimeField,
+    DecimalField,
     Email,
+    EmailField,
+    IntegerField,
     NumberRangeField,
     TimeField,
 )
@@ -49,7 +53,7 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     def test_integer_converts_to_integer_field(self):
         self.init(type_=sa.Integer)
-        self.assert_type('test_column', html5.IntegerField)
+        self.assert_type('test_column', IntegerField)
 
     def test_unicode_text_converts_to_text_area_field(self):
         self.init(type_=sa.UnicodeText)
@@ -61,11 +65,11 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     def test_datetime_converts_to_datetime_field(self):
         self.init(type_=sa.DateTime)
-        self.assert_type('test_column', html5.DateTimeField)
+        self.assert_type('test_column', DateTimeField)
 
     def test_date_converts_to_date_field(self):
         self.init(type_=sa.Date)
-        self.assert_type('test_column', html5.DateField)
+        self.assert_type('test_column', DateField)
 
     def test_float_converts_to_float_field(self):
         self.init(type_=sa.Float)
@@ -73,7 +77,7 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     def test_numeric_converts_to_decimal_field(self):
         self.init(type_=sa.Numeric)
-        self.assert_type('test_column', html5.DecimalField)
+        self.assert_type('test_column', DecimalField)
 
     def test_enum_field_converts_to_select_field(self):
         choices = ['1', '2']
@@ -151,4 +155,4 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     def test_email_type_converts_to_email_field(self):
         self.init(type_=EmailType)
-        self.assert_type('test_column', html5.EmailField)
+        self.assert_type('test_column', EmailField)
