@@ -119,18 +119,21 @@ class TestUpdateStrategy(ModelFieldListTestCase):
         }
         self.save(event, data)
 
+        assert len(event.locations) == 1
         assert event.locations[0].id == location_id
         assert event.locations[0].name == u'Some other location'
 
-    def test_skips_entries_with_unknown_identifiers(self):
+    def test_creates_new_objects_for_entries_with_unknown_identifiers(self):
         event = self.save()
+        location_id = event.locations[0].id
         data = {
             'name': u'Some event',
             'locations-0-id': 12,
             'locations-0-name': u'Some other location'
         }
         self.save(event, data)
-        assert not event.locations
+        assert event.locations
+        assert event.locations[0].id == location_id + 1
 
     def test_replace_entry(self):
         event = self.save()
@@ -156,8 +159,9 @@ class TestUpdateStrategy(ModelFieldListTestCase):
             'locations-3-name': u'Fourth location'
         }
         self.save(event, data)
-        assert len(event.locations) == 3
-        names = [location.name for location in event.locations]
-        assert 'Some location' in names
-        assert 'Some other location' in names
-        assert 'Third location' in names
+        assert len(event.locations) == 4
+        assert event.locations[0].id == location_id
+        assert event.locations[0].name == u'Some other location'
+        assert event.locations[1].name == u'Some location'
+        assert event.locations[2].name == u'Third location'
+        assert event.locations[3].name == u'Fourth location'

@@ -46,15 +46,11 @@ class ModelFieldList(FieldList):
                 except SkipOperation:
                     pass
         else:
-
             for index, entry in enumerate(self.entries):
                 data = entry.data
                 try:
                     if not has_entity(obj, name, model, data):
                         getattr(obj, name).insert(index, model())
                 except UnknownIdentityException:
-                    # we should skip all entries which are not part of obj
-                    # collection
-                    self.entries.pop(index)
-
+                    getattr(obj, name).insert(index, model())
         FieldList.populate_obj(self, obj, name)
