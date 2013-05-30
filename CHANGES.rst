@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.7.4 (2013-05-30)
+^^^^^^^^^^^^^^^^^^
+
+- Fixed min and max arg handling when using zero values
+
+
 0.7.3 (2013-05-24)
 ^^^^^^^^^^^^^^^^^^
 

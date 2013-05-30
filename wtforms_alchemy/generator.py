@@ -413,7 +413,7 @@ class FormGenerator(object):
         min_ = column.info.get('min', None)
         max_ = column.info.get('max', None)
 
-        if min_ or max_:
+        if min_ is not None or max_ is not None:
             if is_integer_column(column):
                 return NumberRange(min=min_, max=max_)
             elif is_date_column(column):
