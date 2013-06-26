@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.7.5 (2013-05-30)
+^^^^^^^^^^^^^^^^^^
+
+- Fixed _obj setting to better cope with wtforms_components unique validator
+
+
 0.7.4 (2013-05-30)
 ^^^^^^^^^^^^^^^^^^
 

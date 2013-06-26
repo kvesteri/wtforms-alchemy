@@ -143,8 +143,7 @@ def model_form_factory(base=Form, **defaults):
         def __init__(self, *args, **kwargs):
             """Sets object as form attribute."""
 
-            if 'obj' in kwargs:
-                self._obj = kwargs['obj']
+            self._obj = kwargs.get('obj', None)
             super(ModelForm, self).__init__(*args, **kwargs)
 
     return ModelForm

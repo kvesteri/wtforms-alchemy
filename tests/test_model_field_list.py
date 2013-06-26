@@ -28,6 +28,7 @@ class ModelFieldListTestCase(FormRelationsTestCase):
             data = {
                 'name': u'Some event',
                 'locations-0-name': u'Some location',
+                'locations-0-description': u'Some description'
             }
         if not event:
             event = self.Event()
@@ -80,6 +81,7 @@ class TestUpdateStrategy(ModelFieldListTestCase):
             __tablename__ = 'location'
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=True)
+            description = sa.Column(sa.Unicode(255))
 
             event_id = sa.Column(sa.Integer, sa.ForeignKey(Event.id))
             event = sa.orm.relationship(Event, backref='locations')
@@ -140,10 +142,13 @@ class TestUpdateStrategy(ModelFieldListTestCase):
         location_id = event.locations[0].id
         data = {
             'name': u'Some event',
-            'locations-0-name': u'Some location',
+            'locations-0-name': u'Some other location',
         }
         self.save(event, data)
-        assert event.locations[0].id == location_id + 1
+        location = event.locations[0]
+        assert location.id == location_id + 1
+        assert location.name == u'Some other location'
+        assert location.description == u''
         assert len(event.locations) == 1
 
     def test_multiple_entries(self):
@@ -165,3 +170,11 @@ class TestUpdateStrategy(ModelFieldListTestCase):
         assert event.locations[1].name == u'Some location'
         assert event.locations[2].name == u'Third location'
         assert event.locations[3].name == u'Fourth location'
+
+    def test_delete_all_field_list_entries(self):
+        event = self.save()
+        data = {
+            'name': u'Some event'
+        }
+        self.save(event, data)
+        assert not event.locations
