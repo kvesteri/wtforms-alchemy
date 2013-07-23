@@ -151,8 +151,8 @@ class FormGenerator(object):
         `SQLAlchemy-i18n package`_ for more information about translatable
         attributes.
 
-        .. _SQLAlchemy-i18n package:
-       https://github.com/kvesteri/sqlalchemy-i18n
+        .. _`SQLAlchemy-i18n package`:
+            https://github.com/kvesteri/sqlalchemy-i18n
         """
         try:
             columns = self.model_class.__translated_columns__

@@ -42,6 +42,9 @@ __all__ = (
 )
 
 
+__version__ = '0.7.5'
+
+
 class ModelFormMeta(FormMeta):
     """Meta class that overrides WTForms base meta class. The primary purpose
     of this class is allowing ModelForms use special configuration params under
