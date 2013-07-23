@@ -392,6 +392,20 @@ If you are using Flask-SQLAlchemy or similar tool, which assigns session-bound q
     Unique(User.email)
 
 
+Using unique validator with existing objects
+--------------------------------------------
+
+When editing an existing object, WTForms-Alchemy must know the object currently edited to avoid raising a ValidationError. Here how to proceed to inform WTForms-Alchemy of this case.
+Example::
+
+    obj = MyModel.query.get(1)
+    form = MyForm(obj=obj)
+    form.populate_obj(obj)
+    form.validate()
+
+WTForms-Alchemy will then understand to avoid the unique validation of the object with this same object.
+
+
 Additional field validators
 ---------------------------
 
