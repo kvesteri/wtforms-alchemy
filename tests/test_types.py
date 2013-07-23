@@ -33,18 +33,35 @@ from wtforms_components import PhoneNumberField
 from tests import ModelFormTestCase
 
 
-class CustomType(sa.types.TypeDecorator):
+class UnknownType(sa.types.UserDefinedType):
+
+    def get_col_spec(self):
+        return "UNKNOWN()"
+
+class CustomUnicodeTextType(sa.types.TypeDecorator):
     impl = sa.types.UnicodeText
+
+
+class CustomUnicodeType(sa.types.TypeDecorator):
+    impl = sa.types.Unicode
+
+
+class CustomNumericType(sa.types.TypeDecorator):
+    impl = sa.types.Numeric
 
 
 class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
     def test_raises_exception_for_unknown_type(self):
         with raises(UnknownTypeException):
-            self.init(type_=CustomType)
+            self.init(type_=UnknownType)
             self.form_class()
 
     def test_unicode_converts_to_text_field(self):
         self.init()
+        self.assert_type('test_column', TextField)
+
+    def test_custom_unicode_converts_to_text_field(self):
+        self.init(type_=CustomUnicodeType)
         self.assert_type('test_column', TextField)
 
     def test_string_converts_to_text_field(self):
@@ -57,6 +74,10 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     def test_unicode_text_converts_to_text_area_field(self):
         self.init(type_=sa.UnicodeText)
+        self.assert_type('test_column', TextAreaField)
+
+    def test_custom_unicode_text_converts_to_text_area_field(self):
+        self.init(type_=CustomUnicodeTextType)
         self.assert_type('test_column', TextAreaField)
 
     def test_boolean_converts_to_boolean_field(self):
@@ -77,6 +98,10 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     def test_numeric_converts_to_decimal_field(self):
         self.init(type_=sa.Numeric)
+        self.assert_type('test_column', DecimalField)
+
+    def test_custom_numeric_converts_to_decimal_field(self):
+        self.init(type_=CustomNumericType)
         self.assert_type('test_column', DecimalField)
 
     def test_enum_field_converts_to_select_field(self):

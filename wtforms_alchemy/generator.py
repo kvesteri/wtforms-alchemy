@@ -442,7 +442,12 @@ class FormGenerator(object):
             return column.info['form_field_class']
         if 'choices' in column.info and column.info['choices']:
             return SelectField
+        if type(column.type) not in self.TYPE_MAP and \
+           isinstance(column.type, sa.types.TypeDecorator):
+            check_type = column.type.impl
+        else:
+            check_type = column.type
         for type_ in self.TYPE_MAP:
-            if isinstance(column.type, type_):
+            if isinstance(check_type, type_):
                 return self.TYPE_MAP[type_]
         raise UnknownTypeException(column)
