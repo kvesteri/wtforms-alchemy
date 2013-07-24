@@ -4,4 +4,7 @@ pysqlite==2.6.3
 pytest==2.2.3
 Werkzeug==0.8.3
 WTForms-Test>=0.1.1
-SQLAlchemy-i18n>=0.2.3
+SQLAlchemy-i18n>=0.5.1
+phonenumbers3k==5.6b1
+passlib >= 1.6, < 2.0
+colour>=0.0.4
