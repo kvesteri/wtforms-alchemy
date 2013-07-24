@@ -31,6 +31,7 @@ Now how is WTForms-Alchemy ModelForm better than wtforms.ext.sqlachemy's model_f
 * Automatic SelectField type coercing based on underlying column type
 * By default uses wtforms_components SelectField for fields with choices. This field understands None values and renders nested datastructures as optgroups.
 * Provides better Unique validator
+* Supports custom user defined types as well as type decorators
 * Supports SQLAlchemy-Utils datatypes
 * Supports ModelForm model relations population
 * Smarter field exclusion
@@ -124,6 +125,7 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
     sqlalchemy_utils.PhoneNumberType    wtforms_components.fields.PhoneNumberField
     sqlalchemy_utils.EmailType          wtforms_components.fields.EmailField
     sqlalchemy_utils.NumberRangeType    wtforms_components.fields.NumberRangeField
+    sqlalchemy_utils.ColorType          wtforms_components.fields.ColorField
 ====================================    =================
 
 
@@ -164,6 +166,38 @@ Now the UserForm would have three fields:
     * name, a required TextField
     * email, an optional TextField
     * age, IntegerField
+
+
+Type decorators
+---------------
+
+WTForms-Alchemy supports SQLAlchemy TypeDecorator based types. When WTForms-Alchemy encounters a TypeDecorator typed column it tries to convert it to underlying type field.
+
+Example::
+
+
+    import sqlalchemy as sa
+    from wtforms.fields import TextField, IntegerField
+    from wtforms.validators import Email
+
+
+    class CustomUnicodeType(sa.types.TypeDecorator):
+        impl = sa.types.Unicode
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+        name = sa.Column(CustomUnicodeType(100), primary_key=True)
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+
+Now the name field of UserForm would be a simple TextField since the underlying type implementation is Unicode.
+
 
 
 Form customization
