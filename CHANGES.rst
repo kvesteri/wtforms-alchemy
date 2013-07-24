@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.7.6 (2013-07-24)
+^^^^^^^^^^^^^^^^^^
+
+- TypeDecorator support added
+
+
 0.7.5 (2013-05-30)
 ^^^^^^^^^^^^^^^^^^
 

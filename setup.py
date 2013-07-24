@@ -24,7 +24,7 @@ class PyTest(Command):
 
 setup(
     name='WTForms-Alchemy',
-    version='0.7.5',
+    version='0.7.6',
     url='https://github.com/kvesteri/wtforms-alchemy',
     license='BSD',
     author='Konsta Vesterinen',
