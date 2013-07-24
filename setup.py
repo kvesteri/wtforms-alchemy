@@ -38,9 +38,20 @@ setup(
     install_requires=[
         'SQLAlchemy>=0.8.0',
         'WTForms>=1.0.4',
-        'WTForms-Components>=0.6.3',
-        'SQLAlchemy-Utils>=0.15.0'
+        'WTForms-Components>=0.6.4',
+        'SQLAlchemy-Utils>=0.15.1'
     ],
+    extras_require={
+        'test': [
+            'pytest==2.2.3',
+            'flexmock>=0.9.7',
+            'psycopg2>=2.4.6'
+        ],
+        'phone': ['phonenumbers3k==5.6b1'],
+        'password': ['passlib >= 1.6, < 2.0'],
+        'color': ['colour>=0.0.4'],
+        'i18n': ['SQLAlchemy-i18n >= 0.5.1']
+    },
     cmdclass={'test': PyTest},
     classifiers=[
         'Environment :: Web Environment',
