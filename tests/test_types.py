@@ -1,4 +1,4 @@
-from pytest import raises
+from pytest import raises, mark
 import sqlalchemy as sa
 from wtforms.fields import (
     TextField,
@@ -13,6 +13,7 @@ from sqlalchemy_utils import (
     NumberRangeType,
     EmailType
 )
+from sqlalchemy_utils.types import phone_number
 from wtforms_components import (
     ColorField,
     DateField,
@@ -37,6 +38,7 @@ class UnknownType(sa.types.UserDefinedType):
 
     def get_col_spec(self):
         return "UNKNOWN()"
+
 
 class CustomUnicodeTextType(sa.types.TypeDecorator):
     impl = sa.types.UnicodeText
@@ -155,15 +157,18 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init(type_=sa.types.REAL)
         self.assert_type('test_column', FloatField)
 
+    @mark.xfail('phone_number.phonenumbers is None')
     def test_phone_number_converts_to_phone_number_field(self):
         self.init(type_=PhoneNumberType)
         self.assert_type('test_column', PhoneNumberField)
 
+    @mark.xfail('phone_number.phonenumbers is None')
     def test_phone_number_country_code_passed_to_field(self):
         self.init(type_=PhoneNumberType(country_code='SE'))
         form = self.form_class()
         assert form.test_column.country_code == 'SE'
 
+    @mark.xfail('phone_number.phonenumbers is None')
     def test_phone_number_type_has_no_length_validation(self):
         self.init(type_=PhoneNumberType(country_code='FI'))
         field = self._get_field('test_column')

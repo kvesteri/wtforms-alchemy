@@ -1,10 +1,11 @@
+from pytest import mark
 import sqlalchemy as sa
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy_utils import PhoneNumber, PhoneNumberType
+from sqlalchemy_utils.types import phone_number
 from wtforms_alchemy import ModelForm
 
 from tests import MultiDict
@@ -31,11 +32,14 @@ class TestCase(object):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255))
-            phone_number = sa.Column(PhoneNumberType(country_code='FI'))
+            phone_number = sa.Column(
+                phone_number.PhoneNumberType(country_code='FI')
+            )
 
         self.User = User
 
 
+@mark.xfail('phone_number.phonenumbers is None')
 class TestPhoneNumbers(TestCase):
     '''
     Simple tests to ensure that sqlalchemy_utils.PhoneNumber,
@@ -51,7 +55,7 @@ class TestPhoneNumbers(TestCase):
         self.UserForm = UserForm
 
         super(TestPhoneNumbers, self).setup_method(method)
-        self.phone_number = PhoneNumber(
+        self.phone_number = phone_number.PhoneNumber(
             '040 1234567',
             'FI'
         )
@@ -79,7 +83,9 @@ class TestPhoneNumbers(TestCase):
         ))
         form.validate()
         assert len(form.errors) == 0
-        assert form.data['phone_number'] == PhoneNumber('+358401231233')
+        assert form.data['phone_number'] == (
+            phone_number.PhoneNumber('+358401231233')
+        )
 
     def test_empty_phone_number_in_form(self):
         form = self.UserForm(MultiDict(
