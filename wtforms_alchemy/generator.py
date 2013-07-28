@@ -5,6 +5,7 @@ from wtforms import (
     FloatField,
     TextAreaField,
     TextField,
+    PasswordField,
 )
 from wtforms.validators import (
     DataRequired,
@@ -66,6 +67,7 @@ class FormGenerator(object):
         (sa.types.Unicode, TextField),
         (types.EmailType, EmailField),
         (types.NumberRangeType, NumberRangeField),
+        (types.PasswordType, PasswordField),
         (types.PhoneNumberType, PhoneNumberField),
         (types.ColorType, ColorField),
     ))

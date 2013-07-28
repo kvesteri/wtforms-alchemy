@@ -1,17 +1,24 @@
 from pytest import raises, mark
 import sqlalchemy as sa
+passlib = None
+try:
+    import passlib
+except ImportError:
+    pass
 from wtforms.fields import (
     TextField,
     TextAreaField,
     BooleanField,
     FloatField,
+    PasswordField,
 )
 from wtforms.validators import Length
 from sqlalchemy_utils import (
     ColorType,
-    PhoneNumberType,
+    EmailType,
     NumberRangeType,
-    EmailType
+    PasswordType,
+    PhoneNumberType,
 )
 from sqlalchemy_utils.types import phone_number
 from wtforms_components import (
@@ -178,6 +185,11 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
     def test_number_range_converts_to_number_range_field(self):
         self.init(type_=NumberRangeType)
         self.assert_type('test_column', NumberRangeField)
+
+    @mark.xfail('passlib is None')
+    def test_password_type_converts_to_password_field(self):
+        self.init(type_=PasswordType)
+        self.assert_type('test_column', PasswordField)
 
     def test_color_type_converts_to_color_field(self):
         self.init(type_=ColorType)

@@ -75,7 +75,7 @@ must define model parameter in the Meta arguments.::
 
 Now this ModelForm is essentially the same as ::
 
-    class User(Form):
+    class UserForm(Form):
         name = TextField(validators=[DataRequired(), Length(max=100)])
         email = TextField(validators=[DataRequired(), Length(max=255)])
 
@@ -197,6 +197,86 @@ Example::
 
 
 Now the name field of UserForm would be a simple TextField since the underlying type implementation is Unicode.
+
+
+Advanced field types
+====================
+
+WTForms-Alchemy supports all additional SQLAlchemy data types provided by SQLAlchemy-Utils.
+
+
+
+Color type
+----------
+
+::
+
+
+    from sqlalchemy_utils import ColorType
+
+
+    class CustomView(Base):
+        __tablename__ = 'view'
+
+        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+        background_color = sa.Column(
+            ColorType(),
+            nullable=False
+        )
+
+    class CustomViewForm(ModelForm):
+        class Meta:
+            model = CustomView
+
+
+Now the CustomViewForm is essentially the same as:
+
+::
+
+
+    from wtforms_components import ColorField
+
+
+    class CustomViewForm(Form):
+        color = ColorField(validators=[DataRequired()])
+
+
+
+Password type
+-------------
+
+Consider the following model definition:
+
+::
+
+
+    from sqlalchemy_utils import PasswordType
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+        name = sa.Column(sa.Unicode(100), nullable=False)
+        password = sa.Column(
+            PasswordType(
+                schemes=['pbkdf2_sha512']
+            ),
+            nullable=False
+        )
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+
+Now the UserForm is essentially the same as:
+
+::
+
+    class UserForm(Form):
+        name = TextField(validators=[DataRequired(), Length(max=100)])
+        password = PasswordField(validators=[DataRequired()])
 
 
 
