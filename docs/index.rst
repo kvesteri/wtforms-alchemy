@@ -122,13 +122,13 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
 ====================================    =================
  **SQAlchemy-Utils type**               **Form field**
 ------------------------------------    -----------------
-    sqlalchemy_utils.ColorType          wtforms_components.fields.ColorField
-    sqlalchemy_utils.EmailType          wtforms_components.fields.EmailField
-    sqlalchemy_utils.IPAddressType      wtforms_components.fields.IPAddressField
-    sqlalchemy_utils.NumberRangeType    wtforms_components.fields.NumberRangeField
-    sqlalchemy_utils.PasswordType       wtforms.fields.PasswordField
-    sqlalchemy_utils.PhoneNumberType    wtforms_components.fields.PhoneNumberField
-    sqlalchemy_utils.UUIDType           wtforms.fields.TextField + UUID validator
+    ColorType                           wtforms_components.fields.ColorField
+    EmailType                           wtforms_components.fields.EmailField
+    IPAddressType                       wtforms_components.fields.IPAddressField
+    NumberRangeType                     wtforms_components.fields.NumberRangeField
+    PasswordType                        wtforms.fields.PasswordField
+    PhoneNumberType                     wtforms_components.fields.PhoneNumberField
+    UUIDType                            wtforms.fields.TextField + UUID validator
 ====================================    =================
 
 
@@ -242,6 +242,40 @@ Now the CustomViewForm is essentially the same as:
 
     class CustomViewForm(Form):
         color = ColorField(validators=[DataRequired()])
+
+
+
+Email type
+----------
+
+::
+
+
+    from sqlalchemy_utils import EmailType
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+        email = sa.Column(EmailType, nullable=False)
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+
+The good old wtforms equivalent of this form would be:
+
+::
+
+
+    from wtforms_components import EmailField
+
+
+    class UserForm(Form):
+        email = EmailField(validators=[DataRequired()])
 
 
 
