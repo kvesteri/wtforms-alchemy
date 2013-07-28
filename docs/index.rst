@@ -122,10 +122,13 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
 ====================================    =================
  **SQAlchemy-Utils type**               **Form field**
 ------------------------------------    -----------------
-    sqlalchemy_utils.PhoneNumberType    wtforms_components.fields.PhoneNumberField
-    sqlalchemy_utils.EmailType          wtforms_components.fields.EmailField
-    sqlalchemy_utils.NumberRangeType    wtforms_components.fields.NumberRangeField
     sqlalchemy_utils.ColorType          wtforms_components.fields.ColorField
+    sqlalchemy_utils.EmailType          wtforms_components.fields.EmailField
+    sqlalchemy_utils.IPAddressType      wtforms_components.fields.IPAddressField
+    sqlalchemy_utils.NumberRangeType    wtforms_components.fields.NumberRangeField
+    sqlalchemy_utils.PasswordType       wtforms.fields.PasswordField
+    sqlalchemy_utils.PhoneNumberType    wtforms_components.fields.PhoneNumberField
+    sqlalchemy_utils.UUIDType           wtforms.fields.TextField + UUID validator
 ====================================    =================
 
 
