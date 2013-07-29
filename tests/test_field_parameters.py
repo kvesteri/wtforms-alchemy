@@ -1,7 +1,8 @@
-from datetime import date
+from datetime import date, time
 import sqlalchemy as sa
 from wtforms import widgets
-from wtforms_alchemy import DateRange, ModelForm
+from wtforms_alchemy import ModelForm
+from wtforms_components import DateRange, TimeRange
 from wtforms.fields import StringField
 from wtforms.validators import NumberRange
 from tests import ModelFormTestCase
@@ -40,6 +41,15 @@ class TestFieldParameters(ModelFormTestCase):
         validator = self.get_validator('test_column', NumberRange)
         assert validator.min == 1
         assert validator.max == 100
+
+    def test_min_and_max_info_attributes_generate_time_range_validator(self):
+        self.init(
+            type_=sa.types.Time,
+            info={'min': time(12, 30), 'max': time(14, 30)}
+        )
+        validator = self.get_validator('test_column', TimeRange)
+        assert validator.min == time(12, 30)
+        assert validator.max == time(14, 30)
 
     def test_min_and_max_info_attributes_generate_date_range_validator(self):
         self.init(

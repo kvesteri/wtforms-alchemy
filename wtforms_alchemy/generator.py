@@ -29,6 +29,7 @@ from wtforms_components import (
     PhoneNumberField,
     SelectField,
     TimeField,
+    TimeRange,
     Unique,
 )
 from .exc import InvalidAttributeException, UnknownTypeException
@@ -65,11 +66,14 @@ class FormGenerator(object):
         (sa.types.String, TextField),
         (sa.types.Time, TimeField),
         (sa.types.Unicode, TextField),
+        (types.ArrowType, DateTimeField),
+        (types.ColorType, ColorField),
         (types.EmailType, EmailField),
         (types.NumberRangeType, NumberRangeField),
         (types.PasswordType, PasswordField),
         (types.PhoneNumberType, PhoneNumberField),
-        (types.ColorType, ColorField),
+        (types.ScalarListType, TextField),
+        (types.UUIDType, TextField),
     ))
 
     def __init__(self, form_class):
@@ -420,6 +424,8 @@ class FormGenerator(object):
                 return NumberRange(min=min_, max=max_)
             elif is_date_column(column):
                 return DateRange(min=min_, max=max_)
+            elif isinstance(column.type, sa.types.Time):
+                return TimeRange(min=min_, max=max_)
 
     def length_validator(self, column):
         """
@@ -444,8 +450,10 @@ class FormGenerator(object):
             return column.info['form_field_class']
         if 'choices' in column.info and column.info['choices']:
             return SelectField
-        if type(column.type) not in self.TYPE_MAP and \
-           isinstance(column.type, sa.types.TypeDecorator):
+        if (
+            type(column.type) not in self.TYPE_MAP and
+            isinstance(column.type, sa.types.TypeDecorator)
+        ):
             check_type = column.type.impl
         else:
             check_type = column.type

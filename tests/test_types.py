@@ -19,7 +19,9 @@ from sqlalchemy_utils import (
     NumberRangeType,
     PasswordType,
     PhoneNumberType,
+    UUIDType
 )
+from sqlalchemy_utils.types import arrow
 from sqlalchemy_utils.types import phone_number
 from wtforms_components import (
     ColorField,
@@ -190,6 +192,15 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
     def test_password_type_converts_to_password_field(self):
         self.init(type_=PasswordType)
         self.assert_type('test_column', PasswordField)
+
+    @mark.xfail('arrow.arrow is None')
+    def test_arrow_type_converts_to_datetime_field(self):
+        self.init(type_=arrow.ArrowType)
+        self.assert_type('test_column', DateTimeField)
+
+    def test_uuid_type_converst_to_uuid_type(self):
+        self.init(type_=UUIDType)
+        self.assert_type('test_column', TextField)
 
     def test_color_type_converts_to_color_field(self):
         self.init(type_=ColorType)
