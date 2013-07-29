@@ -39,7 +39,7 @@ setup(
         'SQLAlchemy>=0.8.0',
         'WTForms>=1.0.4',
         'WTForms-Components>=0.6.4',
-        'SQLAlchemy-Utils>=0.15.1'
+        'SQLAlchemy-Utils>=0.16.0'
     ],
     extras_require={
         'test': [
