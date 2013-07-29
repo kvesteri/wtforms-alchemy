@@ -478,8 +478,9 @@ Auto-assigned validators
 
 By default WTForms-Alchemy ModelForm assigns the following validators:
     * DataRequired validator if your column is not nullable and has no default value
-    * NumberRange validator if column info parameter has min or max arguments defined
-    * DateRange validator if column info parameter has min or max arguments defined
+    * NumberRange validator if column if of type Integer, Float or Decimal and column info parameter has min or max arguments defined
+    * DateRange validator if column is of type Date or DateTime and column info parameter has min or max arguments defined
+    * TimeRange validator if column is of type Time and info parameter has min or max arguments defined
     * Unique validator if column has a unique index
     * Length validator for String/Unicode columns with max length
 
@@ -555,6 +556,29 @@ Example::
     form.validate()
 
 WTForms-Alchemy will then understand to avoid the unique validation of the object with this same object.
+
+
+Range validators
+----------------
+
+WTForms-Alchemy automatically assigns range validators based on column type and assigned column info min and max attributes.
+
+In the following example we create a form for Event model where start_time can't be set in the past.
+
+::
+
+    class Event(Base):
+        __tablename__ = 'event'
+
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        start_time = sa.Column(sa.DateTime, info={'min': datetime.now()})
+
+
+    class EventForm(ModelForm):
+        class Meta:
+            model = Event
+
 
 
 Additional field validators
