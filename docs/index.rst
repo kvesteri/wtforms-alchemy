@@ -209,6 +209,41 @@ Advanced field types
 WTForms-Alchemy supports all additional SQLAlchemy data types provided by SQLAlchemy-Utils.
 
 
+Arrow type
+----------
+
+WTForms-Alchemy supports the ArrowType of SQLAlchemy-Utils and converts it to HTML5 compatible DateTimeField
+of WTForms-Components.
+
+::
+
+
+    from sqlalchemy_utils import ArrowType
+
+
+    class Event(Base):
+        __tablename__ = 'event'
+
+        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+        start_time = sa.Column(
+            ArrowType(),
+            nullable=False
+        )
+
+    class EventForm(ModelForm):
+        class Meta:
+            model = CustomView
+
+
+Now the EventForm is essentially the same as:
+
+::
+
+
+    class EventForm(Form):
+        start_time = DateTimeField(validators=[DataRequired()])
+
+
 
 Color type
 ----------
@@ -323,7 +358,7 @@ Phonenumber type
 ----------------
 
 WTForms-Alchemy supports the PhoneNumberType of SQLAlchemy-Utils and converts it automatically
-to wtforms_components PhoneNumberField. This field renders itself as HTML5 compatible phonenumber input.
+to WTForms-Components PhoneNumberField. This field renders itself as HTML5 compatible phonenumber input.
 
 
 Consider the following model definition:
@@ -364,8 +399,10 @@ Now the UserForm is essentially the same as:
 Form customization
 ==================
 
+
 Custom fields
 -------------
+
 If you want to use a custom field class, you can pass it by using
 form_field_class parameter for the column info dictionary.
 
