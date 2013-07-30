@@ -21,6 +21,14 @@ def null_or_int(value):
         return None
 
 
+def is_numerical_column(column):
+    return (
+        is_integer_column(column) or
+        isinstance(column.type, types.Float) or
+        isinstance(column.type, types.Numeric)
+    )
+
+
 def is_integer_column(column):
     return (
         isinstance(column.type, types.Integer) or

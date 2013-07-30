@@ -60,6 +60,11 @@ class TestFieldParameters(ModelFormTestCase):
         assert validator.min == date(1990, 1, 1)
         assert validator.max == date(2000, 1, 1)
 
+    def test_converts_numeric_scale_to_steps(self):
+        self.init(
+            type_=sa.Numeric(scale=2),
+        )
+
     def test_uses_custom_field_class(self):
         class InputTest(widgets.Input):
             input_type = 'color'

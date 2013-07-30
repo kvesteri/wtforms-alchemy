@@ -1,5 +1,6 @@
 #import pytz
 from collections import OrderedDict
+from decimal import Decimal
 from wtforms import (
     BooleanField,
     FloatField,
@@ -32,6 +33,7 @@ from wtforms_components import (
     TimeRange,
     Unique,
 )
+from wtforms_components.widgets import NumberInput
 from .exc import InvalidAttributeException, UnknownTypeException
 from .utils import (
     is_date_column,
@@ -74,6 +76,12 @@ class FormGenerator(object):
         (types.PhoneNumberType, PhoneNumberField),
         (types.ScalarListType, TextField),
         (types.UUIDType, TextField),
+    ))
+
+    WIDGET_MAP = OrderedDict((
+        (DecimalField, NumberInput),
+        (FloatField, NumberInput),
+        (IntegerField, NumberInput),
     ))
 
     def __init__(self, form_class):
@@ -306,7 +314,33 @@ class FormGenerator(object):
 
         if hasattr(column.type, 'country_code'):
             kwargs['country_code'] = column.type.country_code
+
+        kwargs['widget'] = self.widget(column)
         return kwargs
+
+    def widget(self, column):
+        widget = column.info.get('widget', None)
+        if widget is not None:
+            return widget
+
+        kwargs = {}
+
+        step = column.info.get('step', None)
+        if step is not None:
+            kwargs['step'] = step
+        else:
+            if isinstance(column.type, sa.types.Numeric):
+                if column.type.scale is not None:
+                    kwargs['step'] = self.scale_to_step(column.type.scale)
+
+        if kwargs:
+            widget_class = self.WIDGET_MAP[
+                self.get_field_class(column)
+            ]
+            return widget_class(**kwargs)
+
+    def scale_to_step(self, scale):
+        return str(pow(Decimal('0.1'), scale))
 
     def type_agnostic_parameters(self, column):
         """
@@ -318,7 +352,6 @@ class FormGenerator(object):
         kwargs = {}
         kwargs['description'] = column.info.get('description', '')
         kwargs['label'] = column.info.get('label', name)
-        kwargs['widget'] = column.info.get('widget', None)
         return kwargs
 
     def select_field_kwargs(self, column):

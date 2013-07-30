@@ -1,4 +1,4 @@
 WTForms>=1.0.4
-WTForms-Components>=0.6.4
+WTForms-Components>=0.6.5
 SQLAlchemy>=0.8.0
 SQLAlchemy-Utils>=0.16.0
