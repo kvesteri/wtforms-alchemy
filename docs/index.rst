@@ -122,6 +122,7 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
 ====================================    =================
  **SQAlchemy-Utils type**               **Form field**
 ------------------------------------    -----------------
+    ArrowType                           wtforms_components.fields.DateTimeField
     ColorType                           wtforms_components.fields.ColorField
     EmailType                           wtforms_components.fields.EmailField
     IPAddressType                       wtforms_components.fields.IPAddressField
@@ -314,6 +315,49 @@ Now the UserForm is essentially the same as:
     class UserForm(Form):
         name = TextField(validators=[DataRequired(), Length(max=100)])
         password = PasswordField(validators=[DataRequired()])
+
+
+
+
+Phonenumber type
+----------------
+
+WTForms-Alchemy supports the PhoneNumberType of SQLAlchemy-Utils and converts it automatically
+to wtforms_components PhoneNumberField. This field renders itself as HTML5 compatible phonenumber input.
+
+
+Consider the following model definition:
+
+::
+
+
+    from sqlalchemy_utils import PhoneNumberType
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+        name = sa.Column(sa.Unicode(100), nullable=False)
+        phone_number = sa.Column(PhoneNumberType())
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+
+Now the UserForm is essentially the same as:
+
+::
+
+    from wtforms_components import PhoneNumberField
+
+
+    class UserForm(Form):
+        name = TextField(validators=[DataRequired(), Length(max=100)])
+        password = PhoneNumberField(validators=[DataRequired()])
+
 
 
 
