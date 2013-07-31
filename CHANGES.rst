@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.7.7 (2013-07-31)
+^^^^^^^^^^^^^^^^^^
+
+- HTML5 step widget param support added
+- Updated WTForms-Components dependency to 0.6.6
+
+
 0.7.6 (2013-07-24)
 ^^^^^^^^^^^^^^^^^^
 
