@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.7.8 (2013-07-31)
+^^^^^^^^^^^^^^^^^^
+
+- String typed columns now convert to WTForms-Components StringFields instead of WTForms TextFields
+
+
 0.7.7 (2013-07-31)
 ^^^^^^^^^^^^^^^^^^
 

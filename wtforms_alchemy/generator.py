@@ -5,7 +5,6 @@ from wtforms import (
     BooleanField,
     FloatField,
     TextAreaField,
-    TextField,
     PasswordField,
 )
 from wtforms.validators import (
@@ -29,6 +28,7 @@ from wtforms_components import (
     NumberRangeField,
     PhoneNumberField,
     SelectField,
+    StringField,
     TimeField,
     TimeRange,
     Unique,
@@ -65,17 +65,17 @@ class FormGenerator(object):
         (sa.types.Float, FloatField),
         (sa.types.Integer, IntegerField),
         (sa.types.Numeric, DecimalField),
-        (sa.types.String, TextField),
+        (sa.types.String, StringField),
         (sa.types.Time, TimeField),
-        (sa.types.Unicode, TextField),
+        (sa.types.Unicode, StringField),
         (types.ArrowType, DateTimeField),
         (types.ColorType, ColorField),
         (types.EmailType, EmailField),
         (types.NumberRangeType, NumberRangeField),
         (types.PasswordType, PasswordField),
         (types.PhoneNumberType, PhoneNumberField),
-        (types.ScalarListType, TextField),
-        (types.UUIDType, TextField),
+        (types.ScalarListType, StringField),
+        (types.UUIDType, StringField),
     ))
 
     WIDGET_MAP = OrderedDict((

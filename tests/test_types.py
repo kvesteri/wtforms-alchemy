@@ -6,7 +6,6 @@ try:
 except ImportError:
     pass
 from wtforms.fields import (
-    TextField,
     TextAreaField,
     BooleanField,
     FloatField,
@@ -32,6 +31,7 @@ from wtforms_components import (
     EmailField,
     IntegerField,
     NumberRangeField,
+    StringField,
     TimeField,
 )
 from wtforms_alchemy import (
@@ -69,15 +69,15 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     def test_unicode_converts_to_text_field(self):
         self.init()
-        self.assert_type('test_column', TextField)
+        self.assert_type('test_column', StringField)
 
     def test_custom_unicode_converts_to_text_field(self):
         self.init(type_=CustomUnicodeType)
-        self.assert_type('test_column', TextField)
+        self.assert_type('test_column', StringField)
 
     def test_string_converts_to_text_field(self):
         self.init(type_=sa.String)
-        self.assert_type('test_column', TextField)
+        self.assert_type('test_column', StringField)
 
     def test_integer_converts_to_integer_field(self):
         self.init(type_=sa.Integer)
@@ -152,7 +152,7 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     def test_varchar_converts_to_text_field(self):
         self.init(type_=sa.types.VARCHAR)
-        self.assert_type('test_column', TextField)
+        self.assert_type('test_column', StringField)
 
     def test_text_converts_to_textarea_field(self):
         self.init(type_=sa.types.TEXT)
@@ -160,7 +160,7 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     def test_char_converts_to_text_field(self):
         self.init(type_=sa.types.CHAR)
-        self.assert_type('test_column', TextField)
+        self.assert_type('test_column', StringField)
 
     def test_real_converts_to_float_field(self):
         self.init(type_=sa.types.REAL)
@@ -200,7 +200,7 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     def test_uuid_type_converst_to_uuid_type(self):
         self.init(type_=UUIDType)
-        self.assert_type('test_column', TextField)
+        self.assert_type('test_column', StringField)
 
     def test_color_type_converts_to_color_field(self):
         self.init(type_=ColorType)
