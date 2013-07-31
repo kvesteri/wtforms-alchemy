@@ -203,8 +203,42 @@ Example::
 Now the name field of UserForm would be a simple TextField since the underlying type implementation is Unicode.
 
 
-Advanced field types
-====================
+Basic column types
+==================
+
+
+
+Numeric column
+--------------
+
+WTForms-Alchemy automatically converts Numeric columns to DecimalFields. The converter is also smart enough to convert
+different decimal scales to appropriate HTML5 input step args.
+
+
+::
+
+
+    class Account(Base):
+        __tablename__ = 'event'
+
+        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+        balance = sa.Column(
+            Numeric(scale=2),
+            nullable=False
+        )
+
+    class AccountForm(ModelForm):
+        class Meta:
+            model = Account
+
+
+Now rendering AccountForm.balance would return the following HTML:
+
+<input type='decimal' required step="0.01">
+
+
+Advanced column types
+=====================
 
 WTForms-Alchemy supports all additional SQLAlchemy data types provided by SQLAlchemy-Utils.
 
