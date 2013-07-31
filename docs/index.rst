@@ -223,7 +223,7 @@ different decimal scales to appropriate HTML5 input step args.
 
         id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
         balance = sa.Column(
-            Numeric(scale=2),
+            sa.Numeric(scale=2),
             nullable=False
         )
 
