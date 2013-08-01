@@ -78,7 +78,7 @@ class TestPhoneNumbers(TestCase):
 
     def test_phone_number_in_form(self):
         form = self.UserForm(MultiDict(
-            name=u'Matti Meikäläinen',
+            name=u'Matti Meikalainen',
             phone_number='+358401231233'
         ))
         form.validate()
@@ -89,7 +89,7 @@ class TestPhoneNumbers(TestCase):
 
     def test_empty_phone_number_in_form(self):
         form = self.UserForm(MultiDict(
-            name=u'Matti Meikäläinen',
+            name=u'Matti Meikalainen',
             phone_number=''
         ))
         form.validate()
