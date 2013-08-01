@@ -27,7 +27,8 @@ extras_require = {
     'test': [
         'pytest>=2.3.5',
         'flexmock>=0.9.7',
-        'psycopg2>=2.4.6'
+        'psycopg2>=2.4.6',
+        'WTForms-Test>=0.1.1'
     ],
     'phone': ['phonenumbers3k==5.6b1'],
     'password': ['passlib >= 1.6, < 2.0'],
