@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.7.10 (2013-08-01)
+^^^^^^^^^^^^^^^^^^
+
+- DecimalField with scales and choices now generate SelectField as expected
+
+
 0.7.9 (2013-08-01)
 ^^^^^^^^^^^^^^^^^^
 
