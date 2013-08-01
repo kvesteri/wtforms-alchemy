@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.7.9 (2013-08-01)
+^^^^^^^^^^^^^^^^^^
+
+- TSVectorType columns excluded by default
+
+
 0.7.8 (2013-07-31)
 ^^^^^^^^^^^^^^^^^^
 

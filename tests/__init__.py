@@ -12,8 +12,10 @@ class MultiDict(dict):
 
 
 class ModelFormTestCase(FormTestCase):
+    dns = 'sqlite:///:memory:'
+
     def setup_method(self, method):
-        self.engine = create_engine('sqlite:///:memory:')
+        self.engine = create_engine(self.dns)
         self.base = declarative_base()
 
     def teardown_method(self, method):
@@ -43,8 +45,10 @@ class ModelFormTestCase(FormTestCase):
 
 
 class FormRelationsTestCase(object):
+    dns = 'sqlite:///:memory:'
+
     def setup_method(self, method):
-        self.engine = create_engine('sqlite:///:memory:')
+        self.engine = create_engine(self.dns)
 
         self.base = declarative_base()
         self.create_models()

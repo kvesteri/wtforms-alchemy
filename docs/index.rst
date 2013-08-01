@@ -139,6 +139,7 @@ By default WTForms-Alchemy excludes a column from the ModelForm if one of the fo
     * Column is primary key
     * Column is foreign key
     * Column is DateTime field which has default value (usually this is a generated value)
+    * Column is of TSVectorType type
     * Column is set as model inheritance discriminator field
 
 

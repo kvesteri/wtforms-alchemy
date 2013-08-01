@@ -220,6 +220,9 @@ class FormGenerator(object):
                 column.default):
             return True
 
+        if isinstance(column.type, types.TSVectorType):
+            return True
+
         if self.meta.only_indexed_fields and not self.has_index(column):
             return True
         return False
