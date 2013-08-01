@@ -7,6 +7,10 @@ from wtforms import (
     TextAreaField,
     PasswordField,
 )
+from wtforms.widgets import (
+    CheckboxInput,
+    TextArea
+)
 from wtforms.validators import (
     DataRequired,
     Length,
@@ -21,6 +25,7 @@ from wtforms_components import (
     DateField,
     DateRange,
     DateTimeField,
+    DateTimeLocalField,
     DecimalField,
     Email,
     EmailField,
@@ -33,7 +38,15 @@ from wtforms_components import (
     TimeRange,
     Unique,
 )
-from wtforms_components.widgets import NumberInput
+from wtforms_components.widgets import (
+    ColorInput,
+    EmailInput,
+    DateInput,
+    DateTimeInput,
+    DateTimeLocalInput,
+    NumberInput,
+    TimeInput,
+)
 from .exc import InvalidAttributeException, UnknownTypeException
 from .utils import (
     is_date_column,
@@ -79,9 +92,17 @@ class FormGenerator(object):
     ))
 
     WIDGET_MAP = OrderedDict((
+        (BooleanField, CheckboxInput),
+        (ColorField, ColorInput),
+        (DateField, DateInput),
+        (DateTimeField, DateTimeInput),
+        (DateTimeLocalField, DateTimeLocalInput),
         (DecimalField, NumberInput),
+        (EmailField, EmailInput),
         (FloatField, NumberInput),
         (IntegerField, NumberInput),
+        (TextAreaField, TextArea),
+        (TimeField, TimeInput),
     ))
 
     def __init__(self, form_class):
@@ -333,7 +354,10 @@ class FormGenerator(object):
             kwargs['step'] = step
         else:
             if isinstance(column.type, sa.types.Numeric):
-                if column.type.scale is not None:
+                if (
+                    column.type.scale is not None and
+                    not column.info.get('choices')
+                ):
                     kwargs['step'] = self.scale_to_step(column.type.scale)
 
         if kwargs:

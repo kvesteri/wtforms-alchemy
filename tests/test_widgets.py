@@ -24,6 +24,17 @@ class TestNumericFieldWidgets(ModelFormTestCase):
         form = self.form_class()
         assert 'step="0.1"' in str(form.test_column)
 
+    def test_numeric_field_with_scale_and_choices(self):
+        self.init(
+            type_=sa.Numeric(scale=2),
+            info={'choices': [
+                (1.1, 'choice1'),
+                (1.2, 'choice2')
+            ]},
+        )
+        form = self.form_class()
+        assert 'step="0.1"' not in str(form.test_column)
+
 
 class TestIntegerFieldWidgets(ModelFormTestCase):
     def test_supports_step_as_info_arg(self):
