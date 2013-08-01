@@ -6,7 +6,6 @@ language: python
 python:
   - 2.7
 install:
-  - pip install -q -e . --use-mirrors
-  - pip install -r requirements-dev.txt
+  - pip install -e ".[test]"
 script:
   - python setup.py test

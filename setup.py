@@ -22,6 +22,26 @@ class PyTest(Command):
         errno = subprocess.call(['py.test'])
         raise SystemExit(errno)
 
+
+extras_require = {
+    'test': [
+        'pytest>=2.3.5',
+        'flexmock>=0.9.7',
+        'psycopg2>=2.4.6'
+    ],
+    'phone': ['phonenumbers3k==5.6b1'],
+    'password': ['passlib >= 1.6, < 2.0'],
+    'color': ['colour>=0.0.4'],
+    'i18n': ['SQLAlchemy-i18n >= 0.5.1']
+}
+
+
+# Add all optional dependencies to testing requirements.
+for name, requirements in extras_require.items():
+    if name != 'test':
+        extras_require['test'] += requirements
+
+
 setup(
     name='WTForms-Alchemy',
     version='0.7.9',
@@ -41,17 +61,7 @@ setup(
         'WTForms-Components>=0.6.6',
         'SQLAlchemy-Utils>=0.16.0'
     ],
-    extras_require={
-        'test': [
-            'pytest==2.2.3',
-            'flexmock>=0.9.7',
-            'psycopg2>=2.4.6'
-        ],
-        'phone': ['phonenumbers3k==5.6b1'],
-        'password': ['passlib >= 1.6, < 2.0'],
-        'color': ['colour>=0.0.4'],
-        'i18n': ['SQLAlchemy-i18n >= 0.5.1']
-    },
+    extras_require=extras_require,
     cmdclass={'test': PyTest},
     classifiers=[
         'Environment :: Web Environment',
