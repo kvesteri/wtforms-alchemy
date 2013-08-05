@@ -9,10 +9,6 @@ from tests import ModelFormTestCase
 
 
 class TestFieldParameters(ModelFormTestCase):
-    def test_assigns_labels_from_column_info(self):
-        self.init(info={'label': 'Test Column'})
-        self.assert_label('test_column', 'Test Column')
-
     def test_accepts_custom_widgets(self):
         self.init(info={'widget': widgets.HiddenInput()})
         form = self.form_class()
@@ -60,11 +56,6 @@ class TestFieldParameters(ModelFormTestCase):
         assert validator.min == date(1990, 1, 1)
         assert validator.max == date(2000, 1, 1)
 
-    def test_converts_numeric_scale_to_steps(self):
-        self.init(
-            type_=sa.Numeric(scale=2),
-        )
-
     def test_uses_custom_field_class(self):
         class InputTest(widgets.Input):
             input_type = 'color'
@@ -88,7 +79,7 @@ class TestFieldParameters(ModelFormTestCase):
         form = ModelTestForm()
         assert 'type="color"' in str(form.test_column)
 
-    def test_accepts_none_custom_field_class(self):
+    def test_accepts_none_as_custom_field_class(self):
         class InputTest(widgets.Input):
             input_type = 'color'
 

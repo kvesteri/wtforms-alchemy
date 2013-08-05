@@ -45,6 +45,7 @@ from wtforms_components.widgets import (
     DateTimeInput,
     DateTimeLocalInput,
     NumberInput,
+    TextInput,
     TimeInput,
 )
 from .exc import InvalidAttributeException, UnknownTypeException
@@ -103,6 +104,7 @@ class FormGenerator(object):
         (IntegerField, NumberInput),
         (TextAreaField, TextArea),
         (TimeField, TimeInput),
+        (StringField, TextInput)
     ))
 
     def __init__(self, form_class):
@@ -210,10 +212,19 @@ class FormGenerator(object):
         for attribute in attributes:
             column_property = attribute.property
             column = column_property.columns[0]
-            form_field = self.create_field(column)
+            try:
+                field = self.create_field(column)
+            except UnknownTypeException:
+                if not self.meta.skip_unknown_types:
+                    raise
 
             if not hasattr(form, column.name):
-                setattr(form, column.name, form_field)
+                setattr(form, column.name, field)
+
+        # if column.name in self.meta.widget_options:
+        #     field.widget.options.update(
+        #         self.meta.widget_options[column.name]
+        #     )
 
     def skip_column_property(self, column_property):
         """
@@ -272,11 +283,13 @@ class FormGenerator(object):
         field_class = self.get_field_class(column)
         kwargs['default'] = self.default(column)
         kwargs['validators'] = self.create_validators(column)
+        kwargs['filters'] = self.filters(column)
         kwargs.update(self.type_agnostic_parameters(column))
         kwargs.update(self.type_specific_parameters(column))
-        kwargs.setdefault('filters', [])
-        kwargs['filters'] += self.filters(column)
-        return field_class(**kwargs)
+        if column.name in self.meta.field_args:
+            kwargs.update(self.meta.field_args[column.name])
+        field = field_class(**kwargs)
+        return field
 
     def format(self, column):
         """
@@ -315,10 +328,26 @@ class FormGenerator(object):
                 isinstance(column.type, sa.types.String) and
                 self.meta.strip_string_fields and
                 should_trim is None
-            ) or should_trim is True
+            ) or
+            should_trim is True
         ):
             filters.append(trim)
         return filters
+
+    def date_format(self, column):
+        """
+        Returns date format for given column.
+
+        :param column: SQLAlchemy Column object
+        """
+        if (
+            isinstance(column.type, sa.types.DateTime) or
+            isinstance(column.type, types.ArrowType)
+        ):
+            return self.meta.datetime_format
+
+        if isinstance(column.type, sa.types.Date):
+            return self.meta.date_format
 
     def type_specific_parameters(self, column):
         """
@@ -330,11 +359,9 @@ class FormGenerator(object):
         if (hasattr(column.type, 'enums') or column.info.get('choices')):
             kwargs.update(self.select_field_kwargs(column))
 
-        if isinstance(column.type, sa.types.DateTime):
-            kwargs['format'] = self.meta.datetime_format
-
-        if isinstance(column.type, sa.types.Date):
-            kwargs['format'] = self.meta.date_format
+        date_format = self.date_format(column)
+        if date_format:
+            kwargs['format'] = date_format
 
         if hasattr(column.type, 'country_code'):
             kwargs['country_code'] = column.type.country_code
@@ -343,6 +370,11 @@ class FormGenerator(object):
         return kwargs
 
     def widget(self, column):
+        """
+        Returns WTForms widget for given column.
+
+        :param column: SQLAlchemy Column object
+        """
         widget = column.info.get('widget', None)
         if widget is not None:
             return widget
@@ -367,6 +399,11 @@ class FormGenerator(object):
             return widget_class(**kwargs)
 
     def scale_to_step(self, scale):
+        """
+        Returns HTML5 compatible step attribute for given decimal scale.
+
+        :param scale: an integer that defines a Numeric column's scale
+        """
         return str(pow(Decimal('0.1'), scale))
 
     def type_agnostic_parameters(self, column):
@@ -375,10 +412,9 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        name = column.name
         kwargs = {}
         kwargs['description'] = column.info.get('description', '')
-        kwargs['label'] = column.info.get('label', name)
+        kwargs['label'] = column.info.get('label', column.name)
         return kwargs
 
     def select_field_kwargs(self, column):
@@ -389,13 +425,7 @@ class FormGenerator(object):
         :param column: SQLAlchemy Column object
         """
         kwargs = {}
-        try:
-            kwargs['coerce'] = column.type.python_type
-        except NotImplementedError:
-            kwargs['coerce'] = null_or_unicode
-        if column.nullable and kwargs['coerce'] in (unicode, str):
-            kwargs['coerce'] = null_or_unicode
-
+        kwargs['coerce'] = self.coerce(column)
         if 'choices' in column.info and column.info['choices']:
             kwargs['choices'] = column.info['choices']
         else:
@@ -403,6 +433,19 @@ class FormGenerator(object):
                 (enum, enum) for enum in column.type.enums
             ]
         return kwargs
+
+    def coerce(self, column):
+        """
+        Returns coerce callable for given column
+
+        :param column: SQLAlchemy Column object
+        """
+        if column.nullable and column.type.python_type in (unicode, str):
+            return null_or_unicode
+        try:
+            return column.type.python_type
+        except NotImplementedError:
+            return null_or_unicode
 
     def create_validators(self, column):
         """

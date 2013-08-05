@@ -42,7 +42,7 @@ __all__ = (
 )
 
 
-__version__ = '0.7.10'
+__version__ = '0.7.11'
 
 
 class ModelFormMeta(FormMeta):
@@ -89,6 +89,8 @@ def model_form_factory(base=Form, **defaults):
 
             default = None
 
+            skip_unknown_types = defaults.get('skip_unknown_types', False)
+
             #: Whether or not to assign non-nullable fields as required
             assign_required = defaults.get('assign_required', True)
 
@@ -97,6 +99,12 @@ def model_form_factory(base=Form, **defaults):
             all_fields_optional = defaults.get('all_fields_optional', False)
 
             validators = {}
+
+            #: A dict with keys as field names and values as field arguments.
+            field_args = {}
+
+            #: A dict with keys as field names and values as widget options.
+            widget_options = {}
 
             #: Whether or not to include only indexed fields.
             only_indexed_fields = defaults.get('only_indexed_fields', False)

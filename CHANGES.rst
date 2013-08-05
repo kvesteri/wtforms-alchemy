@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.7.11 (2013-08-05)
+^^^^^^^^^^^^^^^^^^
+
+- Added configuration skip_unknown_types to silently skip columns with types WTForms-Alchemy does not understand
+
+
 0.7.10 (2013-08-01)
 ^^^^^^^^^^^^^^^^^^
 

@@ -8,7 +8,23 @@ from wtforms_alchemy import (
 from tests import ModelFormTestCase
 
 
+class UnknownType(sa.types.UserDefinedType):
+    def get_col_spec(self):
+        return "UNKNOWN()"
+
+
 class TestModelFormConfiguration(ModelFormTestCase):
+    def test_skip_unknown_types(self):
+        self.init(type_=UnknownType)
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+                skip_unknown_types = True
+
+        self.form_class = ModelTestForm
+        assert not self.has_field('test_column')
+
     def test_supports_field_exclusion(self):
         self.init()
 
