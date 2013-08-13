@@ -1,5 +1,8 @@
 #import pytz
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 from decimal import Decimal
 from wtforms import (
     BooleanField,
