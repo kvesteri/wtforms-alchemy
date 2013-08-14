@@ -220,6 +220,8 @@ class FormGenerator(object):
             except UnknownTypeException:
                 if not self.meta.skip_unknown_types:
                     raise
+                else:
+                    continue
 
             if not hasattr(form, column.name):
                 setattr(form, column.name, field)
