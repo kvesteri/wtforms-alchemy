@@ -7,7 +7,7 @@ Here you can see the full list of changes between each WTForms-Alchemy release.
 0.7.12 (2013-08-18)
 ^^^^^^^^^^^^^^^^^^
 
-- Updated SQLAlchemy-Utils dependency to 0.16.6
+- Updated SQLAlchemy-Utils dependency to 0.16.7
 - Updated SQLAlchemy-i18n dependency to 0.6.3
 
 

@@ -60,7 +60,7 @@ setup(
         'SQLAlchemy>=0.8.0',
         'WTForms>=1.0.4',
         'WTForms-Components>=0.6.6',
-        'SQLAlchemy-Utils>=0.16.6'
+        'SQLAlchemy-Utils>=0.16.7'
     ],
     extras_require=extras_require,
     cmdclass={'test': PyTest},
