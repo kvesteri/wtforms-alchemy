@@ -33,7 +33,7 @@ extras_require = {
     'phone': ['phonenumbers3k==5.6b1'],
     'password': ['passlib >= 1.6, < 2.0'],
     'color': ['colour>=0.0.4'],
-    'i18n': ['SQLAlchemy-i18n >= 0.5.1']
+    'i18n': ['SQLAlchemy-i18n >= 0.6.3']
 }
 
 
@@ -45,7 +45,7 @@ for name, requirements in extras_require.items():
 
 setup(
     name='WTForms-Alchemy',
-    version='0.7.11',
+    version='0.7.12',
     url='https://github.com/kvesteri/wtforms-alchemy',
     license='BSD',
     author='Konsta Vesterinen',

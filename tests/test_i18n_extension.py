@@ -18,6 +18,7 @@ class TestInternationalizationExtension(ModelFormTestCase):
             ]
             __translatable__ = {
                 'base_classes': (self.base,),
+                'locales': ['fi', 'en']
             }
 
             id = sa.Column(sa.Integer, primary_key=True)
