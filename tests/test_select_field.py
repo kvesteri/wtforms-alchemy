@@ -9,6 +9,21 @@ class MultiDict(dict):
         return [self[key]]
 
 
+class TestSelectFieldDefaultValue(ModelFormTestCase):
+    def test_option_selected_by_field_default_value(self):
+        choices = [(u'1', '1'), (u'2', '2')]
+        self.init(
+            type_=sa.Integer,
+            default=u'1',
+            info={'choices': choices}
+        )
+        form = self.form_class(MultiDict({'test_column': '2'}))
+        assert (
+            '<option selected="selected" value="2">2</option>' in
+            str(form.test_column)
+        )
+
+
 class TestSelectFieldCoerce(ModelFormTestCase):
     def test_integer_coerces_values_to_integers(self):
         choices = [(u'1', '1'), (u'2', '2')]
