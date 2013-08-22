@@ -262,6 +262,12 @@ class FormGenerator(object):
 
         if self.meta.only_indexed_fields and not self.has_index(column):
             return True
+
+        # Skip all non columns (this is the case when using column_property
+        # methods).
+        if not isinstance(column, sa.Column):
+            return True
+
         return False
 
     def has_index(self, column):

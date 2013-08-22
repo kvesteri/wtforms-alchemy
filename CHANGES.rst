@@ -4,21 +4,27 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.7.13 (2013-08-22)
+^^^^^^^^^^^^^^^^^^^
+
+- Model column_property methods now skipped in model generation process
+
+
 0.7.12 (2013-08-18)
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 - Updated SQLAlchemy-Utils dependency to 0.16.7
 - Updated SQLAlchemy-i18n dependency to 0.6.3
 
 
 0.7.11 (2013-08-05)
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 - Added configuration skip_unknown_types to silently skip columns with types WTForms-Alchemy does not understand
 
 
 0.7.10 (2013-08-01)
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 - DecimalField with scales and choices now generate SelectField as expected
 

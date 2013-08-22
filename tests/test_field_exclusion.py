@@ -13,6 +13,14 @@ class TestFieldExclusion(ModelFormTestCase):
         self.init()
         assert not self.has_field('id')
 
+    def test_excludes_column_properties(self):
+        self.init()
+        self.ModelTest.calculated_value = sa.orm.column_property(
+            sa.func.lower(self.ModelTest.test_column)
+        )
+        self.init_form()
+        self.form_class()
+
 
 class TestTSVectorType(ModelFormTestCase):
     dns = 'postgres://postgres@localhost/wtforms_alchemy_test'
