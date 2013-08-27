@@ -547,9 +547,11 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        if isinstance(column.type, types.PhoneNumberType):
-            return
-        if hasattr(column.type, 'length') and column.type.length:
+        if (
+            isinstance(column.type, sa.types.String) and
+            hasattr(column.type, 'length') and
+            column.type.length
+        ):
             return Length(max=column.type.length)
 
     def get_field_class(self, column):

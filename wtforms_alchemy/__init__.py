@@ -42,7 +42,7 @@ __all__ = (
 )
 
 
-__version__ = '0.7.13'
+__version__ = '0.7.14'
 
 
 class ModelFormMeta(FormMeta):
