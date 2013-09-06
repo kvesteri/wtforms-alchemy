@@ -4,7 +4,13 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
-0.7.13 (2013-08-27)
+0.7.15 (2013-09-06)
+^^^^^^^^^^^^^^^^^^^
+
+- Form generation now understands column aliases
+
+
+0.7.14 (2013-08-27)
 ^^^^^^^^^^^^^^^^^^^
 
 - Length validators only assigned to string typed columns

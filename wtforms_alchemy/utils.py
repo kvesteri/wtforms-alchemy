@@ -3,9 +3,6 @@ from sqlalchemy import types
 from .exc import UnknownIdentityException
 
 
-trim = lambda a: a and a.strip()
-
-
 def is_scalar(value):
     return isinstance(value, (type(None), str, int, float, bool, unicode))
 

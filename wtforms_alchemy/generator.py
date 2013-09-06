@@ -4,6 +4,7 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 from decimal import Decimal
+from string import strip
 from wtforms import (
     BooleanField,
     FloatField,
@@ -57,7 +58,6 @@ from .utils import (
     is_integer_column,
     is_scalar,
     null_or_unicode,
-    trim,
 )
 
 
@@ -201,7 +201,7 @@ class FormGenerator(object):
         else:
             translation_class = self.model_class.__translatable__['class']
             return [
-                getattr(translation_class, column.name)
+                getattr(translation_class, column.key)
                 for column in columns
             ]
 
@@ -223,8 +223,8 @@ class FormGenerator(object):
                 else:
                     continue
 
-            if not hasattr(form, column.name):
-                setattr(form, column.name, field)
+            if not hasattr(form, column.key):
+                setattr(form, column.key, field)
 
         # if column.name in self.meta.widget_options:
         #     field.widget.options.update(
@@ -297,8 +297,8 @@ class FormGenerator(object):
         kwargs['filters'] = self.filters(column)
         kwargs.update(self.type_agnostic_parameters(column))
         kwargs.update(self.type_specific_parameters(column))
-        if column.name in self.meta.field_args:
-            kwargs.update(self.meta.field_args[column.name])
+        if column.key in self.meta.field_args:
+            kwargs.update(self.meta.field_args[column.key])
         field = field_class(**kwargs)
         return field
 
@@ -342,7 +342,7 @@ class FormGenerator(object):
             ) or
             should_trim is True
         ):
-            filters.append(trim)
+            filters.append(strip)
         return filters
 
     def date_format(self, column):
@@ -425,7 +425,7 @@ class FormGenerator(object):
         """
         kwargs = {}
         kwargs['description'] = column.info.get('description', '')
-        kwargs['label'] = column.info.get('label', column.name)
+        kwargs['label'] = column.info.get('label', column.key)
         return kwargs
 
     def select_field_kwargs(self, column):
@@ -497,7 +497,7 @@ class FormGenerator(object):
         :param column: SQLAlchemy Column object
         """
         validators = []
-        name = column.name
+        name = column.key
         if name in self.meta.validators:
             try:
                 validators.extend(self.meta.validators[name])
@@ -519,7 +519,7 @@ class FormGenerator(object):
         """
         if column.unique:
             return Unique(
-                getattr(self.model_class, column.name),
+                getattr(self.model_class, column.key),
                 get_session=self.form_class.get_session
             )
 
