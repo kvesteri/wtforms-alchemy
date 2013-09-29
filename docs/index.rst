@@ -143,6 +143,80 @@ By default WTForms-Alchemy excludes a column from the ModelForm if one of the fo
     * Column is set as model inheritance discriminator field
 
 
+Using include, exclude and only
+-------------------------------
+
+If you wish the include some of the excluded fields described in the earlier chapter you can use the 'include' configuration parameter.
+
+
+In the following example we include the field 'author_id' in the ArticleForm (by default it is excluded since it is a foreign key column).
+
+::
+
+
+    class Article(Base):
+        __tablename__ = 'article'
+
+        id = sa.Column(sa.Integer, primary_key=True, nullable=False)
+        name = sa.Column(
+            sa.Unicode(255),
+            nullable=False
+        )
+        author_id = sa.Column(sa.Integer, sa.ForeignKey(User.id))
+        author = sa.orm.relationship(User)
+
+
+    class ArticleForm(Form):
+        class Meta:
+            include = ['author_id']
+
+
+If you wish the exclude fields you can either use 'exclude' or 'only' configuration parameters. The recommended way is using only, since in most cases it is desirable to explicitly tell which fields the form should contain.
+
+Consider the following model:
+
+::
+
+
+    class Article(Base):
+        __tablename__ = 'article'
+
+        id = sa.Column(sa.Integer, primary_key=True, nullable=False)
+        name = sa.Column(
+            sa.Unicode(255),
+            nullable=False
+        )
+        content = sa.Column(
+            sa.UnicodeText
+        )
+        description = sa.Column(
+            sa.UnicodeText
+        )
+
+
+Now let's say we want to exclude 'description' from the form. This can be achieved as follows:
+
+::
+
+
+    class ArticleForm(Form):
+        class Meta:
+            exclude = ['author_id']
+
+
+Or as follows (the recommended way):
+
+
+::
+
+
+    class ArticleForm(Form):
+        class Meta:
+            only = ['name', 'content']
+
+
+
+
 Adding/overriding fields
 ------------------------
 
