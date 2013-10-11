@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.8.0 (2013-10-11)
+^^^^^^^^^^^^^^^^^^
+
+- Fixed None value handling in string stripping when strip_string_fields option is enabled
+- Python 3 support
+
+
 0.7.15 (2013-09-06)
 ^^^^^^^^^^^^^^^^^^^
 
