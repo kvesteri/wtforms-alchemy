@@ -7,6 +7,7 @@ Generates WTForms forms from SQLAlchemy models.
 
 from setuptools import setup, Command
 import subprocess
+import sys
 
 
 class PyTest(Command):
@@ -23,17 +24,30 @@ class PyTest(Command):
         raise SystemExit(errno)
 
 
+PY3 = sys.version_info[0] == 3
+
+
 extras_require = {
     'test': [
-        'pytest>=2.3.5',
+        'pytest==2.2.3',
+        'Pygments>=1.2',
+        'Jinja2>=2.3',
+        'docutils>=0.10',
         'flexmock>=0.9.7',
         'psycopg2>=2.4.6',
         'WTForms-Test>=0.1.1'
     ],
-    'phone': ['phonenumbers3k==5.6b1'],
+    'babel': ['Babel>=1.3'],
+    'arrow': ['arrow>=0.3.4'],
+    'phone': [
+        # The phonenumbers library has a split for 2.x and 3.x support.
+        'phonenumbers3k==5.6b1' if PY3 else 'phonenumbers<5.6b1'
+    ],
     'password': ['passlib >= 1.6, < 2.0'],
     'color': ['colour>=0.0.4'],
-    'i18n': ['SQLAlchemy-i18n >= 0.6.3']
+    'i18n': ['SQLAlchemy-i18n >= 0.6.3'],
+    'ipaddress': ['ipaddr'] if not PY3 else [],
+    'timezone': ['python-dateutil']
 }
 
 
