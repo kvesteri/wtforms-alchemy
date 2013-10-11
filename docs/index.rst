@@ -844,6 +844,19 @@ You can exclude certain fields by adding them to the exclude list. ::
             # this form contains only 'name' field
 
 
+**field_args** (default: {})
+
+This parameter can be used for overriding field arguments. In the following example we force the email field optional.
+
+::
+
+
+     class UserForm(ModelForm):
+        class Meta:
+            model = User
+            field_args = {'email': {'validators': Optional()}}
+
+
 **include_foreign_keys** (default: False)
 
 Foreign keys can be included in the form by setting include_foreign_keys to True.
