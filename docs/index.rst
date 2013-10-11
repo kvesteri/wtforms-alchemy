@@ -124,6 +124,7 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
 ------------------------------------    -----------------
     ArrowType                           wtforms_components.fields.DateTimeField
     ColorType                           wtforms_components.fields.ColorField
+    CountryType                         wtforms_components.fields.CountryType
     EmailType                           wtforms_components.fields.EmailField
     IPAddressType                       wtforms_components.fields.IPAddressField
     NumberRangeType                     wtforms_components.fields.NumberRangeField
@@ -421,6 +422,41 @@ The good old wtforms equivalent of this form would be:
 
     class UserForm(Form):
         email = EmailField(validators=[DataRequired()])
+
+
+
+
+Country type
+------------
+
+::
+
+
+    from sqlalchemy_utils import CountryType
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+        country = sa.Column(CountryType, nullable=False)
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+
+The UserForm is essentially the same as:
+
+::
+
+
+    from wtforms_components import CountryField
+
+
+    class UserForm(Form):
+        country = CountryField(validators=[DataRequired()])
 
 
 
