@@ -1148,6 +1148,33 @@ Example ::
             model = User
 
 
+Using WTForms-Alchemy with Flask-WTF
+------------------------------------
+
+In order to make WTForms-Alchemy work with Flask-WTF you need the following snippet:
+
+::
+
+
+    from flask.ext.wtf import Form
+    from wtforms_alchemy import model_form_factory
+
+
+    ModelForm = model_form_factory(Form)
+
+
+The you can use the ModelForm just like before:
+
+
+::
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model User
+
+
+
 API Documentation
 =================
 
