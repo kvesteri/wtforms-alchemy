@@ -4,7 +4,6 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 from decimal import Decimal
-from string import strip
 from wtforms import (
     BooleanField,
     FloatField,
@@ -58,6 +57,7 @@ from .utils import (
     is_integer_column,
     is_scalar,
     null_or_unicode,
+    strip_string
 )
 
 
@@ -342,7 +342,7 @@ class FormGenerator(object):
             ) or
             should_trim is True
         ):
-            filters.append(strip)
+            filters.append(strip_string)
         return filters
 
     def date_format(self, column):

@@ -5,7 +5,7 @@ from wtforms.validators import Email
 from wtforms_alchemy import (
     InvalidAttributeException, ModelForm
 )
-from tests import ModelFormTestCase
+from tests import ModelFormTestCase, MultiDict
 
 
 class UnknownType(sa.types.UserDefinedType):
@@ -158,3 +158,28 @@ class TestModelFormConfiguration(ModelFormTestCase):
                 only = []
 
         assert AnotherModelTestForm.Meta.only == []
+
+    def test_strip_strings_fields(self):
+        self.init()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+                only = ['test_column']
+                strip_string_fields = True
+
+        form = ModelTestForm(MultiDict(test_column=u' something '))
+        assert form.test_column.data == u'something'
+
+    def test_strip_strings_fields_with_empty_values(self):
+        self.init()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+                only = ['test_column']
+                strip_string_fields = True
+
+        form = ModelTestForm()
+
+

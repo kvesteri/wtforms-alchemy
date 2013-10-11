@@ -1,6 +1,13 @@
+import six
 import sqlalchemy as sa
 from sqlalchemy import types
 from .exc import UnknownIdentityException
+
+
+def strip_string(value):
+    if isinstance(value, six.string_types):
+        return value.strip()
+    return value
 
 
 def is_scalar(value):
