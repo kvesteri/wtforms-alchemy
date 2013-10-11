@@ -4,6 +4,7 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 from decimal import Decimal
+import six
 from wtforms import (
     BooleanField,
     FloatField,
@@ -451,7 +452,10 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        if column.nullable and column.type.python_type in (unicode, str):
+        if (
+            column.nullable and
+            issubclass(column.type.python_type, six.string_types)
+        ):
             return null_or_unicode
         try:
             return column.type.python_type
