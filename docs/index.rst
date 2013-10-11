@@ -391,41 +391,6 @@ Now the CustomViewForm is essentially the same as:
 
 
 
-Email type
-----------
-
-::
-
-
-    from sqlalchemy_utils import EmailType
-
-
-    class User(Base):
-        __tablename__ = 'user'
-
-        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-        email = sa.Column(EmailType, nullable=False)
-
-
-    class UserForm(ModelForm):
-        class Meta:
-            model = User
-
-
-The good old wtforms equivalent of this form would be:
-
-::
-
-
-    from wtforms_components import EmailField
-
-
-    class UserForm(Form):
-        email = EmailField(validators=[DataRequired()])
-
-
-
-
 Country type
 ------------
 
@@ -457,6 +422,40 @@ The UserForm is essentially the same as:
 
     class UserForm(Form):
         country = CountryField(validators=[DataRequired()])
+
+
+
+Email type
+----------
+
+::
+
+
+    from sqlalchemy_utils import EmailType
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+        email = sa.Column(EmailType, nullable=False)
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+
+The good old wtforms equivalent of this form would be:
+
+::
+
+
+    from wtforms_components import EmailField
+
+
+    class UserForm(Form):
+        email = EmailField(validators=[DataRequired()])
 
 
 
