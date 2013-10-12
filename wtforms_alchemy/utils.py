@@ -11,11 +11,11 @@ def strip_string(value):
 
 
 def is_scalar(value):
-    return isinstance(value, (type(None), str, int, float, bool, unicode))
+    return isinstance(value, (type(None), six.text_type, int, float, bool))
 
 
 def null_or_unicode(value):
-    return unicode(value) or None
+    return six.text_type(value) or None
 
 
 def null_or_int(value):
