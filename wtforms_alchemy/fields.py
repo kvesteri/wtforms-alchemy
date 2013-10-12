@@ -1,3 +1,4 @@
+import six
 from wtforms.fields import FieldList, FormField
 from .exc import UnknownIdentityException
 from .utils import has_entity
@@ -36,7 +37,7 @@ class ModelFieldList(FieldList):
 
         if not state.identity or self.population_strategy == 'replace':
             setattr(obj, name, [])
-            for counter in xrange(len(self.entries)):
+            for counter in six.range(len(self.entries)):
                 try:
                     self.pre_append_object(obj, name, counter)
                     try:
