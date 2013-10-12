@@ -40,6 +40,20 @@ Now how is WTForms-Alchemy ModelForm better than wtforms.ext.sqlachemy's model_f
 * Better configuration
 
 
+Installation
+------------
+
+::
+
+
+    pip install WTForms-Alchemy
+
+
+
+The supported python versions are 2.7 and 3.3.
+
+
+
 QuickStart
 ----------
 
