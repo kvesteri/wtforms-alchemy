@@ -37,7 +37,7 @@ class ModelFieldList(FieldList):
 
         if not state.identity or self.population_strategy == 'replace':
             setattr(obj, name, [])
-            for counter in six.range(len(self.entries)):
+            for counter in six.moves.range(len(self.entries)):
                 try:
                     self.pre_append_object(obj, name, counter)
                     try:

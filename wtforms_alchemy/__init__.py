@@ -1,4 +1,5 @@
 #import pytz
+import six
 from wtforms import Form
 from wtforms.form import FormMeta
 from wtforms_components import (
@@ -70,12 +71,10 @@ class ModelFormMeta(FormMeta):
         return FormMeta.__call__(cls, *args, **kwargs)
 
 
-def model_form_factory(base=Form, **defaults):
+def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
     """Creates new model form, with given base class."""
 
-    class ModelForm(base):
-        __metaclass__ = ModelFormMeta
-
+    class ModelForm(six.with_metaclass(meta, base)):
         """
         A function that returns SQLAlchemy session. This should be
         assigned if you wish to use Unique validator. If you are using
