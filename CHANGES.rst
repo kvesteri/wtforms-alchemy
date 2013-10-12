@@ -9,6 +9,7 @@ Here you can see the full list of changes between each WTForms-Alchemy release.
 
 - Fixed None value handling in string stripping when strip_string_fields option is enabled
 - Python 3 support
+- ModelFormMeta now configurable
 
 
 0.7.15 (2013-09-06)
