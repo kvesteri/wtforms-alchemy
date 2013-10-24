@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.8.1 (2013-10-24)
+^^^^^^^^^^^^^^^^^^
+
+- Added support for SQLAlchemy-Utils ChoiceType
+- Updated SQLAlchemy-Utils dependency to 0.18.0
+
+
 0.8.0 (2013-10-11)
 ^^^^^^^^^^^^^^^^^^
 
