@@ -74,7 +74,7 @@ setup(
         'SQLAlchemy>=0.8.0',
         'WTForms>=1.0.4',
         'WTForms-Components>=0.8.0',
-        'SQLAlchemy-Utils>=0.16.7',
+        'SQLAlchemy-Utils>=0.18.0',
         'six>=1.4.1'
     ],
     extras_require=extras_require,

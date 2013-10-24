@@ -137,6 +137,7 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
  **SQAlchemy-Utils type**               **Form field**
 ------------------------------------    -----------------
     ArrowType                           wtforms_components.fields.DateTimeField
+    ChoiceType                          wtforms_components.fields.SelectField
     ColorType                           wtforms_components.fields.ColorField
     CountryType                         wtforms_components.fields.CountryType
     EmailType                           wtforms_components.fields.EmailField
@@ -366,6 +367,43 @@ Now the EventForm is essentially the same as:
 
     class EventForm(Form):
         start_time = DateTimeField(validators=[DataRequired()])
+
+
+Choice type
+-----------
+
+WTForms-Alchemy automatically converts SQLAlchemy-Utils ChoiceType to WTForms-Components SelectField.
+
+
+::
+
+
+    from sqlalchemy_utils import ChoiceType
+
+
+    class Event(Base):
+        __tablename__ = 'event'
+        TYPES = [
+            (u'party', u'Party'),
+            (u'training, u'Training')
+        ]
+
+        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+        type = sa.Column(ChoiceType(TYPES))
+
+
+    class EventForm(ModelForm):
+        class Meta:
+            model = CustomView
+
+
+Now the EventForm is essentially the same as:
+
+::
+
+
+    class EventForm(Form):
+        type = SelectField(choices=Event.TYPES, validators=[DataRequired()])
 
 
 
