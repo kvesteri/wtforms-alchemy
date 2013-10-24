@@ -13,6 +13,7 @@ from wtforms.fields import (
 )
 from wtforms.validators import Length
 from sqlalchemy_utils import (
+    ChoiceType,
     ColorType,
     EmailType,
     NumberRangeType,
@@ -20,8 +21,7 @@ from sqlalchemy_utils import (
     PhoneNumberType,
     UUIDType
 )
-from sqlalchemy_utils.types import arrow
-from sqlalchemy_utils.types import phone_number
+from sqlalchemy_utils.types import arrow, phone_number
 from wtforms_components import (
     ColorField,
     DateField,
@@ -209,3 +209,9 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
     def test_email_type_converts_to_email_field(self):
         self.init(type_=EmailType)
         self.assert_type('test_column', EmailField)
+
+    def test_choice_type_converts_to_select_field(self):
+        choices = [(u'1', u'choice 1'), (u'2', u'choice 2')]
+        self.init(type_=ChoiceType(choices))
+        self.assert_type('test_column', SelectField)
+        assert self.form_class().test_column.choices == choices

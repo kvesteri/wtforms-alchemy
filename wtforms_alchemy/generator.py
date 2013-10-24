@@ -87,6 +87,7 @@ class FormGenerator(object):
         (sa.types.Time, TimeField),
         (sa.types.Unicode, StringField),
         (types.ArrowType, DateTimeField),
+        (types.ChoiceType, SelectField),
         (types.ColorType, ColorField),
         (types.EmailType, EmailField),
         (types.NumberRangeType, NumberRangeField),
@@ -303,18 +304,6 @@ class FormGenerator(object):
         field = field_class(**kwargs)
         return field
 
-    def format(self, column):
-        """
-        Return field format for given column.
-
-        :param column: SQLAlchemy Column object
-        """
-        if isinstance(column.type, sa.types.DateTime):
-            return self.meta.datetime_format
-
-        if isinstance(column.type, sa.types.Date):
-            return self.meta.date_format
-
     def default(self, column):
         """
         Return field default for given column.
@@ -368,7 +357,11 @@ class FormGenerator(object):
         :param column: SQLAlchemy Column object
         """
         kwargs = {}
-        if (hasattr(column.type, 'enums') or column.info.get('choices')):
+        if (
+            hasattr(column.type, 'enums') or
+            column.info.get('choices') or
+            isinstance(column.type, types.ChoiceType)
+        ):
             kwargs.update(self.select_field_kwargs(column))
 
         date_format = self.date_format(column)
@@ -438,7 +431,9 @@ class FormGenerator(object):
         """
         kwargs = {}
         kwargs['coerce'] = self.coerce(column)
-        if 'choices' in column.info and column.info['choices']:
+        if isinstance(column.type, types.ChoiceType):
+            kwargs['choices'] = column.type.choices
+        elif 'choices' in column.info and column.info['choices']:
             kwargs['choices'] = column.info['choices']
         else:
             kwargs['choices'] = [
