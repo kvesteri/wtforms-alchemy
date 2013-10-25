@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.8.2 (2013-10-25)
+^^^^^^^^^^^^^^^^^^
+
+- TypeDecorator derived type support SelectField coerce callable generator
+
+
 0.8.1 (2013-10-24)
 ^^^^^^^^^^^^^^^^^^
 

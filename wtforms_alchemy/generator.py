@@ -447,15 +447,14 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        if (
-            column.nullable and
-            issubclass(column.type.python_type, six.string_types)
-        ):
-            return null_or_unicode
         try:
-            return column.type.python_type
+            python_type = column.type.python_type
         except NotImplementedError:
             return null_or_unicode
+
+        if column.nullable and issubclass(python_type, six.string_types):
+            return null_or_unicode
+        return python_type
 
     def create_validators(self, column):
         """
