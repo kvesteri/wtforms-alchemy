@@ -1254,7 +1254,7 @@ Advanced concepts
 Using WTForms-Alchemy with SQLAlchemy-Defaults
 ----------------------------------------------
 
-WTForms-Alchemy works wonderfully with SQLAlchemy-Defaults. When using SQLAlchemy-Defaults with WTForms-Alchemy you
+WTForms-Alchemy works wonderfully with `SQLAlchemy-Defaults`_. When using SQLAlchemy-Defaults with WTForms-Alchemy you
 can define your models and model forms with much more robust syntax. For more information see SQLAlchemy-Defaults documentation.
 
 
@@ -1288,7 +1288,7 @@ Example ::
 Using WTForms-Alchemy with Flask-WTF
 ------------------------------------
 
-In order to make WTForms-Alchemy work with Flask-WTF you need the following snippet:
+In order to make WTForms-Alchemy work with `Flask-WTF`_ you need the following snippet:
 
 ::
 
@@ -1329,3 +1329,8 @@ License
 =======
 
 .. include:: ../LICENSE
+
+
+.. _`SQLAlchemy-Defaults`: https://sqlalchemy-defaults.readthedocs.org/en/latest/
+.. _`Flask-WTF`: https://flask-wtf.readthedocs.org/en/latest/
+
