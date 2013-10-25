@@ -145,6 +145,7 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
     NumberRangeType                     wtforms_components.fields.NumberRangeField
     PasswordType                        wtforms.fields.PasswordField
     PhoneNumberType                     wtforms_components.fields.PhoneNumberField
+    URLType                             wtforms_components.fields.StringField + URL validator
     UUIDType                            wtforms.fields.TextField + UUID validator
 ====================================    =================
 
@@ -589,6 +590,42 @@ Now the UserForm is essentially the same as:
         name = TextField(validators=[DataRequired(), Length(max=100)])
         password = PhoneNumberField(validators=[DataRequired()])
 
+
+URL type
+--------
+
+WTForms-Alchemy automatically converts SQLAlchemy-Utils URLType to StringField and adds URL validator for it.
+
+Consider the following model definition:
+
+::
+
+
+    from sqlalchemy_utils import URLType
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+        website = sa.Column(URLType())
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+
+
+Now the UserForm is essentially the same as:
+
+::
+
+    from wtforms_components import StringField
+    from wtforms.validators import URL
+
+
+    class UserForm(Form):
+        website = StringField(validators=[URL()])
 
 
 
