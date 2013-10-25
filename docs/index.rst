@@ -373,7 +373,7 @@ Now the EventForm is essentially the same as:
 Choice type
 -----------
 
-WTForms-Alchemy automatically converts SQLAlchemy-Utils ChoiceType to WTForms-Components SelectField.
+WTForms-Alchemy automatically converts `SQLAlchemy-Utils ChoiceType`_ to WTForms-Components SelectField.
 
 
 ::
@@ -1254,8 +1254,8 @@ Advanced concepts
 Using WTForms-Alchemy with SQLAlchemy-Defaults
 ----------------------------------------------
 
-WTForms-Alchemy works wonderfully with `SQLAlchemy-Defaults`_. When using SQLAlchemy-Defaults with WTForms-Alchemy you
-can define your models and model forms with much more robust syntax. For more information see SQLAlchemy-Defaults documentation.
+WTForms-Alchemy works wonderfully with `SQLAlchemy-Defaults`_. When using `SQLAlchemy-Defaults`_ with WTForms-Alchemy you
+can define your models and model forms with much more robust syntax. For more information see `SQLAlchemy-Defaults`_ documentation.
 
 
 Example ::
@@ -1331,6 +1331,7 @@ License
 .. include:: ../LICENSE
 
 
+.. _`SQLAlchemy-Utils ChoiceType`: http://sqlalchemy-utils.readthedocs.org/en/latest/#choicetype
 .. _`SQLAlchemy-Defaults`: https://sqlalchemy-defaults.readthedocs.org/en/latest/
 .. _`Flask-WTF`: https://flask-wtf.readthedocs.org/en/latest/
 
