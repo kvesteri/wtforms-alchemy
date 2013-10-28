@@ -3,7 +3,7 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
-0.8.3 (2013-10-27)
+0.8.3 (2013-10-28)
 ^^^^^^^^^^^^^^^^^^
 
 - Added Python 2.6 support (supported versions now 2.6, 2.7 and 3.3)
