@@ -50,7 +50,7 @@ Installation
 
 
 
-The supported python versions are 2.7 and 3.3.
+The supported python versions are 2.6, 2.7 and 3.3.
 
 
 
