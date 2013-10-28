@@ -1,3 +1,4 @@
+from decimal import Decimal
 import sqlalchemy as sa
 from wtforms_alchemy import ModelForm
 from tests import ModelFormTestCase
@@ -29,8 +30,8 @@ class TestNumericFieldWidgets(ModelFormTestCase):
         self.init(
             type_=sa.Numeric(scale=2),
             info={'choices': [
-                (1.1, 'choice1'),
-                (1.2, 'choice2')
+                (Decimal('1.1'), 'choice1'),
+                (Decimal('1.2'), 'choice2')
             ]},
         )
         form = self.form_class()
