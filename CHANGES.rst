@@ -7,6 +7,7 @@ Here you can see the full list of changes between each WTForms-Alchemy release.
 ^^^^^^^^^^^^^^^^^^
 
 - Added Python 2.6 support (supported versions now 2.6, 2.7 and 3.3)
+- Enhanced coerce func generator
 
 
 0.8.2 (2013-10-25)
