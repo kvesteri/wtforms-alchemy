@@ -1,6 +1,5 @@
 from decimal import Decimal
 import sqlalchemy as sa
-from wtforms_alchemy import ModelForm
 from tests import ModelFormTestCase
 
 
