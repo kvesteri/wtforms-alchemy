@@ -16,8 +16,6 @@ from .utils import (
     is_scalar,
     null_or_int,
     null_or_unicode,
-    class_list,
-    properties,
 )
 from .exc import InvalidAttributeException, UnknownTypeException
 from .fields import ModelFieldList, ModelFormField
@@ -54,12 +52,12 @@ class ModelFormMeta(FormMeta):
     ModelForm classes inherit parent's Meta class properties.
     """
     def __init__(cls, *args, **kwargs):
-        property_dict = {}
-        for class_ in reversed(class_list(cls)):
-            if hasattr(class_, 'Meta'):
-                property_dict.update(properties(class_.Meta))
+        bases = []
+        for class_ in cls.__mro__:
+            if 'Meta' in class_.__dict__:
+                bases.append(getattr(class_, 'Meta'))
 
-        cls.Meta = type('Meta', (object, ), property_dict)
+        cls.Meta = type('Meta', tuple(bases), {})
 
         return FormMeta.__init__(cls, *args, **kwargs)
 

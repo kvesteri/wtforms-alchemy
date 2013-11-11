@@ -182,4 +182,23 @@ class TestModelFormConfiguration(ModelFormTestCase):
 
         form = ModelTestForm()
 
+    def test_class_meta_regression(self):
+        self.init()
 
+        class SomeForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+                foo = 9
+
+
+        class OtherForm(SomeForm):
+            class Meta:
+                pass
+
+        assert issubclass(OtherForm.Meta, SomeForm.Meta)
+        form = OtherForm()
+
+        # Create a side effect on the base meta.
+        assert form.Meta.foo == 9
+        SomeForm.Meta.foo = 12
+        assert form.Meta.foo == 12
