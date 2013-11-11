@@ -3,6 +3,13 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
+
+0.8.4 (2013-11-11)
+^^^^^^^^^^^^^^^^^^
+
+- Declaration order of model fields now preserved in generated forms
+
+
 0.8.3 (2013-10-28)
 ^^^^^^^^^^^^^^^^^^
 
