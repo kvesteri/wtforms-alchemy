@@ -129,19 +129,18 @@ class FormGenerator(object):
 
         :param form: ModelForm instance
         """
-        attrs = set(self.model_class._sa_class_manager.values())
-        tmp = []
-        for attr in attrs:
-            property_ = attr.property
+        attrs = OrderedDict()
+        for key, property_ in sa.inspect(self.model_class).attrs.items():
             if not isinstance(property_, ColumnProperty):
                 continue
             if self.skip_column_property(property_):
                 continue
-            tmp.append(attr)
-        tmp += self.translated_attributes
-        attrs = set(tmp)
+            attrs[key] = property_
 
-        return self.create_fields(form, self.filter_attributes(attrs))
+        for attr in self.translated_attributes:
+            attrs[attr.key] = attr.property
+
+        return self.create_fields(form, self.filter_attributes(attrs).values())
 
     def filter_attributes(self, attrs):
         """
@@ -151,20 +150,26 @@ class FormGenerator(object):
         :param attrs: Set of attributes
         """
         if self.meta.only:
-            attrs = set(map(self.validate_attribute, self.meta.only))
+            attrs = OrderedDict([
+                (prop.key, prop)
+                for prop in map(self.validate_attribute, self.meta.only)
+            ])
         else:
             if self.meta.include:
-                attrs.update(map(self.validate_attribute, self.meta.include))
+                attrs.update([
+                    (prop.key, prop)
+                    for prop in map(self.validate_attribute, self.meta.include)
+                ])
 
             if self.meta.exclude:
-                func = lambda a: a.key not in self.meta.exclude
-                attrs = filter(func, attrs)
+                for key in self.meta.exclude:
+                    del attrs[key]
         return attrs
 
     def validate_attribute(self, attr_name):
         """
         Finds out whether or not given sqlalchemy model attribute name is
-        valid.
+        valid. Returns attribute property if valid.
 
         :param attr_name: Attribute name
         """
@@ -184,7 +189,7 @@ class FormGenerator(object):
                 raise InvalidAttributeException(attr_name)
         except AttributeError:
             raise InvalidAttributeException(attr_name)
-        return attr
+        return attr.property
 
     @property
     def translated_attributes(self):
@@ -207,16 +212,15 @@ class FormGenerator(object):
                 for column in columns
             ]
 
-    def create_fields(self, form, attributes):
+    def create_fields(self, form, properties):
         """
         Creates fields for given form based on given model attributes.
 
         :param form: form to attach the generated fields into
         :param attributes: model attributes to generate the form fields from
         """
-        for attribute in attributes:
-            column_property = attribute.property
-            column = column_property.columns[0]
+        for prop in properties:
+            column = prop.columns[0]
             try:
                 field = self.create_field(column)
             except UnknownTypeException:
@@ -227,11 +231,6 @@ class FormGenerator(object):
 
             if not hasattr(form, column.key):
                 setattr(form, column.key, field)
-
-        # if column.name in self.meta.widget_options:
-        #     field.widget.options.update(
-        #         self.meta.widget_options[column.name]
-        #     )
 
     def skip_column_property(self, column_property):
         """
