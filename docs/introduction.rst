@@ -1,3 +1,6 @@
+Introduction
+============
+
 What for?
 ---------
 Many times when building modern web apps with SQLAlchemy you’ll have forms that
