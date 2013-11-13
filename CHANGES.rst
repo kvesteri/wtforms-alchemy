@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.8.5 (2013-11-13)
+^^^^^^^^^^^^^^^^^^
+
+- Added Numeric type scale to DecimalField places conversion
+
+
 0.8.4 (2013-11-11)
 ^^^^^^^^^^^^^^^^^^
 

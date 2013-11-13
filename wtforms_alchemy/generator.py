@@ -300,6 +300,10 @@ class FormGenerator(object):
         kwargs.update(self.type_specific_parameters(column))
         if column.key in self.meta.field_args:
             kwargs.update(self.meta.field_args[column.key])
+
+        if issubclass(field_class, DecimalField):
+            if hasattr(column.type, 'scale'):
+                kwargs['places'] = column.type.scale
         field = field_class(**kwargs)
         return field
 

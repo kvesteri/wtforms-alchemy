@@ -111,6 +111,11 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init(type_=sa.Numeric)
         self.assert_type('test_column', DecimalField)
 
+    def test_numeric_scale_converts_to_decimal_field_scale(self):
+        self.init(type_=sa.Numeric(scale=4))
+        form = self.form_class()
+        assert form.test_column.places == 4
+
     def test_custom_numeric_converts_to_decimal_field(self):
         self.init(type_=CustomNumericType)
         self.assert_type('test_column', DecimalField)
