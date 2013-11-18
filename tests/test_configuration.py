@@ -15,7 +15,14 @@ class UnknownType(sa.types.UserDefinedType):
 
 class TestModelFormConfiguration(ModelFormTestCase):
     def test_skip_unknown_types(self):
-        self.init(type_=UnknownType)
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            query = None
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(UnknownType)
+            some_property = 'something'
+
+        self.ModelTest = ModelTest
 
         class ModelTestForm(ModelForm):
             class Meta:
@@ -26,7 +33,7 @@ class TestModelFormConfiguration(ModelFormTestCase):
         assert not self.has_field('test_column')
 
     def test_supports_field_exclusion(self):
-        self.init()
+        self.init_model()
 
         class ModelTestForm(ModelForm):
             class Meta:
@@ -36,27 +43,23 @@ class TestModelFormConfiguration(ModelFormTestCase):
         self.form_class = ModelTestForm
         assert not self.has_field('test_column')
 
-    def test_throws_exception_for_unknown_excluded_column(self):
-        self.init()
-
-        class ModelTestForm(ModelForm):
-            class Meta:
-                model = self.ModelTest
-                include = ['some_unknown_column']
+    def test_throws_exception_for_unknown_included_column(self):
+        self.init_model()
 
         with raises(InvalidAttributeException):
-            self.form_class = ModelTestForm()
+            class ModelTestForm(ModelForm):
+                class Meta:
+                    model = self.ModelTest
+                    include = ['some_unknown_column']
 
     def test_throws_exception_for_non_column_fields(self):
-        self.init()
-
-        class ModelTestForm(ModelForm):
-            class Meta:
-                model = self.ModelTest
-                include = ['some_property']
+        self.init_model()
 
         with raises(InvalidAttributeException):
-            self.form_class = ModelTestForm()
+            class ModelTestForm(ModelForm):
+                class Meta:
+                    model = self.ModelTest
+                    include = ['some_property']
 
     def test_supports_field_inclusion(self):
         self.init()
@@ -170,16 +173,3 @@ class TestModelFormConfiguration(ModelFormTestCase):
 
         form = ModelTestForm(MultiDict(test_column=u' something '))
         assert form.test_column.data == u'something'
-
-    def test_strip_strings_fields_with_empty_values(self):
-        self.init()
-
-        class ModelTestForm(ModelForm):
-            class Meta:
-                model = self.ModelTest
-                only = ['test_column']
-                strip_string_fields = True
-
-        form = ModelTestForm()
-
-

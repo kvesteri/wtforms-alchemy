@@ -26,12 +26,10 @@ class TestAutoAssignedValidators(ModelFormTestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             test_column = sa.Column(sa.Unicode(255), unique=True)
 
-        class ModelTestForm(ModelForm):
-            class Meta:
-                model = ModelTest
-
         with raises(Exception):
-            ModelTestForm()
+            class ModelTestForm(ModelForm):
+                class Meta:
+                    model = ModelTest
 
     def test_assigns_non_nullable_fields_as_required(self):
         self.init(nullable=False)

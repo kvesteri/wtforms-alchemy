@@ -57,18 +57,15 @@ class ModelFormMeta(FormMeta):
         property_dict = {}
         for class_ in reversed(class_list(cls)):
             if hasattr(class_, 'Meta'):
-                property_dict.update(properties(class_.Meta))
+                property_dict.update(class_.Meta.__dict__)
 
         cls.Meta = type('Meta', (object, ), property_dict)
 
-        return FormMeta.__init__(cls, *args, **kwargs)
+        FormMeta.__init__(cls, *args, **kwargs)
 
-    def __call__(cls, *args, **kwargs):
-        if cls.Meta.model:
+        if hasattr(cls.Meta, 'model') and cls.Meta.model:
             generator = cls.Meta.form_generator(cls)
             generator.create_form(cls)
-
-        return FormMeta.__call__(cls, *args, **kwargs)
 
 
 def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
