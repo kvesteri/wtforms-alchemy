@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.8.6 (2013-11-18)
+^^^^^^^^^^^^^^^^^^
+
+- Form fields now generated in class initialization time rather than on form object initialization
+
+
 0.8.5 (2013-11-13)
 ^^^^^^^^^^^^^^^^^^
 
