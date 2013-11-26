@@ -1,13 +1,55 @@
 from pytest import raises
+from unittest import TestCase
 import sqlalchemy as sa
 from wtforms.validators import (
-    Email
+    Email, StopValidation
 )
 from wtforms_alchemy import Unique, ModelForm
+from wtforms_alchemy.generator import NotNone
 from tests import ModelFormTestCase
 
 
+class NotNoneValidatorTest(TestCase):
+    class DummyField(object):
+        def __init__(self, raw_data=None, default=None):
+            self.raw_data = raw_data
+            self.default = default
+            self.errors = []
+
+        def gettext(self, message):
+            return message
+
+    def test_raw_data_is_none_and_no_default(self):
+        field = self.DummyField()
+        validator = NotNone()
+
+        self.assertRaises(
+            StopValidation,
+            validator,
+            None, field
+        )
+
+        self.assertEqual(validator.message, 'This field is required.')
+
+    def test_raw_data_is_none_with_default(self):
+        field = self.DummyField(default='foo')
+        NotNone()(None, field)
+
+    def test_raw_data_is_empty_string_with_no_default(self):
+        field = self.DummyField('')
+        NotNone()(None, field)
+
+    def test_raw_data_is_non_trivial_string_with_no_default(self):
+        field = self.DummyField('foo')
+        NotNone()(None, field)
+
+
 class TestAutoAssignedValidators(ModelFormTestCase):
+    def assert_required(self, field_name):
+        validator = self.get_validator(field_name, NotNone)
+        if validator is None:
+            self.fail("Field '%s' is not required." % field_name)
+
     def test_auto_assigns_length_validators(self):
         self.init()
         self.assert_max_length('test_column', 255)

@@ -16,10 +16,10 @@ from wtforms.widgets import (
     TextArea
 )
 from wtforms.validators import (
-    DataRequired,
     Length,
     NumberRange,
     Optional,
+    StopValidation
 )
 import sqlalchemy as sa
 from sqlalchemy.orm.properties import ColumnProperty
@@ -60,6 +60,21 @@ from .utils import (
     null_or_unicode,
     strip_string
 )
+
+
+class NotNone(object):
+    """
+    Validates that input was provided for this field.
+    """
+    field_flags = ('required', )
+    message = None
+
+    def __call__(self, form, field):
+        if field.raw_data is None and field.default is None:
+            self.message = field.gettext('This field is required.')
+
+            field.errors[:] = []
+            raise StopValidation(self.message)
 
 
 class FormGenerator(object):
@@ -488,7 +503,7 @@ class FormGenerator(object):
                 not column.default and
                 not column.nullable and
                 self.meta.assign_required):
-            return DataRequired()
+            return NotNone()
         return Optional()
 
     def additional_validators(self, column):
