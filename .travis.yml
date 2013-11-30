@@ -9,16 +9,13 @@ python:
   - 3.3
 
 env:
-  global:
-    - COMPONENTS=WTForms-Components==0.8.0
   matrix:
     - WTFORMS=WTForms==1.0.5
-    - WTFORMS=wtforms2 COMPONENTS=tip
+    - WTFORMS=wtforms2
 
 install:
   - "if [ $WTFORMS = wtforms2 ]; then export WTFORMS=https://github.com/wtforms/wtforms/archive/master.zip; fi"
-  - "if [ $COMPONENTS = tip ]; then export COMPONENTS=https://github.com/kvesteri/wtforms-components/archive/master.zip; fi"
-  - "pip install $WTFORMS $COMPONENTS"
+  - "pip install $WTFORMS"
   - pip install -e ".[test]"
 
 script:
