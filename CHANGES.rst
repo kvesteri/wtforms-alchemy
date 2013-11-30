@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.9.0 (2013-11-30)
+^^^^^^^^^^^^^^^^^^
+
+- Initial WTForms 2.0 support
+- New configuration options: not_null_validator, not_null_str_validator
+
+
 0.8.6 (2013-11-18)
 ^^^^^^^^^^^^^^^^^^
 
