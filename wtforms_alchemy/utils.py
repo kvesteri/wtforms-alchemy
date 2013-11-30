@@ -58,20 +58,6 @@ def is_date_column(column):
     )
 
 
-def class_list(cls):
-    """Simple recursive function for listing the parent classes of given class.
-    Used by the ModelFormMeta class.
-    """
-    list_of_parents = [cls]
-    for parent in cls.__bases__:
-        list_of_parents.extend(class_list(parent))
-    return list_of_parents
-
-
-def properties(cls):
-    return dict((name, getattr(cls, name)) for name in dir(cls))
-
-
 def table(model):
     if isinstance(model, sa.schema.Table):
         return model
