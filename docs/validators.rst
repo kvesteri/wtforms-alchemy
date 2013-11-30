@@ -6,7 +6,8 @@ Auto-assigned validators
 ------------------------
 
 By default WTForms-Alchemy ModelForm assigns the following validators:
-    * DataRequired validator if your column is not nullable and has no default value
+    * InputRequired validator if column is not nullable and has no default value
+    * DataRequired validator if column is not nullable, has no default value and is of type `sqlalchemy.types.String`
     * NumberRange validator if column if of type Integer, Float or Decimal and column info parameter has min or max arguments defined
     * DateRange validator if column is of type Date or DateTime and column info parameter has min or max arguments defined
     * TimeRange validator if column is of type Time and info parameter has min or max arguments defined
