@@ -1,6 +1,7 @@
 #import pytz
 import six
 from wtforms import Form
+from wtforms.validators import InputRequired, DataRequired
 from wtforms.form import FormMeta
 from wtforms_components import (
     DateRange,
@@ -17,7 +18,6 @@ from .utils import (
     null_or_int,
     null_or_unicode,
     class_list,
-    properties,
 )
 from .exc import InvalidAttributeException, UnknownTypeException
 from .fields import ModelFieldList, ModelFormField
@@ -122,6 +122,15 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             include_datetimes_with_default = defaults.get(
                 'include_datetimes_with_default', False
             )
+
+            #: The default validator to be used for not nullable columns. Set
+            #: this to `None` if you wish to disable it.
+            not_null_validator = InputRequired()
+
+            #: The default validator to be used for not nullable string
+            #: columns. If this is set to `None` the configuration option
+            #: `not_null_validator` will be used for string columns also.
+            not_null_str_validator = [InputRequired(), DataRequired()]
 
             #: Which form generator to use. Only override this if you have a
             #: valid form generator which you want to use instead of the

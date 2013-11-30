@@ -25,6 +25,16 @@ def null_or_int(value):
         return None
 
 
+def flatten(list_):
+    result = []
+    if isinstance(list_, list):
+        for value in list_:
+            result.extend(flatten(value))
+    else:
+        result.append(list_)
+    return result
+
+
 def is_numerical_column(column):
     return (
         is_integer_column(column) or

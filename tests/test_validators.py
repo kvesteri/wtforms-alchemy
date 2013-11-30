@@ -1,7 +1,7 @@
 from pytest import raises
 import sqlalchemy as sa
 from wtforms.validators import (
-    Email
+    Email, InputRequired, DataRequired
 )
 from wtforms_alchemy import Unique, ModelForm
 from tests import ModelFormTestCase
@@ -33,11 +33,44 @@ class TestAutoAssignedValidators(ModelFormTestCase):
 
     def test_assigns_non_nullable_fields_as_required(self):
         self.init(nullable=False)
-        self.assert_required('test_column')
+        self.assert_has_validator('test_column', DataRequired)
+        self.assert_has_validator('test_column', InputRequired)
+
+    def test_string_not_nullable_validator_fallback(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(sa.Unicode(255), nullable=False)
+
+        validator = DataRequired()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                not_null_str_validator = None
+                not_null_validator = validator
+
+        form = ModelTestForm()
+        assert validator in form.test_column.validators
+
+    def test_configure_not_null_validator(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(sa.Boolean, nullable=False)
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                not_null_str_validator = None
+                not_null_validator = None
+
+        form = ModelTestForm()
+        assert form.test_column.validators == []
 
     def test_not_nullable_booleans_are_required(self):
         self.init(sa.Boolean, nullable=False)
-        self.assert_required('test_column')
+        self.assert_has_validator('test_column', InputRequired)
 
     def test_not_nullable_fields_with_defaults_are_not_required(self):
         self.init(nullable=False, default=u'default')

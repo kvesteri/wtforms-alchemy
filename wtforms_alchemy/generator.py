@@ -16,7 +16,6 @@ from wtforms.widgets import (
     TextArea
 )
 from wtforms.validators import (
-    DataRequired,
     Length,
     NumberRange,
     Optional,
@@ -54,6 +53,7 @@ from wtforms_components.widgets import (
 )
 from .exc import InvalidAttributeException, UnknownTypeException
 from .utils import (
+    flatten,
     is_date_column,
     is_integer_column,
     is_scalar,
@@ -471,7 +471,7 @@ class FormGenerator(object):
             self.unique_validator(column),
             self.range_validator(column)
         ]
-        validators = [v for v in validators if v is not None]
+        validators = flatten([v for v in validators if v is not None])
         if isinstance(column.type, types.EmailType):
             validators.append(Email())
         validators.extend(self.additional_validators(column))
@@ -488,7 +488,10 @@ class FormGenerator(object):
                 not column.default and
                 not column.nullable and
                 self.meta.assign_required):
-            return DataRequired()
+            if isinstance(column.type, sa.types.String):
+                if self.meta.not_null_str_validator:
+                    return self.meta.not_null_str_validator
+            return self.meta.not_null_validator
         return Optional()
 
     def additional_validators(self, column):
