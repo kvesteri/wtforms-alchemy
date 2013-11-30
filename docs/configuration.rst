@@ -99,6 +99,19 @@ Example::
             include_primary_keys = True
             validators = {'email': [Email()]}
 
+
+**not_null_validator** (default: InputRequired())
+
+The default validator to be used for not nullable columns. Set this to `None`
+if you wish to disable it.
+
+
+**not_null_str_validator** (default: [InputRequired(), DataRequired()])
+
+The default validator to be used for not nullable string columns. If this is
+set to `None` the configuration option `not_null_validator` will be used for
+string columns also.
+
 **datetime_format** (default: '%Y-%m-%d %H:%M:%S')
 
 Defines the default datetime format, which will be assigned to generated datetime
