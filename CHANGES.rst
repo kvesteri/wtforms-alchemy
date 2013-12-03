@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.9.1 (2013-12-03)
+^^^^^^^^^^^^^^^^^^
+
+- Fixed property alias handling (issue #46)
+
+
 0.9.0 (2013-11-30)
 ^^^^^^^^^^^^^^^^^^
 

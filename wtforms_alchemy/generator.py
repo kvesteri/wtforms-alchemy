@@ -229,8 +229,8 @@ class FormGenerator(object):
                 else:
                     continue
 
-            if not hasattr(form, column.key):
-                setattr(form, column.key, field)
+            if not hasattr(form, prop.key):
+                setattr(form, prop.key, field)
 
     def skip_column_property(self, column_property):
         """
