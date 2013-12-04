@@ -249,8 +249,10 @@ class FormGenerator(object):
 
         :param column_property: SQLAlchemy Column object
         """
-        if (not self.meta.include_primary_keys and column.primary_key or
-                column.foreign_keys):
+        if not self.meta.include_foreign_keys and column.foreign_keys:
+            return True
+
+        if not self.meta.include_primary_keys and column.primary_key: 
             return True
 
         if (not self.meta.include_datetimes_with_default and
