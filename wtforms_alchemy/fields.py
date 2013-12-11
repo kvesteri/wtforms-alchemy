@@ -1,4 +1,3 @@
-import sqlalchemy as sa
 import six
 from wtforms.fields import FieldList, FormField
 try:
@@ -21,21 +20,6 @@ class ModelFormField(FormField):
             except AttributeError:
                 pass
         FormField.populate_obj(self, obj, name)
-
-
-def match_identifiers(model, data):
-    for column in sa.inspect(model.__class__).columns:
-        if column.primary_key:
-            try:
-                if (
-                    column.key not in data or
-                    getattr(model, column.key) !=
-                    column.type.python_type(data[column.key])
-                ):
-                    return False
-            except ValueError:
-                return False
-    return True
 
 
 class ModelFieldList(FieldList):
