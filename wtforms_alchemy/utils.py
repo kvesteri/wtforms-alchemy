@@ -1,7 +1,6 @@
 import six
 import sqlalchemy as sa
 from sqlalchemy import types
-from .exc import UnknownIdentityException
 
 
 def strip_string(value):
@@ -71,23 +70,18 @@ def primary_keys(model):
             yield column
 
 
-def has_entity(obj, name, model, data):
+def find_entity(coll, model, data):
     for column in primary_keys(model):
         if not column.name in data or not data[column.name]:
-            return False
-
-        found = False
+            return None
         coerce_func = column.type.python_type
-        for related_obj in getattr(obj, name):
+        for related_obj in coll:
             value = getattr(related_obj, column.name)
 
             try:
                 if value == coerce_func(data[column.name]):
-                    found = True
+                    return related_obj
             except ValueError:
                 # coerce failed
                 pass
-
-        if not found:
-            raise UnknownIdentityException()
-    return True
+    return None

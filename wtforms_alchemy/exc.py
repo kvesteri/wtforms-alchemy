@@ -14,7 +14,3 @@ class InvalidAttributeException(Exception):
             "Model does not contain attribute named '%s'." %
             attr_name
         )
-
-
-class UnknownIdentityException(Exception):
-    pass

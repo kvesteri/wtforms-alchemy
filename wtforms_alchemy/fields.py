@@ -1,7 +1,11 @@
+import sqlalchemy as sa
 import six
 from wtforms.fields import FieldList, FormField
-from .exc import UnknownIdentityException
-from .utils import has_entity
+try:
+    from wtforms.utils import unset_value as _unset_value
+except ImportError:
+    from wtforms.fields import _unset_value
+from .utils import find_entity
 
 
 class SkipOperation(Exception):
@@ -19,39 +23,69 @@ class ModelFormField(FormField):
         FormField.populate_obj(self, obj, name)
 
 
+def match_identifiers(model, data):
+    for column in sa.inspect(model.__class__).columns:
+        if column.primary_key:
+            try:
+                if (
+                    column.key not in data or
+                    getattr(model, column.key) !=
+                    column.type.python_type(data[column.key])
+                ):
+                    return False
+            except ValueError:
+                return False
+    return True
+
+
 class ModelFieldList(FieldList):
     def __init__(
             self,
             unbound_field,
-            population_strategy='replace',
+            population_strategy='update',
             **kwargs):
         self.population_strategy = population_strategy
         super(ModelFieldList, self).__init__(unbound_field, **kwargs)
 
-    def pre_append_object(self, obj, name, counter):
-        pass
+    @property
+    def model(self):
+        return self.unbound_field.args[0].Meta.model
+
+    def _add_entry(self, formdata=None, data=_unset_value, index=None):
+        assert not self.max_entries or len(self.entries) < self.max_entries, \
+            'You cannot have more than max_entries entries in this FieldList'
+        new_index = self.last_index = index or (self.last_index + 1)
+        name = '%s-%d' % (self.short_name, new_index)
+        id = '%s-%d' % (self.id, new_index)
+        field = self.unbound_field.bind(
+            form=None, name=name, prefix=self._prefix, id=id
+        )
+        field.process(formdata)
+
+        if (
+            data != _unset_value and
+            data
+        ):
+            entity = find_entity(self.object_data, self.model, field.data)
+            if entity is not None:
+                field.process(formdata, entity)
+        self.entries.append(field)
+        return field
 
     def populate_obj(self, obj, name):
-        model = self.unbound_field.args[0].Meta.model
         state = obj._sa_instance_state
 
         if not state.identity or self.population_strategy == 'replace':
             setattr(obj, name, [])
             for counter in six.moves.range(len(self.entries)):
                 try:
-                    self.pre_append_object(obj, name, counter)
-                    try:
-                        getattr(obj, name).append(model())
-                    except AttributeError:
-                        pass
-                except SkipOperation:
+                    getattr(obj, name).append(self.model())
+                except AttributeError:
                     pass
         else:
             for index, entry in enumerate(self.entries):
                 data = entry.data
-                try:
-                    if not has_entity(obj, name, model, data):
-                        getattr(obj, name).insert(index, model())
-                except UnknownIdentityException:
-                    getattr(obj, name).insert(index, model())
+                coll = getattr(obj, name)
+                if find_entity(coll, self.model, data) is None:
+                    coll.insert(index, self.model())
         FieldList.populate_obj(self, obj, name)

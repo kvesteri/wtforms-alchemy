@@ -23,7 +23,7 @@ class ModelFieldListTestCase(FormRelationsTestCase):
         self.Event = Event
         self.Location = Location
 
-    def save(self, event=None, data={}):
+    def save(self, event=None, data=None):
         if not data:
             data = {
                 'name': u'Some event',
@@ -33,7 +33,10 @@ class ModelFieldListTestCase(FormRelationsTestCase):
         if not event:
             event = self.Event()
             self.session.add(event)
-        form = self.EventForm(MultiDict(data))
+            form = self.EventForm(MultiDict(data))
+        else:
+            form = self.EventForm(MultiDict(data), obj=event)
+
         form.validate()
         form.populate_obj(event)
         self.session.commit()
@@ -79,9 +82,16 @@ class TestUpdateStrategy(ModelFieldListTestCase):
 
         class Location(self.base):
             __tablename__ = 'location'
+            TYPES = (u'', u'football field', u'restaurant')
+
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=True)
-            description = sa.Column(sa.Unicode(255))
+            description = sa.Column(sa.Unicode(255), default=u'')
+            type = sa.Column(
+                sa.Unicode(255),
+                info={'choices': zip(TYPES, TYPES)},
+                default=u''
+            )
 
             event_id = sa.Column(sa.Integer, sa.ForeignKey(Event.id))
             event = sa.orm.relationship(Event, backref='locations')
@@ -96,6 +106,7 @@ class TestUpdateStrategy(ModelFieldListTestCase):
         class LocationForm(ModelForm):
             class Meta:
                 model = self.Location
+                only = ['name', 'description', 'type']
 
             id = PassiveHiddenField()
 
@@ -135,21 +146,56 @@ class TestUpdateStrategy(ModelFieldListTestCase):
         }
         self.save(event, data)
         assert event.locations
-        assert event.locations[0].id == location_id + 1
+        assert event.locations[0].id != location_id
 
     def test_replace_entry(self):
-        event = self.save()
+        data = {
+            'name': u'Some event',
+            'locations-0-name': u'Some location',
+            'locations-0-description': u'Some description',
+            'locations-0-type': u'restaurant'
+        }
+        event = self.save(data=data)
         location_id = event.locations[0].id
+        self.session.commit()
         data = {
             'name': u'Some event',
             'locations-0-name': u'Some other location',
         }
         self.save(event, data)
         location = event.locations[0]
-        assert location.id == location_id + 1
+        assert location.id != location_id
         assert location.name == u'Some other location'
         assert location.description == u''
+        assert location.type == u''
         assert len(event.locations) == 1
+
+    def test_replace_and_update(self):
+        data = {
+            'name': u'Some event',
+            'locations-0-name': u'Location 1',
+            'locations-0-description': u'Location 1 description',
+            'locations-1-name': u'Location 2',
+            'locations-1-description': u'Location 2 description',
+        }
+        event = self.save(data=data)
+        self.session.commit()
+        data = {
+            'name': u'Some event',
+            'locations-0-id': event.locations[1].id,
+            'locations-0-name': u'Location 2 updated',
+            'locations-0-description': u'Location 2 description updated',
+            'locations-1-name': u'Location 3',
+        }
+        self.save(event, data)
+        self.session.commit()
+        location = event.locations[0]
+        location2 = event.locations[1]
+        assert location.name == u'Location 2 updated'
+        assert location.description == u'Location 2 description updated'
+        assert len(event.locations) == 2
+        assert location2.name == u'Location 3'
+        assert location2.description == u''
 
     def test_multiple_entries(self):
         event = self.save()
