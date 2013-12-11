@@ -57,9 +57,20 @@ class ModelFieldList(FieldList):
         new_index = self.last_index = index or (self.last_index + 1)
         name = '%s-%d' % (self.short_name, new_index)
         id = '%s-%d' % (self.id, new_index)
-        field = self.unbound_field.bind(
-            form=None, name=name, prefix=self._prefix, id=id
-        )
+        if hasattr(self, 'meta'):
+            # WTForms 2.0
+            field = self.unbound_field.bind(
+                form=None,
+                name=name,
+                prefix=self._prefix,
+                id=id,
+                _meta=self.meta
+            )
+        else:
+            # WTForms 1.0
+            field = self.unbound_field.bind(
+                form=None, name=name, prefix=self._prefix, id=id
+            )
         field.process(formdata)
 
         if (
