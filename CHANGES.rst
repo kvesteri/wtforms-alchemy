@@ -7,6 +7,7 @@ Here you can see the full list of changes between each WTForms-Alchemy release.
 0.9.2 (2013-12-11)
 ^^^^^^^^^^^^^^^^^^
 
+- Smarter object value inspection for ModelFieldList
 - Changed ModelFieldList default population strategy to 'update' instead of 'replace'
 
 
