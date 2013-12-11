@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.9.2 (2013-12-11)
+^^^^^^^^^^^^^^^^^^
+
+- Changed ModelFieldList default population strategy to 'update' instead of 'replace'
+
+
 0.9.1 (2013-12-03)
 ^^^^^^^^^^^^^^^^^^
 
