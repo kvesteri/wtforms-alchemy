@@ -35,6 +35,7 @@ from wtforms_components import (
     TimeField,
 )
 from wtforms_alchemy import (
+    ModelForm,
     SelectField,
     UnknownTypeException,
     null_or_unicode
@@ -220,3 +221,21 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init(type_=ChoiceType(choices))
         self.assert_type('test_column', SelectField)
         assert self.form_class().test_column.choices == choices
+
+
+class TestCustomTypeMap(ModelFormTestCase):
+    def test_override_type_map_on_class_level(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(sa.Unicode(255), nullable=False)
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                not_null_str_validator = None
+                not_null_validator = None
+                type_map = {sa.String: TextAreaField}
+
+        form = ModelTestForm()
+        assert isinstance(form.test_column, TextAreaField)
