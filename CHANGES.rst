@@ -8,6 +8,7 @@ Here you can see the full list of changes between each WTForms-Alchemy release.
 
 - Support for hybrid properties that return column properties
 - Better exception messages for properties that are not of type ColumnProperty
+- Support for class level type map customization
 
 
 0.9.2 (2013-12-11)
