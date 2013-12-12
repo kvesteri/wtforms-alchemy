@@ -51,14 +51,19 @@ from wtforms_components.widgets import (
     TextInput,
     TimeInput,
 )
-from .exc import InvalidAttributeException, UnknownTypeException
+from .exc import (
+    AttributeTypeException,
+    InvalidAttributeException,
+    UnknownTypeException
+)
 from .utils import (
     flatten,
     is_date_column,
     is_integer_column,
     is_scalar,
     null_or_unicode,
-    strip_string
+    strip_string,
+    translated_attributes
 )
 
 
@@ -137,10 +142,10 @@ class FormGenerator(object):
                 continue
             attrs[key] = property_
 
-        for attr in self.translated_attributes:
+        for attr in translated_attributes(self.model_class):
             attrs[attr.key] = attr.property
 
-        return self.create_fields(form, self.filter_attributes(attrs).values())
+        return self.create_fields(form, self.filter_attributes(attrs))
 
     def filter_attributes(self, attrs):
         """
@@ -151,14 +156,15 @@ class FormGenerator(object):
         """
         if self.meta.only:
             attrs = OrderedDict([
-                (prop.key, prop)
-                for prop in map(self.validate_attribute, self.meta.only)
+                (key, prop)
+                for key, prop in map(self.validate_attribute, self.meta.only)
             ])
         else:
             if self.meta.include:
                 attrs.update([
-                    (prop.key, prop)
-                    for prop in map(self.validate_attribute, self.meta.include)
+                    (key, prop)
+                    for key, prop
+                    in map(self.validate_attribute, self.meta.include)
                 ])
 
             if self.meta.exclude:
@@ -188,29 +194,8 @@ class FormGenerator(object):
             if not isinstance(attr.property, ColumnProperty):
                 raise InvalidAttributeException(attr_name)
         except AttributeError:
-            raise InvalidAttributeException(attr_name)
-        return attr.property
-
-    @property
-    def translated_attributes(self):
-        """
-        Return translated attributes for current model class. See
-        `SQLAlchemy-i18n package`_ for more information about translatable
-        attributes.
-
-        .. _`SQLAlchemy-i18n package`:
-            https://github.com/kvesteri/sqlalchemy-i18n
-        """
-        try:
-            columns = self.model_class.__translated_columns__
-        except AttributeError:
-            return []
-        else:
-            translation_class = self.model_class.__translatable__['class']
-            return [
-                getattr(translation_class, column.key)
-                for column in columns
-            ]
+            raise AttributeTypeException(attr_name)
+        return attr_name, attr.property
 
     def create_fields(self, form, properties):
         """
@@ -219,7 +204,7 @@ class FormGenerator(object):
         :param form: form to attach the generated fields into
         :param attributes: model attributes to generate the form fields from
         """
-        for prop in properties:
+        for key, prop in properties.items():
             column = prop.columns[0]
             try:
                 field = self.create_field(column)
@@ -229,8 +214,8 @@ class FormGenerator(object):
                 else:
                     continue
 
-            if not hasattr(form, prop.key):
-                setattr(form, prop.key, field)
+            if not hasattr(form, key):
+                setattr(form, key, field)
 
     def skip_column_property(self, column_property):
         """
@@ -252,7 +237,7 @@ class FormGenerator(object):
         if not self.meta.include_foreign_keys and column.foreign_keys:
             return True
 
-        if not self.meta.include_primary_keys and column.primary_key: 
+        if not self.meta.include_primary_keys and column.primary_key:
             return True
 
         if (not self.meta.include_datetimes_with_default and

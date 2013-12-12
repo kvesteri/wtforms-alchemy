@@ -85,3 +85,26 @@ def find_entity(coll, model, data):
                 # coerce failed
                 pass
     return None
+
+
+def translated_attributes(model):
+    """
+    Return translated attributes for current model class. See
+    `SQLAlchemy-i18n package`_ for more information about translatable
+    attributes.
+
+    .. _`SQLAlchemy-i18n package`:
+        https://github.com/kvesteri/sqlalchemy-i18n
+
+    :param model: SQLAlchemy declarative model class
+    """
+    try:
+        columns = model.__translated_columns__
+    except AttributeError:
+        return []
+    else:
+        translation_class = model.__translatable__['class']
+        return [
+            getattr(translation_class, column.key)
+            for column in columns
+        ]

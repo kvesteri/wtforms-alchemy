@@ -14,3 +14,12 @@ class InvalidAttributeException(Exception):
             "Model does not contain attribute named '%s'." %
             attr_name
         )
+
+
+class AttributeTypeException(Exception):
+    def __init__(self, attr_name):
+        Exception.__init__(
+            self,
+            "Model attribute '%s' is not of type ColumnProperty." %
+            attr_name
+        )
