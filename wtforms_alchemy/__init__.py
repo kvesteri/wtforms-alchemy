@@ -18,12 +18,17 @@ from .utils import (
     null_or_int,
     null_or_unicode,
 )
-from .exc import InvalidAttributeException, UnknownTypeException
+from .exc import (
+    AttributeTypeException,
+    InvalidAttributeException,
+    UnknownTypeException
+)
 from .fields import ModelFieldList, ModelFormField
 from .generator import FormGenerator
 
 
 __all__ = (
+    AttributeTypeException,
     DateRange,
     InvalidAttributeException,
     ModelFieldList,
