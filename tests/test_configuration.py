@@ -3,7 +3,7 @@ import sqlalchemy as sa
 from wtforms.fields import IntegerField
 from wtforms.validators import Email
 from wtforms_alchemy import (
-    InvalidAttributeException, ModelForm
+    AttributeTypeException, InvalidAttributeException, ModelForm
 )
 from tests import ModelFormTestCase, MultiDict
 
@@ -55,7 +55,7 @@ class TestModelFormConfiguration(ModelFormTestCase):
     def test_throws_exception_for_non_column_fields(self):
         self.init_model()
 
-        with raises(InvalidAttributeException):
+        with raises(AttributeTypeException):
             class ModelTestForm(ModelForm):
                 class Meta:
                     model = self.ModelTest
