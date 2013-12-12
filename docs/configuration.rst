@@ -205,6 +205,35 @@ use model User and have additional Email validator on column 'email'. Also it as
 all fields as optional.
 
 
+Customizing type conversion
+---------------------------
+
+You can customize the SQLAlchemy type conversion on class level with type_map Meta property.
+
+Type map accepts dictionary of SQLAlchemy types as keys and WTForms field classes
+as values. The key value pairs of this dictionary override the key value pairs of FormGenerator.TYPE_MAP.
+
+Let's say we want to convert all unicode typed properties to TextAreaFields instead of StringFields. We can do this by assigning Unicode, TextAreaField key value pair into type map.
+
+::
+
+
+    from wtforms.fields import TextAreaField
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(100))
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            type_map = {sa.Unicode: TextAreaField}
+
+
+
 
 Custom form base class
 ----------------------
