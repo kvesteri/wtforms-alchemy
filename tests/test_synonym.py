@@ -1,0 +1,35 @@
+import sqlalchemy as sa
+from sqlalchemy.ext.hybrid import hybrid_property
+from wtforms_alchemy import ModelForm
+from tests import ModelFormTestCase
+
+
+class TestSynonym(ModelFormTestCase):
+    def test_synonym_returning_column_property(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            _test_column = sa.Column('test_column', sa.Integer, nullable=False)
+
+            @hybrid_property
+            def test_column(self):
+                return self.test_column * 2
+
+            @test_column.setter
+            def test_column(self, value):
+                self._test_column = value
+
+            test_column = sa.orm.synonym(
+                '_test_column', descriptor='test_column'
+            )
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                not_null_str_validator = None
+                not_null_validator = None
+                include = ('test_column', )
+                exclude = ('_test_column', )
+
+        form = ModelTestForm()
+        assert form.test_column
