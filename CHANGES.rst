@@ -3,6 +3,12 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
+0.9.3 (2013-12-12)
+^^^^^^^^^^^^^^^^^^
+
+- Support for hybrid properties that return column properties
+- Better exception messages for properties that are not of type ColumnProperty
+
 
 0.9.2 (2013-12-11)
 ^^^^^^^^^^^^^^^^^^
