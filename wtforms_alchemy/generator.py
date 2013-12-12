@@ -127,6 +127,7 @@ class FormGenerator(object):
         self.form_class = form_class
         self.model_class = self.form_class.Meta.model
         self.meta = self.form_class.Meta
+        self.TYPE_MAP.update(self.form_class.Meta.type_map)
 
     def create_form(self, form):
         """

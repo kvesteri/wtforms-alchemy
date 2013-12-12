@@ -84,6 +84,12 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
 
             default = None
 
+            #: Whether or not to skip unknown types. If this is set to True,
+            #: fields with types that are not present in FormGenerator type map
+            #: will be silently excluded from the generated form.
+            #:
+            #: By default this is set to False, meaning unknown types throw
+            #: exceptions when encountered.
             skip_unknown_types = defaults.get('skip_unknown_types', False)
 
             #: Whether or not to assign non-nullable fields as required
@@ -145,6 +151,14 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             datetime_format = defaults.get(
                 'datetime_format', '%Y-%m-%d %H:%M:%S'
             )
+
+            #: Dictionary of SQLAlchemy types as keys and WTForms field classes
+            #: as values. The key value pairs of this dictionary override
+            #: the key value pairs of FormGenerator.TYPE_MAP.
+            #:
+            #: Using this configuration option one can easily configure the
+            #: type conversion in class level.
+            type_map = {}
 
             #: Additional fields to include in the generated form.
             include = []
