@@ -1,6 +1,11 @@
+from inspect import isclass
 import six
 import sqlalchemy as sa
 from sqlalchemy import types
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 
 
 def strip_string(value):
@@ -108,3 +113,9 @@ def translated_attributes(model):
             getattr(translation_class, column.key)
             for column in columns
         ]
+
+
+class ClassMap(OrderedDict):
+    def __contains__(self, key):
+        test_func = issubclass if isclass(key) else isinstance
+        return any(test_func(key, class_) for class_ in self)
