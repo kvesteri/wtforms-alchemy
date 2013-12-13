@@ -1,5 +1,6 @@
 from pytest import raises
 import sqlalchemy as sa
+from sqlalchemy_utils import EmailType
 from wtforms.validators import (
     Email, InputRequired, DataRequired, Optional
 )
@@ -36,7 +37,7 @@ class TestAutoAssignedValidators(ModelFormTestCase):
         self.assert_has_validator('test_column', DataRequired)
         self.assert_has_validator('test_column', InputRequired)
 
-    def test_string_not_nullable_validator_fallback(self):
+    def test_type_level_not_nullable_validators(self):
         class ModelTest(self.base):
             __tablename__ = 'model_test'
             id = sa.Column(sa.Integer, primary_key=True)
@@ -49,6 +50,25 @@ class TestAutoAssignedValidators(ModelFormTestCase):
                 model = ModelTest
                 not_null_validator_type_map = ClassMap()
                 not_null_validator = validator
+
+        form = ModelTestForm()
+        assert validator in form.test_column.validators
+
+    def test_not_nullable_validator_with_type_decorator(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(EmailType, nullable=False)
+
+        validator = DataRequired()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                not_null_validator_type_map = ClassMap(
+                    [(sa.String, validator)]
+                )
+                not_null_validator = []
 
         form = ModelTestForm()
         assert validator in form.test_column.validators

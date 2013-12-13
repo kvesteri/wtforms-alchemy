@@ -477,16 +477,17 @@ class FormGenerator(object):
                 not column.default and
                 not column.nullable):
 
-            # if (
-            #     type(column.type) not in self.TYPE_MAP and
-            #     isinstance(column.type, sa.types.TypeDecorator)
-            # ):
-            #     check_type = column.type.impl
-            # else:
-            #     check_type = column.type
+            type_map = self.meta.not_null_validator_type_map
             try:
-                return self.meta.not_null_validator_type_map[column.type]
+                return type_map[column.type]
             except KeyError:
+                if isinstance(column.type, sa.types.TypeDecorator):
+                    type_ = column.type.impl
+
+                    try:
+                        return type_map[type_]
+                    except KeyError:
+                        pass
                 if self.meta.not_null_validator is not None:
                     return self.meta.not_null_validator
         return Optional()
