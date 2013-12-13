@@ -474,12 +474,21 @@ class FormGenerator(object):
         """
         if (not self.meta.all_fields_optional and
                 not column.default and
-                not column.nullable and
-                self.meta.assign_required):
-            if isinstance(column.type, sa.types.String):
-                if self.meta.not_null_str_validator:
-                    return self.meta.not_null_str_validator
-            return self.meta.not_null_validator
+                not column.nullable):
+
+            # if (
+            #     type(column.type) not in self.TYPE_MAP and
+            #     isinstance(column.type, sa.types.TypeDecorator)
+            # ):
+            #     check_type = column.type.impl
+            # else:
+            #     check_type = column.type
+            if self.meta.not_null_validator_type_map is not None:
+                for type_ in self.meta.not_null_validator_type_map:
+                    if isinstance(column.type, type_):
+                        return self.meta.not_null_validator_type_map[type_]
+            if self.meta.not_null_validator is not None:
+                return self.meta.not_null_validator
         return Optional()
 
     def additional_validators(self, column):

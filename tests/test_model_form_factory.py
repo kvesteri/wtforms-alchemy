@@ -17,7 +17,6 @@ class TestModelFormFactory(ModelFormTestCase):
             pass
 
         defaults = {
-            'assign_required': False,
             'all_fields_optional': True,
             'only_indexed_fields': True,
             'include_primary_keys': True,

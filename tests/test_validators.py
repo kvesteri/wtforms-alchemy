@@ -1,7 +1,7 @@
 from pytest import raises
 import sqlalchemy as sa
 from wtforms.validators import (
-    Email, InputRequired, DataRequired
+    Email, InputRequired, DataRequired, Optional
 )
 from wtforms_alchemy import Unique, ModelForm
 from tests import ModelFormTestCase
@@ -47,13 +47,13 @@ class TestAutoAssignedValidators(ModelFormTestCase):
         class ModelTestForm(ModelForm):
             class Meta:
                 model = ModelTest
-                not_null_str_validator = None
+                not_null_validator_type_map = None
                 not_null_validator = validator
 
         form = ModelTestForm()
         assert validator in form.test_column.validators
 
-    def test_configure_not_null_validator(self):
+    def test_not_null_validator_as_empty_list(self):
         class ModelTest(self.base):
             __tablename__ = 'model_test'
             id = sa.Column(sa.Integer, primary_key=True)
@@ -62,11 +62,27 @@ class TestAutoAssignedValidators(ModelFormTestCase):
         class ModelTestForm(ModelForm):
             class Meta:
                 model = ModelTest
-                not_null_str_validator = None
-                not_null_validator = None
+                not_null_validator_type_map = None
+                not_null_validator = []
 
         form = ModelTestForm()
         assert form.test_column.validators == []
+
+    def test_not_null_validator_as_none(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(sa.Boolean, nullable=False)
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                not_null_validator_type_map = None
+                not_null_validator = None
+
+        form = ModelTestForm()
+        assert len(form.test_column.validators) == 1
+        assert isinstance(form.test_column.validators[0], Optional)
 
     def test_not_nullable_booleans_are_required(self):
         self.init(sa.Boolean, nullable=False)

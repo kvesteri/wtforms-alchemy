@@ -1,5 +1,6 @@
 #import pytz
 import six
+import sqlalchemy as sa
 from wtforms import Form
 from wtforms.validators import InputRequired, DataRequired
 from wtforms.form import FormMeta
@@ -97,9 +98,6 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #: exceptions when encountered.
             skip_unknown_types = defaults.get('skip_unknown_types', False)
 
-            #: Whether or not to assign non-nullable fields as required
-            assign_required = defaults.get('assign_required', True)
-
             #: Whether or not to assign all fields as optional, useful when
             #: creating update forms for patch requests
             all_fields_optional = defaults.get('all_fields_optional', False)
@@ -137,10 +135,12 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #: this to `None` if you wish to disable it.
             not_null_validator = InputRequired()
 
-            #: The default validator to be used for not nullable string
-            #: columns. If this is set to `None` the configuration option
-            #: `not_null_validator` will be used for string columns also.
-            not_null_str_validator = [InputRequired(), DataRequired()]
+            #: A dictionary that overrides not null validation on type level.
+            #: Keys should be valid SQLAlchemy types and values should be valid
+            #: WTForms validators.
+            not_null_validator_type_map = {
+                sa.String: [InputRequired(), DataRequired()]
+            }
 
             #: Which form generator to use. Only override this if you have a
             #: valid form generator which you want to use instead of the
