@@ -18,6 +18,7 @@ from .utils import (
     is_scalar,
     null_or_int,
     null_or_unicode,
+    ClassMap
 )
 from .exc import (
     AttributeTypeException,
@@ -138,9 +139,9 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #: A dictionary that overrides not null validation on type level.
             #: Keys should be valid SQLAlchemy types and values should be valid
             #: WTForms validators.
-            not_null_validator_type_map = {
-                sa.String: [InputRequired(), DataRequired()]
-            }
+            not_null_validator_type_map = ClassMap(
+                [(sa.String, [InputRequired(), DataRequired()])]
+            )
 
             #: Which form generator to use. Only override this if you have a
             #: valid form generator which you want to use instead of the

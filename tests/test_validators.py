@@ -3,7 +3,7 @@ import sqlalchemy as sa
 from wtforms.validators import (
     Email, InputRequired, DataRequired, Optional
 )
-from wtforms_alchemy import Unique, ModelForm
+from wtforms_alchemy import Unique, ModelForm, ClassMap
 from tests import ModelFormTestCase
 
 
@@ -47,7 +47,7 @@ class TestAutoAssignedValidators(ModelFormTestCase):
         class ModelTestForm(ModelForm):
             class Meta:
                 model = ModelTest
-                not_null_validator_type_map = None
+                not_null_validator_type_map = ClassMap()
                 not_null_validator = validator
 
         form = ModelTestForm()
@@ -62,7 +62,7 @@ class TestAutoAssignedValidators(ModelFormTestCase):
         class ModelTestForm(ModelForm):
             class Meta:
                 model = ModelTest
-                not_null_validator_type_map = None
+                not_null_validator_type_map = ClassMap()
                 not_null_validator = []
 
         form = ModelTestForm()
@@ -77,7 +77,7 @@ class TestAutoAssignedValidators(ModelFormTestCase):
         class ModelTestForm(ModelForm):
             class Meta:
                 model = ModelTest
-                not_null_validator_type_map = None
+                not_null_validator_type_map = ClassMap()
                 not_null_validator = None
 
         form = ModelTestForm()

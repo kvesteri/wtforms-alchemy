@@ -63,7 +63,8 @@ from .utils import (
     is_scalar,
     null_or_unicode,
     strip_string,
-    translated_attributes
+    translated_attributes,
+    ClassMap
 )
 
 
@@ -76,7 +77,7 @@ class FormGenerator(object):
     # When converting SQLAlchemy types to fields this ordered dict is iterated
     # in given order. This allows smart type conversion of different inherited
     # type objects.
-    TYPE_MAP = OrderedDict((
+    TYPE_MAP = ClassMap((
         (sa.types.UnicodeText, TextAreaField),
         (sa.types.BigInteger, IntegerField),
         (sa.types.SmallInteger, IntegerField),
@@ -483,12 +484,11 @@ class FormGenerator(object):
             #     check_type = column.type.impl
             # else:
             #     check_type = column.type
-            if self.meta.not_null_validator_type_map is not None:
-                for type_ in self.meta.not_null_validator_type_map:
-                    if isinstance(column.type, type_):
-                        return self.meta.not_null_validator_type_map[type_]
-            if self.meta.not_null_validator is not None:
-                return self.meta.not_null_validator
+            try:
+                return self.meta.not_null_validator_type_map[column.type]
+            except KeyError:
+                if self.meta.not_null_validator is not None:
+                    return self.meta.not_null_validator
         return Optional()
 
     def additional_validators(self, column):
@@ -568,13 +568,14 @@ class FormGenerator(object):
         if 'choices' in column.info and column.info['choices']:
             return SelectField
         if (
-            type(column.type) not in self.TYPE_MAP and
+            column.type not in self.TYPE_MAP and
             isinstance(column.type, sa.types.TypeDecorator)
         ):
             check_type = column.type.impl
         else:
             check_type = column.type
-        for type_ in self.TYPE_MAP:
-            if isinstance(check_type, type_):
-                return self.TYPE_MAP[type_]
-        raise UnknownTypeException(column)
+
+        try:
+            return self.TYPE_MAP[check_type]
+        except KeyError:
+            raise UnknownTypeException(column)
