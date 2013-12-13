@@ -119,3 +119,11 @@ class ClassMap(OrderedDict):
     def __contains__(self, key):
         test_func = issubclass if isclass(key) else isinstance
         return any(test_func(key, class_) for class_ in self)
+
+    def __getitem__(self, key):
+        if not isclass(key):
+            key = type(key)
+        for class_ in self:
+            if issubclass(key, class_):
+                return OrderedDict.__getitem__(self, class_)
+        raise KeyError(key)

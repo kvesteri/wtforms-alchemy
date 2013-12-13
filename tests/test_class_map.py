@@ -35,3 +35,19 @@ def test_contains_with_isinstance_check():
     assert B() in class_map
     assert A() in class_map
     assert A2() in class_map
+
+
+def test_getitem_with_classes():
+    class_map = ClassMap({A: 3, B: 6})
+    assert class_map[B2] == 6
+    assert class_map[B] == 6
+    assert class_map[A] == 3
+    assert class_map[A2] == 3
+
+
+def test_getitem_with_objects():
+    class_map = ClassMap({A: 3, B: 6})
+    assert class_map[B2()] == 6
+    assert class_map[B()] == 6
+    assert class_map[A()] == 3
+    assert class_map[A2()] == 3
