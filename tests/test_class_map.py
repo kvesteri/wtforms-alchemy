@@ -1,4 +1,4 @@
-from pytest import mark
+from pytest import mark, raises
 from wtforms_alchemy.utils import ClassMap
 
 
@@ -80,6 +80,12 @@ def test_getitem_with_objects(key, value):
     assert class_map[key] == value
 
 
+def test_getitem_throws_keyerror_for_unknown_key():
+    class_map = ClassMap({A: 3, B: 6})
+    with raises(KeyError):
+        class_map['unknown']
+
+
 @mark.parametrize(
     'items',
     [
@@ -104,17 +110,3 @@ def test_init_sorts_dict_of_items_by_inheritance(items):
 def test_init_sorts_items_by_inheritance(items):
     class_map = ClassMap(items)
     assert class_map.items() == [(A5, 5), (A4, 4), (A3, 3), (A2, 2), (A, 1)]
-
-
-# @mark.parametrize(
-#     'items',
-#     [
-#         {A: 1, A2: 2, A3: 3, A4: 4, A5: 5},
-#         {A2: 2, A: 1, A4: 4, A3: 3, A5: 5},
-#         {A5: 5, A: 1, A4: 4, A3: 3, A2: 2},
-#     ]
-# )
-# def test_update_sorts_items_by_inheritance(items):
-#     class_map = ClassMap()
-#     class_map.update(items)
-#     assert class_map.items() == [(A5, 5), (A4, 4), (A3, 3), (A2, 2), (A, 1)]

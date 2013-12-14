@@ -40,6 +40,7 @@ from wtforms_alchemy import (
     UnknownTypeException,
     null_or_unicode
 )
+from wtforms_alchemy.utils import ClassMap
 from wtforms_components import PhoneNumberField
 from tests import ModelFormTestCase
 
@@ -233,9 +234,8 @@ class TestCustomTypeMap(ModelFormTestCase):
         class ModelTestForm(ModelForm):
             class Meta:
                 model = ModelTest
-                not_null_str_validator = None
                 not_null_validator = None
-                type_map = {sa.String: TextAreaField}
+                type_map = ClassMap({sa.Unicode: TextAreaField})
 
         form = ModelTestForm()
         assert isinstance(form.test_column, TextAreaField)
