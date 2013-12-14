@@ -116,14 +116,64 @@ def translated_attributes(model):
 
 
 class ClassMap(OrderedDict):
+    """
+    An ordered dictionary with keys as classes. ClassMap has the following
+    charasteristics:
+
+        1. Checking if a key exists not only matches exact classes but also
+        subclasses and objects which are instances of a ClassMap key.
+
+        2. Getting an item of ClassMap with a key matches subclasses and
+        instances also.
+    """
     def __contains__(self, key):
+        """
+        Checks if given key exists in by first trying to find an exact match.
+        If no exact match is found then this method iterates trhough keys
+        and tries to check if given key is either:
+
+            1. A subclass of one of the keys
+            2. An instance of one of the keys
+
+        The first check has the time complexity of O(1) whereas the second
+        check has O(n).
+
+        Example::
+
+
+
+            class A(object):
+                pass
+
+
+            class B(object):
+                pass
+
+
+            class A2(A):
+                pass
+
+
+            class_map = ClassMap({A: 1, B: 2})
+            assert B in class_map
+            assert A in class_map
+            assert A2 in class_map
+            assert B() in class_map
+            assert A() in class_map
+            assert A2() in class_map
+        """
+        if OrderedDict.__contains__(self, key):
+            return True
         test_func = issubclass if isclass(key) else isinstance
         return any(test_func(key, class_) for class_ in self)
 
     def __getitem__(self, key):
-        if not isclass(key):
-            key = type(key)
-        for class_ in self:
-            if issubclass(key, class_):
-                return OrderedDict.__getitem__(self, class_)
-        raise KeyError(key)
+        try:
+            return OrderedDict.__getitem__(self, key)
+        except KeyError:
+            if not isclass(key):
+                key = type(key)
+            for class_ in self:
+                if issubclass(key, class_):
+                    return OrderedDict.__getitem__(self, class_)
+            raise
