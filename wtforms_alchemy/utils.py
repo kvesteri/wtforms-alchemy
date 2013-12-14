@@ -168,6 +168,32 @@ class ClassMap(OrderedDict):
         return any(test_func(key, class_) for class_ in self)
 
     def __getitem__(self, key):
+        """
+        Returns the item matching a key. The key matching has the same
+        charasteristics as __contains__ method.
+
+        Example::
+
+            class A(object):
+                pass
+
+
+            class B(object):
+                pass
+
+
+            class A2(A):
+                pass
+
+
+            class_map = ClassMap({A: 1, B: 2})
+            assert class_map[B] == 2
+            assert class_map[A] == 1
+            assert class_map[A2] == 1
+            assert class_map[B()] == 2
+            assert class_map[A()] == 1
+            assert class_map[A2()] == 1
+        """
         try:
             return OrderedDict.__getitem__(self, key)
         except KeyError:
