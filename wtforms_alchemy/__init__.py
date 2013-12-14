@@ -97,44 +97,44 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #:
             #: By default this is set to False, meaning unknown types throw
             #: exceptions when encountered.
-            skip_unknown_types = defaults.get('skip_unknown_types', False)
+            skip_unknown_types = defaults.pop('skip_unknown_types', False)
 
             #: Whether or not to assign all fields as optional, useful when
             #: creating update forms for patch requests
-            all_fields_optional = defaults.get('all_fields_optional', False)
+            all_fields_optional = defaults.pop('all_fields_optional', False)
 
-            validators = defaults.get('validators', {})
+            validators = defaults.pop('validators', {})
 
             #: A dict with keys as field names and values as field arguments.
-            field_args = defaults.get('field_args', {})
+            field_args = defaults.pop('field_args', {})
 
             #: A dict with keys as field names and values as widget options.
-            widget_options = defaults.get('widget_options', {})
+            widget_options = defaults.pop('widget_options', {})
 
             #: Whether or not to include only indexed fields.
-            only_indexed_fields = defaults.get('only_indexed_fields', False)
+            only_indexed_fields = defaults.pop('only_indexed_fields', False)
 
             #: Whether or not to include primary keys.
-            include_primary_keys = defaults.get('include_primary_keys', False)
+            include_primary_keys = defaults.pop('include_primary_keys', False)
 
             #: Whether or not to include foreign keys. By default this is False
             #: indicating that foreign keys are not included in the generated
             #: form.
-            include_foreign_keys = defaults.get('include_foreign_keys', False)
+            include_foreign_keys = defaults.pop('include_foreign_keys', False)
 
             #: Whether or not to strip string fields
-            strip_string_fields = defaults.get('strip_string_fields', False)
+            strip_string_fields = defaults.pop('strip_string_fields', False)
 
             #: Whether or not to include datetime columns that have a default
             #: value. A good example is created_at column which has a default
             #: value of datetime.utcnow.
-            include_datetimes_with_default = defaults.get(
+            include_datetimes_with_default = defaults.pop(
                 'include_datetimes_with_default', False
             )
 
             #: The default validator to be used for not nullable columns. Set
             #: this to `None` if you wish to disable it.
-            not_null_validator = defaults.get(
+            not_null_validator = defaults.pop(
                 'not_null_validator',
                 InputRequired()
             )
@@ -142,7 +142,7 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #: A dictionary that overrides not null validation on type level.
             #: Keys should be valid SQLAlchemy types and values should be valid
             #: WTForms validators.
-            not_null_validator_type_map = defaults.get(
+            not_null_validator_type_map = defaults.pop(
                 'not_null_validator_type_map',
                 ClassMap(
                     [(sa.String, [InputRequired(), DataRequired()])]
@@ -152,15 +152,15 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #: Which form generator to use. Only override this if you have a
             #: valid form generator which you want to use instead of the
             #: default one.
-            form_generator = defaults.get(
+            form_generator = defaults.pop(
                 'form_generator', FormGenerator
             )
 
             #: Default date format
-            date_format = defaults.get('date_format', '%Y-%m-%d')
+            date_format = defaults.pop('date_format', '%Y-%m-%d')
 
             #: Default datetime format
-            datetime_format = defaults.get(
+            datetime_format = defaults.pop(
                 'datetime_format', '%Y-%m-%d %H:%M:%S'
             )
 
@@ -170,16 +170,16 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #:
             #: Using this configuration option one can easily configure the
             #: type conversion in class level.
-            type_map = defaults.get('type_map', ClassMap())
+            type_map = defaults.pop('type_map', ClassMap())
 
             #: Additional fields to include in the generated form.
-            include = defaults.get('include', [])
+            include = defaults.pop('include', [])
 
             #: List of fields to exclude from the generated form.
-            exclude = []
+            exclude = defaults.pop('exclude', [])
 
             #: List of fields to only include in the generated form.
-            only = []
+            only = defaults.pop('only', [])
 
         def __init__(self, *args, **kwargs):
             """Sets object as form attribute."""
