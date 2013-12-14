@@ -103,13 +103,13 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #: creating update forms for patch requests
             all_fields_optional = defaults.get('all_fields_optional', False)
 
-            validators = {}
+            validators = defaults.get('validators', {})
 
             #: A dict with keys as field names and values as field arguments.
-            field_args = {}
+            field_args = defaults.get('field_args', {})
 
             #: A dict with keys as field names and values as widget options.
-            widget_options = {}
+            widget_options = defaults.get('widget_options', {})
 
             #: Whether or not to include only indexed fields.
             only_indexed_fields = defaults.get('only_indexed_fields', False)
@@ -134,13 +134,19 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
 
             #: The default validator to be used for not nullable columns. Set
             #: this to `None` if you wish to disable it.
-            not_null_validator = InputRequired()
+            not_null_validator = defaults.get(
+                'not_null_validator',
+                InputRequired()
+            )
 
             #: A dictionary that overrides not null validation on type level.
             #: Keys should be valid SQLAlchemy types and values should be valid
             #: WTForms validators.
-            not_null_validator_type_map = ClassMap(
-                [(sa.String, [InputRequired(), DataRequired()])]
+            not_null_validator_type_map = defaults.get(
+                'not_null_validator_type_map',
+                ClassMap(
+                    [(sa.String, [InputRequired(), DataRequired()])]
+                )
             )
 
             #: Which form generator to use. Only override this if you have a
@@ -164,10 +170,10 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #:
             #: Using this configuration option one can easily configure the
             #: type conversion in class level.
-            type_map = {}
+            type_map = defaults.get('type_map', ClassMap())
 
             #: Additional fields to include in the generated form.
-            include = []
+            include = defaults.get('include', [])
 
             #: List of fields to exclude from the generated form.
             exclude = []
