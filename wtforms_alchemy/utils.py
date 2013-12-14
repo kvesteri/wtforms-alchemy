@@ -115,6 +115,17 @@ def translated_attributes(model):
         ]
 
 
+def sorted_classes(classes):
+    if classes:
+        try:
+            classes = classes.items()
+        except AttributeError:
+            pass
+        return reversed(sorted(classes, key=lambda a: a[0].mro()))
+    else:
+        return {}
+
+
 class ClassMap(OrderedDict):
     """
     An ordered dictionary with keys as classes. ClassMap has the following
@@ -126,6 +137,10 @@ class ClassMap(OrderedDict):
         2. Getting an item of ClassMap with a key matches subclasses and
         instances also.
     """
+    def __init__(self, items=None):
+        items = sorted_classes(items)
+        OrderedDict.__init__(self, items)
+
     def __contains__(self, key):
         """
         Checks if given key exists in by first trying to find an exact match.

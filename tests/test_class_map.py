@@ -1,3 +1,4 @@
+from pytest import mark
 from wtforms_alchemy.utils import ClassMap
 
 
@@ -13,6 +14,18 @@ class A2(A):
     pass
 
 
+class A3(A2):
+    pass
+
+
+class A4(A3):
+    pass
+
+
+class A5(A4):
+    pass
+
+
 class B2(B):
     pass
 
@@ -21,33 +34,87 @@ class C(object):
     pass
 
 
-def test_contains_with_subclass_check():
+@mark.parametrize(
+    'key',
+    [B2, B, A, A2]
+)
+def test_contains_with_subclass_check(key):
     class_map = ClassMap({A: 3, B: 6})
-    assert B2 in class_map
-    assert B in class_map
-    assert A in class_map
-    assert A2 in class_map
+    assert key in class_map
 
 
-def test_contains_with_isinstance_check():
+@mark.parametrize(
+    'key',
+    [B2(), B(), A(), A2()]
+)
+def test_contains_with_isinstance_check(key):
     class_map = ClassMap({A: 3, B: 6})
-    assert B2() in class_map
-    assert B() in class_map
-    assert A() in class_map
-    assert A2() in class_map
+    assert key in class_map
 
 
-def test_getitem_with_classes():
+@mark.parametrize(
+    ('key', 'value'),
+    [
+        (B2, 6),
+        (B, 6),
+        (A, 3),
+        (A2, 3)
+    ]
+)
+def test_getitem_with_classes(key, value):
     class_map = ClassMap({A: 3, B: 6})
-    assert class_map[B2] == 6
-    assert class_map[B] == 6
-    assert class_map[A] == 3
-    assert class_map[A2] == 3
+    assert class_map[key] == value
 
 
-def test_getitem_with_objects():
+@mark.parametrize(
+    ('key', 'value'),
+    [
+        (B2(), 6),
+        (B(), 6),
+        (A(), 3),
+        (A2(), 3)
+    ]
+)
+def test_getitem_with_objects(key, value):
     class_map = ClassMap({A: 3, B: 6})
-    assert class_map[B2()] == 6
-    assert class_map[B()] == 6
-    assert class_map[A()] == 3
-    assert class_map[A2()] == 3
+    assert class_map[key] == value
+
+
+@mark.parametrize(
+    'items',
+    [
+        {A: 1, A2: 2, A3: 3, A4: 4, A5: 5},
+        {A2: 2, A: 1, A4: 4, A3: 3, A5: 5},
+        {A5: 5, A: 1, A4: 4, A3: 3, A2: 2},
+    ]
+)
+def test_init_sorts_dict_of_items_by_inheritance(items):
+    class_map = ClassMap(items)
+    assert class_map.items() == [(A5, 5), (A4, 4), (A3, 3), (A2, 2), (A, 1)]
+
+
+@mark.parametrize(
+    'items',
+    [
+        [(A, 1), (A2, 2), (A3, 3), (A4, 4), (A5, 5)],
+        [(A2, 2), (A, 1), (A4, 4), (A3, 3), (A5, 5)],
+        [(A5, 5), (A, 1), (A4, 4), (A3, 3), (A2, 2)],
+    ]
+)
+def test_init_sorts_items_by_inheritance(items):
+    class_map = ClassMap(items)
+    assert class_map.items() == [(A5, 5), (A4, 4), (A3, 3), (A2, 2), (A, 1)]
+
+
+# @mark.parametrize(
+#     'items',
+#     [
+#         {A: 1, A2: 2, A3: 3, A4: 4, A5: 5},
+#         {A2: 2, A: 1, A4: 4, A3: 3, A5: 5},
+#         {A5: 5, A: 1, A4: 4, A3: 3, A2: 2},
+#     ]
+# )
+# def test_update_sorts_items_by_inheritance(items):
+#     class_map = ClassMap()
+#     class_map.update(items)
+#     assert class_map.items() == [(A5, 5), (A4, 4), (A3, 3), (A2, 2), (A, 1)]
