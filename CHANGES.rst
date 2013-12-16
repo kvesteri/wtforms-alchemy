@@ -3,8 +3,9 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
-0.10.0 (not released yet)
-^^^^^^^^^^^^^^^^^^^^^^^^^
+
+0.10.0 (2013-12-16)
+^^^^^^^^^^^^^^^^^^^
 
 - Replaced assign_required configuration option with not_null_validator for more fine grained control of not null validation
 - Replaced not_null_str_validator with not_null_validator_type_map
