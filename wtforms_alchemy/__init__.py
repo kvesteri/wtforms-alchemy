@@ -190,7 +190,7 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
 
     if defaults:
         raise UnknownConfigurationOption(
-            defaults.keys()[0]
+            list(defaults.keys())[0]
         )
 
     return ModelForm

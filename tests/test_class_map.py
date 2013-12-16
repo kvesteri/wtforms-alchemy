@@ -120,7 +120,9 @@ def test_getitem_throws_keyerror_for_unknown_key():
 )
 def test_init_sorts_dict_of_items_by_inheritance(items):
     class_map = ClassMap(items)
-    assert class_map.items() == [(A5, 5), (A4, 4), (A3, 3), (A2, 2), (A, 1)]
+    assert list(class_map.items()) == [
+        (A5, 5), (A4, 4), (A3, 3), (A2, 2), (A, 1)
+    ]
 
 
 @mark.parametrize(
@@ -133,4 +135,6 @@ def test_init_sorts_dict_of_items_by_inheritance(items):
 )
 def test_init_sorts_items_by_inheritance(items):
     class_map = ClassMap(items)
-    assert class_map.items() == [(A5, 5), (A4, 4), (A3, 3), (A2, 2), (A, 1)]
+    assert list(class_map.items()) == [
+        (A5, 5), (A4, 4), (A3, 3), (A2, 2), (A, 1)
+    ]
