@@ -183,7 +183,7 @@ class TestModelFormConfiguration(ModelFormTestCase):
                 only = ['test_column']
                 strip_string_fields = True
 
-        form = ModelTestForm()
+        ModelTestForm()
 
     def test_class_meta_regression(self):
         self.init()
@@ -192,7 +192,6 @@ class TestModelFormConfiguration(ModelFormTestCase):
             class Meta:
                 model = self.ModelTest
                 foo = 9
-
 
         class OtherForm(SomeForm):
             class Meta:

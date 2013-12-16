@@ -23,7 +23,8 @@ from .utils import (
 from .exc import (
     AttributeTypeException,
     InvalidAttributeException,
-    UnknownTypeException
+    UnknownTypeException,
+    UnknownConfigurationOption
 )
 from .fields import ModelFieldList, ModelFormField
 from .generator import FormGenerator
@@ -186,6 +187,11 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
 
             self._obj = kwargs.get('obj', None)
             super(ModelForm, self).__init__(*args, **kwargs)
+
+    if defaults:
+        raise UnknownConfigurationOption(
+            defaults.keys()[0]
+        )
 
     return ModelForm
 

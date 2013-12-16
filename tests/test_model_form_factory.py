@@ -1,5 +1,10 @@
+from pytest import raises
 from wtforms import Form
-from wtforms_alchemy import model_form_factory, FormGenerator
+from wtforms_alchemy import (
+    model_form_factory,
+    FormGenerator,
+    UnknownConfigurationOption
+)
 from tests import ModelFormTestCase
 
 try:
@@ -30,6 +35,18 @@ class TestModelFormFactory(ModelFormTestCase):
         ModelForm = model_form_factory(Form, **defaults)
         for key, value in defaults.items():
             assert getattr(ModelForm.Meta, key) == value
+
+    def test_throws_exception_for_unknown_configuration_option(self):
+        self.init()
+
+        class SomeForm(Form):
+            pass
+
+        defaults = {
+            'unknown': 'something'
+        }
+        with raises(UnknownConfigurationOption):
+            model_form_factory(SomeForm, **defaults)
 
     def test_supports_custom_base_class_with_model_form_factory(self):
         self.init()

@@ -23,3 +23,12 @@ class AttributeTypeException(Exception):
             "Model attribute '%s' is not of type ColumnProperty." %
             attr_name
         )
+
+
+class UnknownConfigurationOption(Exception):
+    def __init__(self, option):
+        Exception.__init__(
+            self,
+            "Unknown configuration option '%s' given." %
+            option
+        )
