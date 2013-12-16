@@ -99,19 +99,6 @@ Example::
             include_primary_keys = True
             validators = {'email': [Email()]}
 
-
-**not_null_validator** (default: InputRequired())
-
-The default validator to be used for not nullable columns. Set this to `None`
-if you wish to disable it.
-
-
-**not_null_str_validator** (default: [InputRequired(), DataRequired()])
-
-The default validator to be used for not nullable string columns. If this is
-set to `None` the configuration option `not_null_validator` will be used for
-string columns also.
-
 **datetime_format** (default: '%Y-%m-%d %H:%M:%S')
 
 Defines the default datetime format, which will be assigned to generated datetime
@@ -205,6 +192,37 @@ use model User and have additional Email validator on column 'email'. Also it as
 all fields as optional.
 
 
+Not nullable column validation
+------------------------------
+
+WTForms-Alchemy offers two options for configuring how not nullable columns are validated:
+
+* not_null_validator
+
+    The default validator to be used for not nullable columns. Set this to `None`
+    if you wish to disable it. By default this is `[InputRequired()]`.
+
+
+* not_null_validator_type_map
+
+    Type map which overrides the **not_null_validator** on specific column type. By default this is `ClassMap({sa.String: [InputRequired(), DataRequired()]})`.
+
+
+In the following example we set `DataRequired` validator for all not nullable Enum typed columns:
+
+
+::
+
+    import sqlalchemy as sa
+    from wtforms.validators import DataRequired
+    from wtforms_alchemy import ClassMap
+
+
+    class MyForm(ModelForm):
+        not_null_validator_type_map = ClassMap({sa.Enum: [DataRequired()]})
+
+
+
 Customizing type conversion
 ---------------------------
 
@@ -219,6 +237,7 @@ Let's say we want to convert all unicode typed properties to TextAreaFields inst
 
 
     from wtforms.fields import TextAreaField
+    from wtforms_alchemy import ClassMap
 
 
     class User(Base):
@@ -230,7 +249,7 @@ Let's say we want to convert all unicode typed properties to TextAreaFields inst
 
     class UserForm(ModelForm):
         class Meta:
-            type_map = {sa.Unicode: TextAreaField}
+            type_map = ClassMap({sa.Unicode: TextAreaField})
 
 
 
