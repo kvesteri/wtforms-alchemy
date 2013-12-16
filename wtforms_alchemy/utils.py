@@ -120,7 +120,7 @@ def sorted_classes(classes, reverse=False):
         classes,
         # We need to map classes to ids, since python 3 throws error when
         # trying to compare unorderable types.
-        key=lambda a: map(id, a.__mro__[::-1]),
+        key=lambda a: tuple(id(v) for v in a.__mro__[::-1]),
         reverse=reverse
     )
 
