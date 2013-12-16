@@ -1,4 +1,3 @@
-from functools import cmp_to_key
 from inspect import isclass
 import six
 import sqlalchemy as sa
@@ -119,7 +118,9 @@ def translated_attributes(model):
 def sorted_classes(classes, reverse=False):
     return sorted(
         classes,
-        key=lambda a: a.__mro__[::-1],
+        # We need to map classes to ids, since python 3 throws error when
+        # trying to compare unorderable types.
+        key=lambda a: map(id, a.__mro__[::-1]),
         reverse=reverse
     )
 
