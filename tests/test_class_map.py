@@ -1,5 +1,5 @@
 from pytest import mark, raises
-from wtforms_alchemy.utils import ClassMap
+from wtforms_alchemy.utils import ClassMap, sorted_classes
 
 
 class A(object):
@@ -78,6 +78,30 @@ def test_getitem_with_classes(key, value):
 def test_getitem_with_objects(key, value):
     class_map = ClassMap({A: 3, B: 6})
     assert class_map[key] == value
+
+
+@mark.parametrize(
+    'items',
+    [
+        [A, A2, A3, A4, A5],
+        [A2, A, A4, A3, A5],
+        [A5, A, A4, A3, A2],
+    ]
+)
+def test_sorted_classes_with_reverse(items):
+    assert sorted_classes(items, reverse=True) == [A5, A4, A3, A2, A]
+
+
+@mark.parametrize(
+    'items',
+    [
+        [A, A2, A3, A4, A5],
+        [A2, A, A4, A3, A5],
+        [A5, A, A4, A3, A2],
+    ]
+)
+def test_sorted_classes_without_reverse(items):
+    assert sorted_classes(items) == [A, A2, A3, A4, A5]
 
 
 def test_getitem_throws_keyerror_for_unknown_key():

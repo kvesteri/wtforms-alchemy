@@ -1,3 +1,4 @@
+from functools import cmp_to_key
 from inspect import isclass
 import six
 import sqlalchemy as sa
@@ -115,15 +116,12 @@ def translated_attributes(model):
         ]
 
 
-def sorted_classes(classes):
-    if classes:
-        try:
-            classes = classes.items()
-        except AttributeError:
-            pass
-        return reversed(sorted(classes, key=lambda a: a[0].mro()))
-    else:
-        return {}
+def sorted_classes(classes, reverse=False):
+    return sorted(
+        classes,
+        key=lambda a: a.__mro__[::-1],
+        reverse=reverse
+    )
 
 
 class ClassMap(OrderedDict):
@@ -138,7 +136,12 @@ class ClassMap(OrderedDict):
         instances also.
     """
     def __init__(self, items=None):
-        items = sorted_classes(items)
+        if items:
+            items = dict(items)
+            sorted_keys = sorted_classes(items.keys(), reverse=True)
+            items = [(key, items[key]) for key in sorted_keys]
+        else:
+            items = {}
         OrderedDict.__init__(self, items)
 
     def __contains__(self, key):
