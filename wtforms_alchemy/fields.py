@@ -62,15 +62,21 @@ class ModelFieldList(FieldList):
             data=data,
             index=index
         )
-        field.process(formdata)
-
         if (
             data != _unset_value and
             data
         ):
+            if formdata:
+                field.process(formdata)
+            else:
+                field.process(formdata, data=data)
+
             entity = find_entity(self.object_data, self.model, field.data)
             if entity is not None:
                 field.process(formdata, entity)
+        else:
+            field.process(formdata)
+
         self.entries.append(field)
         return field
 
