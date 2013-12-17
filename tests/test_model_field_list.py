@@ -122,6 +122,11 @@ class TestUpdateStrategy(ModelFieldListTestCase):
         self.LocationForm = LocationForm
         self.EventForm = EventForm
 
+    def test_with_none_as_formdata_for_existing_objects(self):
+        event = self.save()
+        form = self.EventForm(MultiDict(), obj=event)
+        assert form.locations[0].data['id']
+
     def test_single_entry_update(self):
         event = self.save()
         location_id = event.locations[0].id
