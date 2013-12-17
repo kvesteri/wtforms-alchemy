@@ -35,7 +35,7 @@ class ModelFieldList(FieldList):
     def model(self):
         return self.unbound_field.args[0].Meta.model
 
-    def _add_entry(self, formdata=None, data=_unset_value, index=None):
+    def _get_bound_field_for_entry(self, formdata, data, index):
         assert not self.max_entries or len(self.entries) < self.max_entries, \
             'You cannot have more than max_entries entries in this FieldList'
         new_index = self.last_index = index or (self.last_index + 1)
@@ -43,7 +43,7 @@ class ModelFieldList(FieldList):
         id = '%s-%d' % (self.id, new_index)
         if hasattr(self, 'meta'):
             # WTForms 2.0
-            field = self.unbound_field.bind(
+            return self.unbound_field.bind(
                 form=None,
                 name=name,
                 prefix=self._prefix,
@@ -52,9 +52,16 @@ class ModelFieldList(FieldList):
             )
         else:
             # WTForms 1.0
-            field = self.unbound_field.bind(
+            return self.unbound_field.bind(
                 form=None, name=name, prefix=self._prefix, id=id
             )
+
+    def _add_entry(self, formdata=None, data=_unset_value, index=None):
+        field = self._get_bound_field_for_entry(
+            formdata=formdata,
+            data=data,
+            index=index
+        )
         field.process(formdata)
 
         if (
