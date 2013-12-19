@@ -133,3 +133,68 @@ Example::
             model = User
 
 Now the 'email' field of UserForm would have Email validator.
+
+
+Overriding default validators
+-----------------------------
+
+Sometimes you may want to override what class WTForms-Alchemy uses for email, number_range, length etc. validations.
+For all automatically assigned validators WTForms-Alchemy provides configuration options to override the default validator.
+
+In the following example we set a custom Email validator for User class.
+
+::
+
+
+    from sqlalchemy_utils import EmailType
+    from wtforms_components import Email
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        name = sa.Column(sa.Unicode(100), primary_key=True, nullable=False)
+        email = sa.Column(
+            EmailType,
+            nullable=False,
+        )
+
+    class MyEmailValidator(Email):
+        def __init__(self, message='My custom email error message'):
+            Email.__init__(self, message=message)
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            email_validator = MyEmailValidator
+
+
+If you don't wish to subclass you can simply use functions / lambdas:
+
+::
+
+
+    def email():
+        return Email(message='My custom email error message')
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            email_validator = email
+
+
+You can also override validators that take multiple arguments this way:
+
+::
+
+
+    def length(min=None, max=None):
+        return Length(min=min, max=max, message='Wrong length')
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            length_validator = length
