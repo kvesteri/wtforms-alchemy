@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.11.0 (2013-12-19)
+^^^^^^^^^^^^^^^^^^^
+
+- Added configurable default validators
+- Fixed ModelFieldList processing
+
+
 0.10.0 (2013-12-16)
 ^^^^^^^^^^^^^^^^^^^
 
