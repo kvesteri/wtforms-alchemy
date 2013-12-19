@@ -198,3 +198,20 @@ You can also override validators that take multiple arguments this way:
         class Meta:
             model = User
             length_validator = length
+
+
+Here is the full list of configuration options you can use to override default validators:
+
+* email_validator
+
+* length_validator
+
+* unique_validator
+
+* number_range_validator
+
+* date_range_validator
+
+* time_range_validator
+
+* optional_validator
