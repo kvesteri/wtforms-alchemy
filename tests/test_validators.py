@@ -215,7 +215,7 @@ class TestAutoAssignedValidators(ModelFormTestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             test_column = sa.Column(sa.Unicode(255), nullable=True)
 
-        def length(min=None, max=None):
+        def length(min=-1, max=-1):
             return Length(min=min, max=max, message='Wrong length')
 
         class ModelTestForm(ModelForm):
