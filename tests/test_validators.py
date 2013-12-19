@@ -1,10 +1,12 @@
+from datetime import datetime, time
 from pytest import raises
 import sqlalchemy as sa
 from sqlalchemy_utils import EmailType
 from wtforms.validators import (
-    Email, InputRequired, DataRequired, Optional
+    Email, InputRequired, DataRequired, Optional, NumberRange, Length
 )
 from wtforms_alchemy import Unique, ModelForm, ClassMap
+from wtforms_components import TimeRange, DateRange
 from tests import ModelFormTestCase
 
 
@@ -115,3 +117,136 @@ class TestAutoAssignedValidators(ModelFormTestCase):
     def test_assigns_not_nullable_integers_as_optional(self):
         self.init(sa.Integer, nullable=True)
         self.assert_optional('test_column')
+
+    def test_override_email_validator(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(EmailType, nullable=True)
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                email_validator = lambda: Email('Wrong email')
+
+        form = ModelTestForm()
+        assert form.test_column.validators[1].message == 'Wrong email'
+
+    def test_override_optional_validator(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(EmailType, nullable=True)
+
+        class MyOptionalValidator(object):
+            def __init__(self, *args, **kwargs):
+                pass
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                optional_validator = MyOptionalValidator
+
+        form = ModelTestForm()
+        assert isinstance(form.test_column.validators[0], MyOptionalValidator)
+
+    def test_override_number_range_validator(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(sa.Integer, info={'min': 3}, nullable=True)
+
+        def number_range(min=None, max=None):
+            return NumberRange(min=min, max=max, message='Wrong number range')
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                number_range_validator = number_range
+
+        form = ModelTestForm()
+        assert form.test_column.validators[1].message == 'Wrong number range'
+
+    def test_override_date_range_validator(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(
+                sa.DateTime,
+                info={'min': datetime(2000, 1, 1)},
+                nullable=True
+            )
+
+        def date_range(min=None, max=None):
+            return DateRange(min=min, max=max, message='Wrong date range')
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                date_range_validator = date_range
+
+        form = ModelTestForm()
+        assert form.test_column.validators[1].message == 'Wrong date range'
+
+    def test_override_time_range_validator(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(
+                sa.Time,
+                info={'min': time(14, 30)},
+                nullable=True
+            )
+
+        def time_range(min=None, max=None):
+            return TimeRange(min=min, max=max, message='Wrong time')
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                time_range_validator = time_range
+
+        form = ModelTestForm()
+        assert form.test_column.validators[1].message == 'Wrong time'
+
+    def test_override_length_validator(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(sa.Unicode(255), nullable=True)
+
+        def length(min=None, max=None):
+            return Length(min=min, max=max, message='Wrong length')
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                length_validator = length
+
+        form = ModelTestForm()
+        assert form.test_column.validators[1].message == 'Wrong length'
+
+    def test_override_unique_validator(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(
+                sa.Unicode(255), unique=True, nullable=True
+            )
+
+        def unique(column, get_session):
+            return Unique(
+                column, get_session=get_session, message='Not unique'
+            )
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                unique_validator = unique
+
+            @staticmethod
+            def get_session():
+                return None
+
+        form = ModelTestForm()
+        assert form.test_column.validators[2].message == 'Not unique'

@@ -4,6 +4,7 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 from decimal import Decimal
+import inspect
 import six
 from wtforms import (
     BooleanField,
@@ -15,22 +16,15 @@ from wtforms.widgets import (
     CheckboxInput,
     TextArea
 )
-from wtforms.validators import (
-    Length,
-    NumberRange,
-    Optional,
-)
 import sqlalchemy as sa
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy_utils import types
 from wtforms_components import (
     ColorField,
     DateField,
-    DateRange,
     DateTimeField,
     DateTimeLocalField,
     DecimalField,
-    Email,
     EmailField,
     IntegerField,
     NumberRangeField,
@@ -38,8 +32,6 @@ from wtforms_components import (
     SelectField,
     StringField,
     TimeField,
-    TimeRange,
-    Unique,
 )
 from wtforms_components.widgets import (
     ColorInput,
@@ -460,9 +452,10 @@ class FormGenerator(object):
             self.unique_validator(column),
             self.range_validator(column)
         ]
-        validators = flatten([v for v in validators if v is not None])
         if isinstance(column.type, types.EmailType):
-            validators.append(Email())
+            validators.append(self.get_validator('email'))
+        validators = flatten([v for v in validators if v is not None])
+
         validators.extend(self.additional_validators(column))
         return validators
 
@@ -490,7 +483,15 @@ class FormGenerator(object):
                         pass
                 if self.meta.not_null_validator is not None:
                     return self.meta.not_null_validator
-        return Optional()
+        return self.get_validator('optional')
+
+    def get_validator(self, name, **kwargs):
+        attr_name = '%s_validator' % name
+        attr = getattr(self.meta, attr_name)
+        if inspect.ismethod(attr):
+            return six.get_unbound_function(attr)(**kwargs)
+        else:
+            return attr(**kwargs)
 
     def additional_validators(self, column):
         """
@@ -520,8 +521,9 @@ class FormGenerator(object):
         :param column: SQLAlchemy Column object
         """
         if column.unique:
-            return Unique(
-                getattr(self.model_class, column.key),
+            return self.get_validator(
+                'unique',
+                column=getattr(self.model_class, column.key),
                 get_session=self.form_class.get_session
             )
 
@@ -532,16 +534,16 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        min_ = column.info.get('min', None)
-        max_ = column.info.get('max', None)
+        min_ = column.info.get('min')
+        max_ = column.info.get('max')
 
         if min_ is not None or max_ is not None:
             if is_integer_column(column):
-                return NumberRange(min=min_, max=max_)
+                return self.get_validator('number_range', min=min_, max=max_)
             elif is_date_column(column):
-                return DateRange(min=min_, max=max_)
+                return self.get_validator('date_range', min=min_, max=max_)
             elif isinstance(column.type, sa.types.Time):
-                return TimeRange(min=min_, max=max_)
+                return self.get_validator('time_range', min=min_, max=max_)
 
     def length_validator(self, column):
         """
@@ -554,7 +556,7 @@ class FormGenerator(object):
             hasattr(column.type, 'length') and
             column.type.length
         ):
-            return Length(max=column.type.length)
+            return self.get_validator('length', max=column.type.length)
 
     def get_field_class(self, column):
         """

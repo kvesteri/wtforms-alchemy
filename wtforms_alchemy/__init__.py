@@ -2,15 +2,19 @@
 import six
 import sqlalchemy as sa
 from wtforms import Form
-from wtforms.validators import InputRequired, DataRequired
+from wtforms.validators import (
+    InputRequired, DataRequired, NumberRange, Length, Optional
+)
 from wtforms.form import FormMeta
 from wtforms_components import (
     DateRange,
+    Email,
     NumberRangeField,
     PhoneNumberField,
     SelectField,
     SelectMultipleField,
     Unique,
+    TimeRange
 )
 from .utils import (
     is_date_column,
@@ -149,6 +153,27 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
                     [(sa.String, [InputRequired(), DataRequired()])]
                 )
             )
+
+            #: Default email validator
+            email_validator = Email
+
+            #: Default length validator
+            length_validator = Length
+
+            #: Default unique validator
+            unique_validator = Unique
+
+            #: Default number range validator
+            number_range_validator = NumberRange
+
+            #: Default date range validator
+            date_range_validator = DateRange
+
+            #: Default time range validator
+            time_range_validator = TimeRange
+
+            #: Default optional validator
+            optional_validator = Optional
 
             #: Which form generator to use. Only override this if you have a
             #: valid form generator which you want to use instead of the
