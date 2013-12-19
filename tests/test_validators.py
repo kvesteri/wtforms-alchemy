@@ -156,7 +156,7 @@ class TestAutoAssignedValidators(ModelFormTestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             test_column = sa.Column(sa.Integer, info={'min': 3}, nullable=True)
 
-        def number_range(min=None, max=None):
+        def number_range(min=-1, max=-1):
             return NumberRange(min=min, max=max, message='Wrong number range')
 
         class ModelTestForm(ModelForm):
