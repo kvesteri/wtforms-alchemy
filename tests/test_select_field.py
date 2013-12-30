@@ -1,8 +1,10 @@
 import six
 from decimal import Decimal
 import sqlalchemy as sa
+from wtforms import Form
 from wtforms_alchemy import SelectField
-from tests import ModelFormTestCase
+from wtforms_alchemy.fields import QueryChoices, NoneChoice
+from tests import ModelFormTestCase, FormRelationsTestCase
 
 
 class MultiDict(dict):
@@ -82,3 +84,40 @@ class TestSelectFieldCoerce(ModelFormTestCase):
         form = self.form_class(MultiDict({'test_column': '2.0'}))
         assert form.test_column.data == u'2.0'
         assert isinstance(form.test_column.data, six.text_type)
+
+
+class TestQueryChoices(FormRelationsTestCase):
+    def create_models(self):
+        class User(self.base):
+            __tablename__ = 'user'
+
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+
+        class Article(self.base):
+            __tablename__ = 'article'
+
+            id = sa.Column(sa.Integer, primary_key=True)
+            author_id = sa.Column(sa.Integer, sa.ForeignKey(User.id))
+            author = sa.orm.relationship(User)
+
+        self.User = User
+        self.Article = Article
+
+    def create_forms(self):
+        class ArticleForm(Form):
+            author = SelectField(
+                choices=QueryChoices(lambda: self.session.query(self.User))
+            )
+
+        self.ArticleForm = ArticleForm
+
+    def test_query_choices(self):
+        self.session.add(self.User(name=u'John'))
+        self.session.add(self.User(name=u'Michael'))
+        self.session.commit()
+
+        form = self.ArticleForm(MultiDict({'author': 'user:1'}))
+        form.validate()
+
+        print form.errors

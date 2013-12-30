@@ -1,6 +1,11 @@
 import six
 from wtforms.fields import FieldList, FormField
 try:
+    from sqlalchemy.orm.util import identity_key
+    has_identity_key = True
+except ImportError:
+    has_identity_key = False
+try:
     from wtforms.utils import unset_value as _unset_value
 except ImportError:
     from wtforms.fields import _unset_value
@@ -9,6 +14,56 @@ from .utils import find_entity
 
 class SkipOperation(Exception):
     pass
+
+
+
+def get_pk_from_identity(obj):
+    cls, key = identity_key(instance=obj)
+    return ':'.join(map(six.text_type, key))
+
+
+def labelize(func):
+    if func is None:
+        return lambda x: x
+    elif isinstance(func, string_types):
+        return operator.attrgetter(func)
+    else:
+        return func
+
+
+class NoneChoice(object):
+    def __iter__(self):
+        yield '__None', None
+
+
+class QueryChoices(object):
+    def __init__(self, query_factory, get_pk=None, get_label=None):
+        if get_pk is None:
+            if not has_identity_key:
+                raise Exception(
+                    'The sqlalchemy identity_key function could not be '
+                    'imported.'
+                )
+            self.get_pk = get_pk_from_identity
+        else:
+            self.get_pk = get_pk
+
+        self.get_label = labelize(get_label)
+        self.query_factory = query_factory
+        self._object_list = None
+
+    def _get_object_list(self):
+        if self._object_list is None:
+            query = self.query_factory()
+            self._object_list = list(
+                (six.text_type(self.get_pk(obj)), obj) for obj in query
+            )
+        return self._object_list
+
+    def __iter__(self):
+        for pk, obj in self._get_object_list():
+            yield pk, obj
+
 
 
 class ModelFormField(FormField):
