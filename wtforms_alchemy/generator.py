@@ -163,7 +163,8 @@ class FormGenerator(object):
 
             if self.meta.exclude:
                 for key in self.meta.exclude:
-                    del attrs[key]
+                    if key in attrs:
+                        del attrs[key]
         return attrs
 
     def validate_attribute(self, attr_name):
