@@ -15,11 +15,14 @@ from wtforms.validators import Length
 from sqlalchemy_utils import (
     ChoiceType,
     ColorType,
+    DateRangeType,
+    DateTimeRangeType,
     EmailType,
-    NumberRangeType,
+    IntRangeType,
+    NumericRangeType,
     PasswordType,
     PhoneNumberType,
-    UUIDType
+    UUIDType,
 )
 from sqlalchemy_utils.types import arrow, phone_number
 from wtforms_components import (
@@ -30,7 +33,10 @@ from wtforms_components import (
     Email,
     EmailField,
     IntegerField,
-    NumberRangeField,
+    IntIntervalField,
+    DecimalIntervalField,
+    DateIntervalField,
+    DateTimeIntervalField,
     StringField,
     TimeField,
 )
@@ -191,9 +197,12 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         for validator in field.validators:
             assert validator.__class__ != Length
 
-    def test_number_range_converts_to_number_range_field(self):
-        self.init(type_=NumberRangeType)
-        self.assert_type('test_column', NumberRangeField)
+    @mark.parametrize(('type', 'field'), (
+        (IntRangeType, IntIntervalField),
+    ))
+    def test_range_type_conversion(self, type, field):
+        self.init(type_=type)
+        self.assert_type('test_column', field)
 
     @mark.xfail('passlib is None')
     def test_password_type_converts_to_password_field(self):
