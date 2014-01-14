@@ -20,7 +20,7 @@ class TestSelectFieldDefaultValue(ModelFormTestCase):
         )
         form = self.form_class(MultiDict({'test_column': '2'}))
         assert (
-            '<option selected="selected" value="2">2</option>' in
+            '<option selected value="2">2</option>' in
             str(form.test_column)
         )
 
