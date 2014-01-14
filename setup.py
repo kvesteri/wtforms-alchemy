@@ -43,6 +43,7 @@ extras_require = {
         # The phonenumbers library has a split for 2.x and 3.x support.
         'phonenumbers3k==5.6b1' if PY3 else 'phonenumbers<5.6b1'
     ],
+    'intervals': ['intervals>=0.2.0'],
     'password': ['passlib >= 1.6, < 2.0'],
     'color': ['colour>=0.0.4'],
     'i18n': ['SQLAlchemy-i18n >= 0.6.3'],
@@ -73,8 +74,8 @@ setup(
     install_requires=[
         'SQLAlchemy>=0.8.0',
         'WTForms>=1.0.4',
-        'WTForms-Components>=0.8.1',
-        'SQLAlchemy-Utils>=0.19.0',
+        'WTForms-Components>=0.9.0',
+        'SQLAlchemy-Utils>=0.23.1',
         'six>=1.4.1',
         'ordereddict>=1.1'
         if sys.version_info[0] == 2 and sys.version_info[1] < 7 else '',
