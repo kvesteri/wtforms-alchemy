@@ -43,12 +43,18 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
     CountryType                         wtforms_components.fields.CountryType
     EmailType                           wtforms_components.fields.EmailField
     IPAddressType                       wtforms_components.fields.IPAddressField
-    NumberRangeType                     wtforms_components.fields.NumberRangeField
     PasswordType                        wtforms.fields.PasswordField
     PhoneNumberType                     wtforms_components.fields.PhoneNumberField
     URLType                             wtforms_components.fields.StringField + URL validator
     UUIDType                            wtforms.fields.TextField + UUID validator
+
+    DateRangeType                       wtforms_components.fields.DateIntervalField
+    DateTimeRangeType                   wtforms_components.fields.DateTimeIntervalField
+    IntRangeType                        wtforms_components.fields.IntIntervalField
+    NumericRangeType                    wtforms_components.fields.DecimalIntervalField
 ====================================    =================
+
+
 
 
 Excluded fields
