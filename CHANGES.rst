@@ -4,6 +4,15 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.12.0 (2013-12-19)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for SQLAlchemy-Utils range types IntRange, NumericRange, DateRange and DateTimeRange
+- Deprecated support for NumberRangeField
+- Updated SQLAlchemy-Utils dependency to 0.23.1
+- Updated WTForms-Components dependency to 0.9.0
+
+
 0.11.0 (2013-12-19)
 ^^^^^^^^^^^^^^^^^^^
 
