@@ -1,6 +1,6 @@
 from pytest import raises
 import sqlalchemy as sa
-from sqlalchemy_i18n import Translatable, make_translatable
+from sqlalchemy_i18n import Translatable, make_translatable, translation_base
 from wtforms_alchemy import ModelForm
 from tests import ModelFormTestCase, MultiDict
 
@@ -12,20 +12,20 @@ class TestInternationalizationExtension(ModelFormTestCase):
     def init(self):
         class ModelTest(self.base, Translatable):
             __tablename__ = 'model_test'
-            __translated_columns__ = [
-                sa.Column('name', sa.Unicode(255)),
-                sa.Column('content', sa.Unicode(255))
-            ]
             __translatable__ = {
-                'base_classes': (self.base,),
                 'locales': ['fi', 'en']
             }
 
             id = sa.Column(sa.Integer, primary_key=True)
             some_property = 'something'
 
-            def get_locale(self):
-                return 'en'
+            locale = 'en'
+
+        class ModelTranslation(translation_base(ModelTest)):
+            __tablename__ = 'model_translation'
+
+            name = sa.Column(sa.Unicode(255))
+            content = sa.Column(sa.Unicode(255))
 
         self.ModelTest = ModelTest
         sa.orm.configure_mappers()

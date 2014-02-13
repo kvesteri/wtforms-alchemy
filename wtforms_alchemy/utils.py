@@ -104,15 +104,14 @@ def translated_attributes(model):
     :param model: SQLAlchemy declarative model class
     """
     try:
-        columns = model.__translated_columns__
+        translation_class = model.__translatable__['class']
     except AttributeError:
         return []
-    else:
-        translation_class = model.__translatable__['class']
-        return [
-            getattr(translation_class, column.key)
-            for column in columns
-        ]
+    return [
+        getattr(translation_class, column.key)
+        for column in sa.inspect(translation_class).columns
+        if not column.primary_key
+    ]
 
 
 def sorted_classes(classes, reverse=False):
