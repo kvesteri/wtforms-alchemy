@@ -219,7 +219,8 @@ In the following example we set `DataRequired` validator for all not nullable En
 
 
     class MyForm(ModelForm):
-        not_null_validator_type_map = ClassMap({sa.Enum: [DataRequired()]})
+        class Meta:
+            not_null_validator_type_map = ClassMap({sa.Enum: [DataRequired()]})
 
 
 
