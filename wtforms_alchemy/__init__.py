@@ -9,7 +9,6 @@ from wtforms.form import FormMeta
 from wtforms_components import (
     DateRange,
     Email,
-    NumberRangeField,
     PhoneNumberField,
     SelectField,
     SelectMultipleField,
@@ -40,7 +39,6 @@ __all__ = (
     InvalidAttributeException,
     ModelFieldList,
     ModelFormField,
-    NumberRangeField,
     PhoneNumberField,
     SelectField,
     SelectMultipleField,
