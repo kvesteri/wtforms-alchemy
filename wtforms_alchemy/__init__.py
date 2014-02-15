@@ -207,6 +207,11 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #: List of fields to only include in the generated form.
             only = defaults.pop('only', [])
 
+            #: Silently ignore exclude elements which aren't mapped
+            #:
+            #: By Default silently ignores missing elements
+            silent_exclude = defaults.pop('silent_exclude', True)
+
         def __init__(self, *args, **kwargs):
             """Sets object as form attribute."""
 
