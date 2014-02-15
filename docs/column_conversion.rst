@@ -130,7 +130,7 @@ Now let's say we want to exclude 'description' from the form. This can be achiev
 
     class ArticleForm(Form):
         class Meta:
-            exclude = ['author_id']
+            exclude = ['description']
 
 
 Or as follows (the recommended way):
