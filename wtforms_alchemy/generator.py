@@ -161,7 +161,9 @@ class FormGenerator(object):
 
             if self.meta.exclude:
                 for key in self.meta.exclude:
-                    if key in attrs:
+                    if self.meta.silent_exclude and not key in attrs:
+                        continue
+                    else:
                         del attrs[key]
         return attrs
 
