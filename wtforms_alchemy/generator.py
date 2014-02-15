@@ -158,6 +158,7 @@ class FormGenerator(object):
             attrs = OrderedDict([
                 (key, prop)
                 for key, prop in map(self.validate_attribute, self.meta.only)
+                if key
             ])
         else:
             if self.meta.include:
@@ -165,11 +166,16 @@ class FormGenerator(object):
                     (key, prop)
                     for key, prop
                     in map(self.validate_attribute, self.meta.include)
+                    if key
                 ])
 
             if self.meta.exclude:
                 for key in self.meta.exclude:
-                    del attrs[key]
+                    try:
+                        del attrs[key]
+                    except KeyError:
+                        if self.meta.attr_errors:
+                            raise InvalidAttributeException(key)
         return attrs
 
     def validate_attribute(self, attr_name):
@@ -188,11 +194,16 @@ class FormGenerator(object):
                 )
                 attr = getattr(translation_class, attr_name)
             except AttributeError:
-                raise InvalidAttributeException(attr_name)
-
+                if self.meta.attr_errors:
+                    raise InvalidAttributeException(attr_name)
+                else:
+                    return None, None
         try:
             if not isinstance(attr.property, ColumnProperty):
-                raise InvalidAttributeException(attr_name)
+                if self.meta.attr_errors:
+                    raise InvalidAttributeException(attr_name)
+                else:
+                    return None, None
         except AttributeError:
             raise AttributeTypeException(attr_name)
         return attr_name, attr.property

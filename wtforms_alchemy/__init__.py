@@ -196,6 +196,10 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #: type conversion in class level.
             type_map = defaults.pop('type_map', ClassMap())
 
+            #: Whether or not to raise InvalidAttributExceptions when invalid
+            #: attribute names are given for include / exclude or only
+            attr_errors = defaults.pop('attr_errors', True)
+
             #: Additional fields to include in the generated form.
             include = defaults.pop('include', [])
 
