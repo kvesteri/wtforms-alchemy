@@ -30,7 +30,7 @@ from .exc import (
     UnknownTypeException,
     UnknownConfigurationOption
 )
-from .fields import ModelFieldList, ModelFormField
+from .fields import ModelFieldList, ModelFormField, OptionalModelFormField
 from .generator import FormGenerator
 
 
@@ -40,6 +40,7 @@ __all__ = (
     InvalidAttributeException,
     ModelFieldList,
     ModelFormField,
+    OptionalModelFormField,
     NumberRangeField,
     PhoneNumberField,
     SelectField,
