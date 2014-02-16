@@ -16,7 +16,6 @@ class SkipOperation(Exception):
     pass
 
 
-
 def get_pk_from_identity(obj):
     cls, key = identity_key(instance=obj)
     return ':'.join(map(six.text_type, key))
@@ -25,8 +24,8 @@ def get_pk_from_identity(obj):
 def labelize(func):
     if func is None:
         return lambda x: x
-    elif isinstance(func, string_types):
-        return operator.attrgetter(func)
+    elif isinstance(func, six.string_types):
+        return six.operator.attrgetter(func)
     else:
         return func
 
@@ -65,7 +64,6 @@ class QueryChoices(object):
             yield pk, obj
 
 
-
 class ModelFormField(FormField):
     def populate_obj(self, obj, name):
         if self.data:
@@ -75,6 +73,27 @@ class ModelFormField(FormField):
             except AttributeError:
                 pass
         FormField.populate_obj(self, obj, name)
+
+
+class OptionalModelFormField(ModelFormField):
+    def __init__(self, *args, **kwargs):
+        super(OptionalModelFormField, self).__init__(*args, **kwargs)
+
+        # just here to set is_missing form field val to False
+        self.is_missing = True
+
+    def process(self, formdata, **kwargs):
+        super(OptionalModelFormField, self).process(formdata, **kwargs)
+
+        # check if the prefix is found anywhere
+        prefix = self.name + self.separator
+        self.is_missing = not any(
+            key.startswith(prefix) for key in formdata.keys())
+
+    def populate_obj(self, obj, name):
+        # only create a new sub object if the form field wasn't missing
+        if not self.is_missing:
+            super(OptionalModelFormField, self).populate_obj(obj, name)
 
 
 class ModelFieldList(FieldList):
