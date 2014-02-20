@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.12.2 (2014-02-20)
+^^^^^^^^^^^^^^^^^^^
+
+- New configuration option: attr_errors
+- Min and max info attributes generate NumberRange validator for Numeric, Float, IntRangeType and NumericRangeType columns
+
+
 0.12.1 (2014-02-13)
 ^^^^^^^^^^^^^^^^^^^
 
