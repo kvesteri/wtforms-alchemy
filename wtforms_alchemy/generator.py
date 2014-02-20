@@ -54,7 +54,8 @@ from .exc import (
 from .utils import (
     flatten,
     is_date_column,
-    is_integer_column,
+    is_number,
+    is_number_range,
     is_scalar,
     null_or_unicode,
     strip_string,
@@ -555,7 +556,7 @@ class FormGenerator(object):
         max_ = column.info.get('max')
 
         if min_ is not None or max_ is not None:
-            if is_integer_column(column):
+            if is_number(column.type) or is_number_range(column.type):
                 return self.get_validator('number_range', min=min_, max=max_)
             elif is_date_column(column):
                 return self.get_validator('date_range', min=min_, max=max_)

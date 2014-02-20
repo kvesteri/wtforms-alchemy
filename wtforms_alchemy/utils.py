@@ -2,6 +2,7 @@ from inspect import isclass
 import six
 import sqlalchemy as sa
 from sqlalchemy import types
+from sqlalchemy_utils import NumericRangeType, IntRangeType
 try:
     from collections import OrderedDict
 except ImportError:
@@ -39,20 +40,12 @@ def flatten(list_):
     return result
 
 
-def is_numerical_column(column):
-    return (
-        is_integer_column(column) or
-        isinstance(column.type, types.Float) or
-        isinstance(column.type, types.Numeric)
-    )
+def is_number(type):
+    return isinstance(type, types.Integer) or isinstance(type, types.Numeric)
 
 
-def is_integer_column(column):
-    return (
-        isinstance(column.type, types.Integer) or
-        isinstance(column.type, types.SmallInteger) or
-        isinstance(column.type, types.BigInteger)
-    )
+def is_number_range(type):
+    return isinstance(type, IntRangeType) or isinstance(type, NumericRangeType)
 
 
 def is_date_column(column):

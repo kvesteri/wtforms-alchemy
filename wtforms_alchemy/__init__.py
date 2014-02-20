@@ -17,7 +17,6 @@ from wtforms_components import (
 )
 from .utils import (
     is_date_column,
-    is_integer_column,
     is_scalar,
     null_or_int,
     null_or_unicode,
@@ -45,7 +44,6 @@ __all__ = (
     Unique,
     UnknownTypeException,
     is_date_column,
-    is_integer_column,
     is_scalar,
     null_or_int,
     null_or_unicode,
