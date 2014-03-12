@@ -85,7 +85,9 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
         Flask-SQLAlchemy along with WTForms-Alchemy you don't need to
         set this.
         """
-        get_session = None
+
+        if not hasattr(base, 'get_session'):
+            get_session = None
 
         class Meta:
             model = None
