@@ -254,6 +254,7 @@ Let's say we want to convert all unicode typed properties to TextAreaFields inst
 
 
 
+.. _custom_base:
 
 Custom form base class
 ----------------------
