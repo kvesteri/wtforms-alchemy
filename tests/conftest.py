@@ -1,6 +1,8 @@
 import pytest
-from wtforms_alchemy import ModelForm, model_form_factory, model_form_meta_factory, ModelFormMeta
+from wtforms_alchemy import (model_form_factory, model_form_meta_factory,
+                             ModelFormMeta)
 from wtforms.form import FormMeta
+
 
 class _MetaWithInit(FormMeta):
     def __init__(cls, *args, **kwargs):
@@ -16,7 +18,6 @@ class _MetaWithoutInit(FormMeta):
 
 
 MetaWithoutInit = model_form_meta_factory(_MetaWithoutInit)
-
 
 
 @pytest.fixture(params=[MetaWithInit, MetaWithoutInit, ModelFormMeta])

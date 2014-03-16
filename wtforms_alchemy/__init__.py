@@ -83,9 +83,10 @@ def model_form_meta_factory(base=FormMeta):
     """
 
     class ModelFormMeta(base):
-        """Meta class that overrides WTForms base meta class. The primary purpose
-        of this class is allowing ModelForms use special configuration params under
-        the 'Meta' class namespace.
+        """
+        Meta class that overrides WTForms base meta class. The primary purpose
+        of this class is allowing ModelForms use special configuration params
+        under the 'Meta' class namespace.
 
         ModelForm classes inherit parent's Meta class properties.
         """
