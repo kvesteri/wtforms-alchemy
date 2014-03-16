@@ -97,7 +97,7 @@ def model_form_meta_factory(base=FormMeta):
 
             cls.Meta = type('Meta', tuple(bases), {})
 
-            FormMeta.__init__(cls, *args, **kwargs)
+            base.__init__(cls, *args, **kwargs)
 
             if hasattr(cls.Meta, 'model') and cls.Meta.model:
                 generator = cls.Meta.form_generator(cls)
