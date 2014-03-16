@@ -5,10 +5,10 @@ from tests import ModelFormTestCase
 
 class TestModelFormMetaWithInheritance(ModelFormTestCase):
 
-    def test_skip_unknown_types(self, ModelForm_all):
+    def test_skip_unknown_types(self, model_form_all):
         self.init(type_=sa.Integer)
 
-        class ModelTestForm(ModelForm_all):
+        class ModelTestForm(model_form_all):
             class Meta:
                 skip_unknown_types = True
 
@@ -19,10 +19,10 @@ class TestModelFormMetaWithInheritance(ModelFormTestCase):
         self.form_class = ModelTestForm2
         assert self.form_class.Meta.skip_unknown_types == True
 
-    def test_inheritance_attributes(self, ModelForm_custom):
+    def test_inheritance_attributes(self, model_form_custom):
         self.init(type_=sa.Integer)
 
-        class ModelTestForm(ModelForm_custom):
+        class ModelTestForm(model_form_custom):
             class Meta:
                 model = self.ModelTest
 
@@ -31,10 +31,10 @@ class TestModelFormMetaWithInheritance(ModelFormTestCase):
 
 
 class TestUnboundFieldsInitialization(ModelFormTestCase):
-    def test_skip_unknown_types(self, ModelForm_all):
+    def test_skip_unknown_types(self, model_form_all):
         self.init(type_=sa.Integer)
 
-        class ModelTestForm(ModelForm_all):
+        class ModelTestForm(model_form_all):
             class Meta:
                 model = self.ModelTest
                 skip_unknown_types = True

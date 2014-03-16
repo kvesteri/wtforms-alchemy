@@ -20,13 +20,15 @@ MetaWithoutInit = model_form_meta_factory(_MetaWithoutInit)
 
 
 @pytest.fixture(params=[MetaWithInit, MetaWithoutInit, ModelFormMeta])
-def ModelForm_all(request):
-    """Returns one of each possible model form classes with custom and the original metaclass."""
+def model_form_all(request):
+    """Returns one of each possible model form classes with custom and the
+    original metaclass."""
     ModelForm = model_form_factory(meta=request.param)
     return ModelForm
 
 
 @pytest.fixture(params=[MetaWithInit, MetaWithoutInit])
-def ModelForm_custom(request):
-    """Returns one of each possible model form classes with custom metaclasses."""
+def model_form_custom(request):
+    """Returns one of each possible model form classes with custom
+    metaclasses."""
     return model_form_factory(meta=request.param)
