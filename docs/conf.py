@@ -218,4 +218,8 @@ man_pages = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {'http://docs.python.org/': None,
+                       'http://wtforms.readthedocs.org/en/latest/': None,
+                       'https://sqlalchemy-utils.readthedocs.org/en/latest/': None,
+                       'http://wtforms-components.readthedocs.org/en/latest/': None,
+                      }

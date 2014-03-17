@@ -53,37 +53,89 @@ __all__ = (
 __version__ = '0.12.2'
 
 
-class ModelFormMeta(FormMeta):
-    """Meta class that overrides WTForms base meta class. The primary purpose
-    of this class is allowing ModelForms use special configuration params under
-    the 'Meta' class namespace.
-
-    ModelForm classes inherit parent's Meta class properties.
+def model_form_meta_factory(base=FormMeta):
     """
-    def __init__(cls, *args, **kwargs):
-        bases = []
-        for class_ in cls.__mro__:
-            if 'Meta' in class_.__dict__:
-                bases.append(getattr(class_, 'Meta'))
+    Create a new class usable as a metaclass for the
+    :func:`model_form_factory`. You only need to concern yourself with this if
+    you desire to have a custom metclass. Otherwise, a default class is
+    created and is used as a metaclass on :func:`model_form_factory`.
 
-        cls.Meta = type('Meta', tuple(bases), {})
+    :param base: The base class to use for the meta class. This is an optional
+                 parameter that defaults to :class:`.FormMeta`. If you want to
+                 provide your own, your class must derive from this class and
+                 not directly from ``type``.
 
-        FormMeta.__init__(cls, *args, **kwargs)
+    :return: A new class suitable as a metaclass for the actual model form.
+             Therefore, it should be passed as the ``meta`` argument to
+             :func:`model_form_factory`.
 
-        if hasattr(cls.Meta, 'model') and cls.Meta.model:
-            generator = cls.Meta.form_generator(cls)
-            generator.create_form(cls)
+    Example usage:
+
+    .. code-block:: python
+
+        from wtforms.form import FormMeta
+        class MyModelFormMeta(FormMeta):
+            # do some metaclass magic here
+            pass
+
+        ModelFormMeta = model_form_meta_factory(MyModelFormMeta)
+        ModelForm = model_form_factory(meta=ModelFormMeta)
+    """
+
+    class ModelFormMeta(base):
+        """
+        Meta class that overrides WTForms base meta class. The primary purpose
+        of this class is allowing ModelForms use special configuration params
+        under the 'Meta' class namespace.
+
+        ModelForm classes inherit parent's Meta class properties.
+        """
+        def __init__(cls, *args, **kwargs):
+            bases = []
+            for class_ in cls.__mro__:
+                if 'Meta' in class_.__dict__:
+                    bases.append(getattr(class_, 'Meta'))
+
+            cls.Meta = type('Meta', tuple(bases), {})
+
+            base.__init__(cls, *args, **kwargs)
+
+            if hasattr(cls.Meta, 'model') and cls.Meta.model:
+                generator = cls.Meta.form_generator(cls)
+                generator.create_form(cls)
+    return ModelFormMeta
+
+ModelFormMeta = model_form_meta_factory()
 
 
 def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
-    """Creates new model form, with given base class."""
+    """
+    Create a base class for all model forms to derive from.
+
+    :param base: Class that should be used as a base for the returned class.
+                 By default, this is WTForms's base class
+                 :class:`wtforms.Form`.
+
+    :param meta: A metaclass to use on this class. Normally, you do not need to
+                 provide this value, but if you want, you should check out
+                 :func:`model_form_meta_factory`.
+
+    :return: A class to be used as the base class for all forms that should be
+             connected to a SQLAlchemy model class.
+
+    Additional arguments provided to the form override the default
+    configuration as described in :ref:`custom_base`.
+    """
 
     class ModelForm(six.with_metaclass(meta, base)):
         """
-        A function that returns SQLAlchemy session. This should be
-        assigned if you wish to use Unique validator. If you are using
-        Flask-SQLAlchemy along with WTForms-Alchemy you don't need to
-        set this.
+        Standard base-class for all forms to be combined with a model. Use
+        :func:`model_form_factory` in case you wish to change its behavior.
+
+        ``get_session``: If you want to use the Unique validator, you should
+        define this method. If you are using Flask-SQLAlchemy along with
+        WTForms-Alchemy you don't need to set this. If you define this in the
+        superclass, it will not be overriden.
         """
 
         if not hasattr(base, 'get_session'):

@@ -5,8 +5,9 @@ Type specific conversion
 Numeric type
 ------------
 
-WTForms-Alchemy automatically converts Numeric columns to DecimalFields. The converter is also smart enough to convert
-different decimal scales to appropriate HTML5 input step args.
+WTForms-Alchemy automatically converts Numeric columns to DecimalFields. The
+converter is also smart enough to convert different decimal scales to
+appropriate HTML5 input step args.
 
 
 ::
@@ -34,8 +35,8 @@ Now rendering AccountForm.balance would return the following HTML:
 Arrow type
 ----------
 
-WTForms-Alchemy supports the ArrowType of SQLAlchemy-Utils and converts it to HTML5 compatible DateTimeField
-of WTForms-Components.
+WTForms-Alchemy supports the ArrowType of SQLAlchemy-Utils and converts it to
+HTML5 compatible DateTimeField of WTForms-Components.
 
 ::
 
@@ -69,7 +70,9 @@ Now the EventForm is essentially the same as:
 Choice type
 -----------
 
-WTForms-Alchemy automatically converts `SQLAlchemy-Utils ChoiceType`_ to WTForms-Components SelectField.
+WTForms-Alchemy automatically converts
+:class:`sqlalchemy_utils.types.choice.ChoiceType` to WTForms-Components
+SelectField.
 
 
 ::
