@@ -52,6 +52,7 @@ from .exc import (
     UnknownTypeException
 )
 from .utils import (
+    choice_type_coerce_factory,
     flatten,
     is_date_column,
     is_number,
@@ -449,6 +450,8 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
+        if isinstance(column.type, types.ChoiceType):
+            return choice_type_coerce_factory(column.type)
         try:
             python_type = column.type.python_type
         except NotImplementedError:

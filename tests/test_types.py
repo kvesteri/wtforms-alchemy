@@ -48,7 +48,7 @@ from wtforms_alchemy import (
 )
 from wtforms_alchemy.utils import ClassMap
 from wtforms_components import PhoneNumberField
-from tests import ModelFormTestCase
+from tests import ModelFormTestCase, MultiDict
 
 
 class UnknownType(sa.types.UserDefinedType):
@@ -231,6 +231,14 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init(type_=ChoiceType(choices))
         self.assert_type('test_column', SelectField)
         assert self.form_class().test_column.choices == choices
+
+    def test_choice_type_uses_custom_coerce_func(self):
+        choices = [(u'1', u'choice 1'), (u'2', u'choice 2')]
+        self.init(type_=ChoiceType(choices))
+        self.assert_type('test_column', SelectField)
+        model = self.ModelTest(test_column=u'2')
+        form = self.form_class(obj=model)
+        assert '<option selected value="2">' in str(form.test_column)
 
 
 class TestCustomTypeMap(ModelFormTestCase):

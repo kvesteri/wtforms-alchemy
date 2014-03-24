@@ -3,10 +3,27 @@ import six
 import sqlalchemy as sa
 from sqlalchemy import types
 from sqlalchemy_utils import NumericRangeType, IntRangeType
+from sqlalchemy_utils.types.choice import Choice
 try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
+
+
+def choice_type_coerce_factory(type_):
+    """
+    Return a function needed to coerce a ChoiceTyped column. This function is
+    then passed to generated SelectField as the default coerce function.
+
+    :param type_: ChoiceType object
+    """
+    def choice_coerce(value):
+        if value is None:
+            return None
+        if isinstance(value, Choice):
+            return value.code
+        return type_.python_type(value)
+    return choice_coerce
 
 
 def strip_string(value):
