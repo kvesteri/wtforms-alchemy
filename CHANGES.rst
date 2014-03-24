@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.12.3 (2014-03-24)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed ChoiceType coercion for SelectFields
+
+
 0.12.2 (2014-02-20)
 ^^^^^^^^^^^^^^^^^^^
 
