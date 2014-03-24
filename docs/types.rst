@@ -101,9 +101,15 @@ Now the EventForm is essentially the same as:
 
 ::
 
+    from wtforms_alchemy.utils import choice_type_coerce_factory
+
 
     class EventForm(Form):
-        type = SelectField(choices=Event.TYPES, validators=[DataRequired()])
+        type = SelectField(
+            choices=Event.TYPES,
+            coerce=choice_type_coerce_factory(Event.type.type),
+            validators=[DataRequired()]
+        )
 
 
 
