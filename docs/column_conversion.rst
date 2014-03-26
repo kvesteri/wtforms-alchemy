@@ -47,6 +47,7 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
     PhoneNumberType                     wtforms_components.fields.PhoneNumberField
     URLType                             wtforms_components.fields.StringField + URL validator
     UUIDType                            wtforms.fields.TextField + UUID validator
+    WeekDaysType                        wtforms_components.fields.WeekDaysField
 ====================================    =================
 
 
