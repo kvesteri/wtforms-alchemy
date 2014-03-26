@@ -57,7 +57,7 @@ for name, requirements in extras_require.items():
 
 setup(
     name='WTForms-Alchemy',
-    version='0.12.3',
+    version='0.12.4',
     url='https://github.com/kvesteri/wtforms-alchemy',
     license='BSD',
     author='Konsta Vesterinen',
