@@ -28,12 +28,13 @@ from .exc import (
     UnknownTypeException,
     UnknownConfigurationOption
 )
-from .fields import ModelFieldList, ModelFormField
+from .fields import ModelFieldList, ModelFormField, CountryField
 from .generator import FormGenerator
 
 
 __all__ = (
     AttributeTypeException,
+    CountryField,
     DateRange,
     InvalidAttributeException,
     ModelFieldList,

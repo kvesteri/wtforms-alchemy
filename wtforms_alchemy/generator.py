@@ -52,6 +52,7 @@ from .exc import (
     InvalidAttributeException,
     UnknownTypeException
 )
+from .fields import CountryField
 from .utils import (
     choice_type_coerce_factory,
     flatten,
@@ -93,6 +94,7 @@ class FormGenerator(object):
         (types.ArrowType, DateTimeField),
         (types.ChoiceType, SelectField),
         (types.ColorType, ColorField),
+        (types.CountryType, CountryField),
         (types.DateRangeType, DateIntervalField),
         (types.DateTimeRangeType, DateTimeIntervalField),
         (types.EmailType, EmailField),

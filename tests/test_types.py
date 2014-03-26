@@ -15,6 +15,7 @@ from wtforms.validators import Length
 from sqlalchemy_utils import (
     ChoiceType,
     ColorType,
+    CountryType,
     DateRangeType,
     DateTimeRangeType,
     EmailType,
@@ -45,6 +46,7 @@ from wtforms_alchemy import (
     ModelForm,
     SelectField,
     UnknownTypeException,
+    CountryField,
     null_or_unicode
 )
 from wtforms_alchemy.utils import ClassMap
@@ -226,6 +228,10 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
     def test_email_type_converts_to_email_field(self):
         self.init(type_=EmailType)
         self.assert_type('test_column', EmailField)
+
+    def test_country_type_converts_to_country_field(self):
+        self.init(type_=CountryType)
+        self.assert_type('test_column', CountryField)
 
     def test_choice_type_converts_to_select_field(self):
         choices = [(u'1', u'choice 1'), (u'2', u'choice 2')]
