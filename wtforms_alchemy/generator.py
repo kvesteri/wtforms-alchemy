@@ -35,6 +35,7 @@ from wtforms_components import (
     SelectField,
     StringField,
     TimeField,
+    WeekDaysField,
 )
 from wtforms_components.widgets import (
     ColorInput,
@@ -101,6 +102,7 @@ class FormGenerator(object):
         (types.PhoneNumberType, PhoneNumberField),
         (types.ScalarListType, StringField),
         (types.UUIDType, StringField),
+        (types.WeekDaysType, WeekDaysField),
     ))
 
     WIDGET_MAP = OrderedDict((

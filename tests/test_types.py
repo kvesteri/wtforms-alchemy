@@ -24,13 +24,13 @@ from sqlalchemy_utils import (
     PhoneNumberType,
     UUIDType,
 )
-from sqlalchemy_utils.types import arrow, phone_number
-from wtforms_components import (
+from sqlalchemy_utils.types import arrow, phone_number, WeekDaysType
+from wtforms_components import Email
+from wtforms_components.fields import (
     ColorField,
     DateField,
     DateTimeField,
     DecimalField,
-    Email,
     EmailField,
     IntegerField,
     IntIntervalField,
@@ -40,6 +40,7 @@ from wtforms_components import (
     StringField,
     TimeField,
 )
+from wtforms_components.fields.weekdays import WeekDaysField
 from wtforms_alchemy import (
     ModelForm,
     SelectField,
@@ -48,7 +49,7 @@ from wtforms_alchemy import (
 )
 from wtforms_alchemy.utils import ClassMap
 from wtforms_components import PhoneNumberField
-from tests import ModelFormTestCase, MultiDict
+from tests import ModelFormTestCase
 
 
 class UnknownType(sa.types.UserDefinedType):
@@ -239,6 +240,14 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         model = self.ModelTest(test_column=u'2')
         form = self.form_class(obj=model)
         assert '<option selected value="2">' in str(form.test_column)
+
+
+class TestWeekDaysTypeConversion(ModelFormTestCase):
+    dns = 'postgres://postgres@localhost/wtforms_alchemy_test'
+
+    def test_weekdays_type_converts_to_weekdays_field(self):
+        self.init(type_=WeekDaysType)
+        self.assert_type('test_column', WeekDaysField)
 
 
 class TestCustomTypeMap(ModelFormTestCase):
