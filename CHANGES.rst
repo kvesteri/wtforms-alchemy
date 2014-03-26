@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.12.5 (2014-03-26)
+^^^^^^^^^^^^^^^^^^^
+
+- Added CountryField
+- Added CountryType to CountryField conversion
+
+
 0.12.4 (2014-03-26)
 ^^^^^^^^^^^^^^^^^^^
 
