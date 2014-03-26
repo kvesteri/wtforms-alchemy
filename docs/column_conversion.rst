@@ -40,7 +40,7 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
     ArrowType                           wtforms_components.fields.DateTimeField
     ChoiceType                          wtforms_components.fields.SelectField
     ColorType                           wtforms_components.fields.ColorField
-    CountryType                         wtforms_components.fields.CountryType
+    CountryType                         wtforms_alchemy.fields.CountryType
     EmailType                           wtforms_components.fields.EmailField
     IPAddressType                       wtforms_components.fields.IPAddressField
     PasswordType                        wtforms.fields.PasswordField
