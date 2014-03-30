@@ -55,7 +55,7 @@ HTML5 compatible DateTimeField of WTForms-Components.
 
     class EventForm(ModelForm):
         class Meta:
-            model = CustomView
+            model = Event
 
 
 Now the EventForm is essentially the same as:
@@ -94,7 +94,7 @@ SelectField.
 
     class EventForm(ModelForm):
         class Meta:
-            model = CustomView
+            model = Event
 
 
 Now the EventForm is essentially the same as:
