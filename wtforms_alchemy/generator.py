@@ -454,6 +454,8 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
+        if 'coerce' in column.info:
+            return column.info['coerce']
         if isinstance(column.type, types.ChoiceType):
             return choice_type_coerce_factory(column.type)
         try:
