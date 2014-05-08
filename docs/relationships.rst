@@ -2,7 +2,7 @@ Forms with relations
 ====================
 
 WTForms-Alchemy provides special Field subtypes ModelFormField and ModelFieldList.
-When using these types WTForms-Alchemy undestands model relations and is smart enough to populate related
+When using these types WTForms-Alchemy understands model relations and is smart enough to populate related
 objects accordingly.
 
 One-to-one relations
