@@ -99,8 +99,6 @@ def model_form_meta_factory(base=FormMeta):
                 if 'Meta' in class_.__dict__:
                     bases.append(getattr(class_, 'Meta'))
 
-            if not bases:
-                bases = [object]
             cls.Meta = type('Meta', tuple(bases), {})
 
             base.__init__(cls, *args, **kwargs)

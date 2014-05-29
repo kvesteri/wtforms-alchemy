@@ -86,6 +86,7 @@ def primary_keys(model):
 
 
 def find_entity(coll, model, data):
+    # TODO: clearly not working if primary keys have aliases
     for column in primary_keys(model):
         if not column.name in data or not data[column.name]:
             return None
