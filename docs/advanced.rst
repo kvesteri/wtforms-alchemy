@@ -50,10 +50,16 @@ In order to make WTForms-Alchemy work with `Flask-WTF`_ you need the following s
 
     from flask.ext.wtf import Form
     from wtforms_alchemy import model_form_factory
+    # The variable db here is a SQLAlchemy object instance from
+    # Flask-SQLAlchemy package
+    from myproject.extensions import db
 
+    BaseModelForm = model_form_factory(Form)
 
-    ModelForm = model_form_factory(Form)
-
+    class ModelForm(BaseModelForm):
+        @classmethod
+        def get_session(self):
+            return db.session
 
 The you can use the ModelForm just like before:
 
