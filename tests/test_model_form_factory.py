@@ -8,7 +8,9 @@ from wtforms_alchemy import (
 from tests import ModelFormTestCase
 
 try:
+    import wtforms
     from wtforms.meta import DefaultMeta
+    print wtforms.__version__
     has_wtforms2 = True
 except ImportError:
     has_wtforms2 = False
@@ -63,6 +65,8 @@ class TestModelFormFactory(ModelFormTestCase):
     def test_class_meta_wtforms2(self):
         if not has_wtforms2:
             return  # Not running on wtforms2
+
+        print wtforms.__version__
 
         self.init()
 
