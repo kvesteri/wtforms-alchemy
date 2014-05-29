@@ -55,7 +55,7 @@ class TestModelFormFactory(ModelFormTestCase):
         assert isinstance(TestCustomBase(), SomeForm)
 
     def test_class_meta_wtforms2(self):
-        DefaultMeta = importorskip('wtforms.meta.DefaultMeta')
+        meta = importorskip('wtforms.meta')
 
         self.init()
 
@@ -74,7 +74,7 @@ class TestModelFormFactory(ModelFormTestCase):
 
         form = TestCustomBase()
         other_form = OtherForm()
-        assert isinstance(form.meta, DefaultMeta)
+        assert isinstance(form.meta, meta.DefaultMeta)
         assert form.meta.locales == ['fr']
         assert hasattr(form.meta, 'model')
         assert hasattr(form.meta, 'csrf')
