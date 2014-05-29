@@ -10,12 +10,12 @@ python:
 
 env:
   matrix:
-    - WTFORMS=WTForms==1.0.5
-    - WTFORMS=wtforms2
+    - WTFORMS=1.0.4
+    - WTFORMS=1.0.5
+    - WTFORMS=2.0
 
 install:
-  - "if [ $WTFORMS = wtforms2 ]; then export WTFORMS=https://github.com/wtforms/wtforms/archive/master.zip; fi"
-  - "pip install $WTFORMS"
+  - pip install WTForms==$WTFORMS
   - pip install -e ".[test]"
 
 script:
