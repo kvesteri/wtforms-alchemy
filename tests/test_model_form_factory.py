@@ -57,6 +57,8 @@ class TestModelFormFactory(ModelFormTestCase):
     def test_class_meta_wtforms2(self):
         meta = importorskip('wtforms.meta')
 
+        print meta.DefaultMeta
+
         self.init()
 
         class SomeForm(Form):
