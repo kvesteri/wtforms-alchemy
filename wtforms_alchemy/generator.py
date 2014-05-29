@@ -224,7 +224,7 @@ class FormGenerator(object):
         for key, prop in properties.items():
             column = prop.columns[0]
             try:
-                field = self.create_field(column)
+                field = self.create_field(prop, column)
             except UnknownTypeException:
                 if not self.meta.skip_unknown_types:
                     raise
@@ -289,21 +289,22 @@ class FormGenerator(object):
                 return True
         return False
 
-    def create_field(self, column):
+    def create_field(self, prop, column):
         """
         Create form field for given column.
 
+        :param prop: SQLAlchemy ColumnProperty object.
         :param column: SQLAlchemy Column object.
         """
         kwargs = {}
         field_class = self.get_field_class(column)
         kwargs['default'] = self.default(column)
-        kwargs['validators'] = self.create_validators(column)
+        kwargs['validators'] = self.create_validators(prop, column)
         kwargs['filters'] = self.filters(column)
-        kwargs.update(self.type_agnostic_parameters(column))
+        kwargs.update(self.type_agnostic_parameters(prop.key, column))
         kwargs.update(self.type_specific_parameters(column))
-        if column.key in self.meta.field_args:
-            kwargs.update(self.meta.field_args[column.key])
+        if prop.key in self.meta.field_args:
+            kwargs.update(self.meta.field_args[prop.key])
 
         if issubclass(field_class, DecimalField):
             if hasattr(column.type, 'scale'):
@@ -418,7 +419,7 @@ class FormGenerator(object):
         """
         return str(pow(Decimal('0.1'), scale))
 
-    def type_agnostic_parameters(self, column):
+    def type_agnostic_parameters(self, key, column):
         """
         Returns all type agnostic form field parameters for given column.
 
@@ -426,7 +427,7 @@ class FormGenerator(object):
         """
         kwargs = {}
         kwargs['description'] = column.info.get('description', '')
-        kwargs['label'] = column.info.get('label', column.key)
+        kwargs['label'] = column.info.get('label', key)
         return kwargs
 
     def select_field_kwargs(self, column):
@@ -467,7 +468,7 @@ class FormGenerator(object):
             return null_or_unicode
         return python_type
 
-    def create_validators(self, column):
+    def create_validators(self, prop, column):
         """
         Returns validators for given column
 
@@ -476,14 +477,14 @@ class FormGenerator(object):
         validators = [
             self.required_validator(column),
             self.length_validator(column),
-            self.unique_validator(column),
+            self.unique_validator(prop.key, column),
             self.range_validator(column)
         ]
         if isinstance(column.type, types.EmailType):
             validators.append(self.get_validator('email'))
         validators = flatten([v for v in validators if v is not None])
 
-        validators.extend(self.additional_validators(column))
+        validators.extend(self.additional_validators(prop.key, column))
         return validators
 
     def required_validator(self, column):
@@ -520,19 +521,19 @@ class FormGenerator(object):
         else:
             return attr(**kwargs)
 
-    def additional_validators(self, column):
+    def additional_validators(self, key, column):
         """
         Returns additional validators for given column
 
+        :param key: String key of the column property
         :param column: SQLAlchemy Column object
         """
         validators = []
-        name = column.key
-        if name in self.meta.validators:
+        if key in self.meta.validators:
             try:
-                validators.extend(self.meta.validators[name])
+                validators.extend(self.meta.validators[key])
             except TypeError:
-                validators.append(self.meta.validators[name])
+                validators.append(self.meta.validators[key])
 
         if 'validators' in column.info and column.info['validators']:
             try:
@@ -541,16 +542,17 @@ class FormGenerator(object):
                 validators.append(column.info['validators'])
         return validators
 
-    def unique_validator(self, column):
+    def unique_validator(self, key, column):
         """
         Returns unique validator for given column if column has a unique index
 
+        :param key: String key of the column property
         :param column: SQLAlchemy Column object
         """
         if column.unique:
             return self.get_validator(
                 'unique',
-                column=getattr(self.model_class, column.key),
+                column=getattr(self.model_class, key),
                 get_session=self.form_class.get_session
             )
 
