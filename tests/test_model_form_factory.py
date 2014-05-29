@@ -1,4 +1,6 @@
-from pytest import importorskip, raises
+from distutils.version import LooseVersion
+from pytest import raises
+import wtforms
 from wtforms import Form
 from wtforms_alchemy import (
     model_form_factory,
@@ -55,9 +57,8 @@ class TestModelFormFactory(ModelFormTestCase):
         assert isinstance(TestCustomBase(), SomeForm)
 
     def test_class_meta_wtforms2(self):
-        meta = importorskip('wtforms.meta')
-
-        print meta.DefaultMeta
+        if LooseVersion(wtforms.__version__) < LooseVersion('2'):
+            return  # skip test for wtforms < 2
 
         self.init()
 
@@ -76,7 +77,7 @@ class TestModelFormFactory(ModelFormTestCase):
 
         form = TestCustomBase()
         other_form = OtherForm()
-        assert isinstance(form.meta, meta.DefaultMeta)
+        assert isinstance(form.meta, wtforms.meta.DefaultMeta)
         assert form.meta.locales == ['fr']
         assert hasattr(form.meta, 'model')
         assert hasattr(form.meta, 'csrf')
