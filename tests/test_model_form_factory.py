@@ -1,5 +1,4 @@
-from pytest import raises
-import wtforms
+from pytest import importorskip, raises
 from wtforms import Form
 from wtforms_alchemy import (
     model_form_factory,
@@ -7,12 +6,6 @@ from wtforms_alchemy import (
     UnknownConfigurationOption
 )
 from tests import ModelFormTestCase
-
-try:
-    from wtforms.meta import DefaultMeta
-except ImportError:
-    pass
-from distutils.version import LooseVersion
 
 
 class TestModelFormFactory(ModelFormTestCase):
@@ -62,8 +55,7 @@ class TestModelFormFactory(ModelFormTestCase):
         assert isinstance(TestCustomBase(), SomeForm)
 
     def test_class_meta_wtforms2(self):
-        if LooseVersion(wtforms.__version__) < LooseVersion('2'):
-            return  # Not running on wtforms2
+        DefaultMeta = importorskip('wtforms.meta.DefaultMeta')
 
         self.init()
 
