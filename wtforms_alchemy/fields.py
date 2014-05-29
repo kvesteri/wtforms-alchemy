@@ -115,7 +115,7 @@ class CountryField(SelectField):
         # ("ZZ"), "European Union" ("QU") and "Outlying Oceania" ("QO").
         territories = [
             (code, name)
-            for code, name in i18n.get_locale().territories.iteritems()
+            for code, name in six.iteritems(i18n.get_locale().territories)
             if len(code) == 2 and code not in ('QO', 'QU', 'ZZ')
         ]
         return sorted(territories, key=operator.itemgetter(1))
