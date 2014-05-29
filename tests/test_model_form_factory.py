@@ -1,4 +1,6 @@
+from distutils.version import LooseVersion
 from pytest import raises
+import wtforms
 from wtforms import Form
 from wtforms_alchemy import (
     model_form_factory,
@@ -6,12 +8,6 @@ from wtforms_alchemy import (
     UnknownConfigurationOption
 )
 from tests import ModelFormTestCase
-
-try:
-    from wtforms.meta import DefaultMeta
-    has_wtforms2 = True
-except ImportError:
-    has_wtforms2 = False
 
 
 class TestModelFormFactory(ModelFormTestCase):
@@ -61,8 +57,8 @@ class TestModelFormFactory(ModelFormTestCase):
         assert isinstance(TestCustomBase(), SomeForm)
 
     def test_class_meta_wtforms2(self):
-        if not has_wtforms2:
-            return  # Not running on wtforms2
+        if LooseVersion(wtforms.__version__) < LooseVersion('2'):
+            return  # skip test for wtforms < 2
 
         self.init()
 
@@ -81,7 +77,7 @@ class TestModelFormFactory(ModelFormTestCase):
 
         form = TestCustomBase()
         other_form = OtherForm()
-        assert isinstance(form.meta, DefaultMeta)
+        assert isinstance(form.meta, wtforms.meta.DefaultMeta)
         assert form.meta.locales == ['fr']
         assert hasattr(form.meta, 'model')
         assert hasattr(form.meta, 'csrf')
