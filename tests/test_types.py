@@ -249,7 +249,6 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
 
 class TestWeekDaysTypeConversion(ModelFormTestCase):
-    dns = 'postgres://postgres@localhost/wtforms_alchemy_test'
 
     def test_weekdays_type_converts_to_weekdays_field(self):
         self.init(type_=WeekDaysType)
