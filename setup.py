@@ -35,6 +35,7 @@ extras_require = {
         'docutils>=0.10',
         'flexmock>=0.9.7',
         'psycopg2>=2.4.6',
+        'sqlalchemy-defaults',
         'WTForms-Test>=0.1.1'
     ],
     'babel': ['Babel>=1.3'],
