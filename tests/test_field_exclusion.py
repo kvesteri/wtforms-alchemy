@@ -23,7 +23,6 @@ class TestFieldExclusion(ModelFormTestCase):
 
 
 class TestTSVectorType(ModelFormTestCase):
-    dns = 'postgres://postgres@localhost/wtforms_alchemy_test'
 
     def test_does_not_include_tsvector_typed_columns_with_default(self):
         self.init(TSVectorType)
