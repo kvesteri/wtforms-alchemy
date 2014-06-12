@@ -51,7 +51,7 @@ __all__ = (
 )
 
 
-__version__ = '0.12.5'
+__version__ = '0.12.6'
 
 
 def model_form_meta_factory(base=FormMeta):

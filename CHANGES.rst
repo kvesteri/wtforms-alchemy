@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.12.6 (2014-06-12)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix various issues with new-style classes
+
+
 0.12.5 (2014-05-29)
 ^^^^^^^^^^^^^^^^^^^
 
