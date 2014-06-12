@@ -147,7 +147,7 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
         if not hasattr(base, 'get_session'):
             get_session = None
 
-        class Meta:
+        class Meta(object):
             model = None
 
             default = None
@@ -289,13 +289,13 @@ class ModelCreateForm(ModelForm):
 
 
 class ModelUpdateForm(ModelForm):
-    class Meta:
+    class Meta(object):
         all_fields_optional = True
         assign_required = False
 
 
 class ModelSearchForm(ModelForm):
-    class Meta:
+    class Meta(object):
         all_fields_optional = True
         only_indexed_fields = True
         include_primary_keys = True
