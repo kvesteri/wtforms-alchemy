@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.12.7 (2014-07-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix ModelFieldList handling of simultaneous deletes and updates
+
+
 0.12.6 (2014-06-12)
 ^^^^^^^^^^^^^^^^^^^
 

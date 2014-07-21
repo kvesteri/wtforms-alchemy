@@ -95,11 +95,16 @@ class ModelFieldList(FieldList):
                 except AttributeError:
                     pass
         else:
+            coll = getattr(obj, name)
+            entities = []
             for index, entry in enumerate(self.entries):
                 data = entry.data
-                coll = getattr(obj, name)
-                if find_entity(coll, self.model, data) is None:
-                    coll.insert(index, self.model())
+                entity = find_entity(coll, self.model, data)
+                if entity is None:
+                    entities.insert(index, self.model())
+                else:
+                    entities.append(entity)
+            setattr(obj, name, entities)
         FieldList.populate_obj(self, obj, name)
 
 
