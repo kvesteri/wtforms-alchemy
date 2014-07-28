@@ -11,7 +11,7 @@ from wtforms.fields import (
     FloatField,
     PasswordField,
 )
-from wtforms.validators import Length
+from wtforms.validators import Length, URL
 from sqlalchemy_utils import (
     ChoiceType,
     ColorType,
@@ -23,6 +23,7 @@ from sqlalchemy_utils import (
     NumericRangeType,
     PasswordType,
     PhoneNumberType,
+    URLType,
     UUIDType,
 )
 from sqlalchemy_utils.types import arrow, phone_number, WeekDaysType
@@ -38,6 +39,7 @@ from wtforms_components.fields import (
     DecimalIntervalField,
     DateIntervalField,
     DateTimeIntervalField,
+    PhoneNumberField,
     StringField,
     TimeField,
 )
@@ -50,7 +52,6 @@ from wtforms_alchemy import (
     null_or_unicode
 )
 from wtforms_alchemy.utils import ClassMap
-from wtforms_components import PhoneNumberField
 from tests import ModelFormTestCase
 
 
@@ -162,6 +163,10 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init(type_=EmailType)
         self.assert_has_validator('test_column', Email)
 
+    def test_assigns_url_validator_for_url_type(self):
+        self.init(type_=URLType)
+        self.assert_has_validator('test_column', URL)
+
     def test_time_converts_to_time_field(self):
         self.init(type_=sa.types.Time)
         self.assert_type('test_column', TimeField)
@@ -216,6 +221,10 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
     def test_arrow_type_converts_to_datetime_field(self):
         self.init(type_=arrow.ArrowType)
         self.assert_type('test_column', DateTimeField)
+
+    def test_url_type_converts_to_string_field(self):
+        self.init(type_=URLType)
+        self.assert_type('test_column', StringField)
 
     def test_uuid_type_converst_to_uuid_type(self):
         self.init(type_=UUIDType)

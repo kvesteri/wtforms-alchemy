@@ -3,7 +3,7 @@ import six
 import sqlalchemy as sa
 from wtforms import Form
 from wtforms.validators import (
-    InputRequired, DataRequired, NumberRange, Length, Optional
+    InputRequired, DataRequired, NumberRange, Length, Optional, URL
 )
 from wtforms.form import FormMeta
 from wtforms_components import (
@@ -51,7 +51,7 @@ __all__ = (
 )
 
 
-__version__ = '0.12.7'
+__version__ = '0.12.8'
 
 
 def model_form_meta_factory(base=FormMeta):
@@ -230,6 +230,9 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
 
             #: Default optional validator
             optional_validator = Optional
+
+            #: Default URL validator
+            url_validator = URL
 
             #: Which form generator to use. Only override this if you have a
             #: valid form generator which you want to use instead of the

@@ -103,6 +103,7 @@ class FormGenerator(object):
         (types.PasswordType, PasswordField),
         (types.PhoneNumberType, PhoneNumberField),
         (types.ScalarListType, StringField),
+        (types.URLType, StringField),
         (types.UUIDType, StringField),
         (types.WeekDaysType, WeekDaysField),
     ))
@@ -482,6 +483,8 @@ class FormGenerator(object):
         ]
         if isinstance(column.type, types.EmailType):
             validators.append(self.get_validator('email'))
+        if isinstance(column.type, types.URLType):
+            validators.append(self.get_validator('url'))
         validators = flatten([v for v in validators if v is not None])
 
         validators.extend(self.additional_validators(prop.key, column))
