@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.12.9 (2014-08-30)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for composite primary keys in ModelFieldList
+
+
 0.12.8 (2014-07-28)
 ^^^^^^^^^^^^^^^^^^^
 
