@@ -79,27 +79,28 @@ def table(model):
         return model.__table__
 
 
-def primary_keys(model):
-    for column in table(model).c:
-        if column.primary_key:
-            yield column
-
-
 def find_entity(coll, model, data):
-    # TODO: clearly not working if primary keys have aliases
-    for column in primary_keys(model):
-        if not column.name in data or not data[column.name]:
-            return None
-        coerce_func = column.type.python_type
-        for related_obj in coll:
-            value = getattr(related_obj, column.name)
+    """
+    Find object in `coll` that matches `data`
+    """
+    mapper = sa.inspect(model)
 
-            try:
-                if value == coerce_func(data[column.name]):
-                    return related_obj
-            except ValueError:
-                # coerce failed
-                pass
+    def match_pk(obj, col):
+        data_val = data.get(col.name)
+        if not data_val:
+            # name not in data, or null value
+            return False
+        value = getattr(obj, col.name)
+        try:
+            return value == col.type.python_type(data_val)
+        except ValueError:
+            # coerce failed
+            return False
+
+    for obj in coll:
+        if all(match_pk(obj, col) for col in mapper.primary_key):
+            return obj
+
     return None
 
 
