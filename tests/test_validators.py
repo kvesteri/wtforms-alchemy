@@ -5,7 +5,7 @@ from sqlalchemy_utils import EmailType
 from wtforms.validators import (
     Email, InputRequired, DataRequired, Optional, NumberRange, Length
 )
-from wtforms_alchemy import Unique, ModelForm, ClassMap
+from wtforms_alchemy import Unique, ModelForm, ClassMap, model_form_factory
 from wtforms_components import TimeRange, DateRange
 from tests import ModelFormTestCase
 
@@ -29,8 +29,11 @@ class TestAutoAssignedValidators(ModelFormTestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             test_column = sa.Column(sa.Unicode(255), unique=True)
 
+        Form = model_form_factory()
+        assert not Form.get_session
+
         with raises(Exception):
-            class ModelTestForm(ModelForm):
+            class ModelTestForm(Form):
                 class Meta:
                     model = ModelTest
 
