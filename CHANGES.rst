@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.13.0 (2014-10-xx)
+^^^^^^^^^^^^^^^^^^^
+
+- Make all default validators configurable in model_form_factory
+
+
 0.12.9 (2014-08-30)
 ^^^^^^^^^^^^^^^^^^^
 

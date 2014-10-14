@@ -51,7 +51,7 @@ __all__ = (
 )
 
 
-__version__ = '0.12.9'
+__version__ = '0.13.0'
 
 
 def model_form_meta_factory(base=FormMeta):
@@ -211,28 +211,36 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             )
 
             #: Default email validator
-            email_validator = Email
+            email_validator = defaults.pop('email_validator', Email)
 
             #: Default length validator
-            length_validator = Length
+            length_validator = defaults.pop('length_validator', Length)
 
             #: Default unique validator
-            unique_validator = Unique
+            unique_validator = defaults.pop('unique_validator', Unique)
 
             #: Default number range validator
-            number_range_validator = NumberRange
+            number_range_validator = defaults.pop(
+                'number_range_validator', NumberRange
+            )
 
             #: Default date range validator
-            date_range_validator = DateRange
+            date_range_validator = defaults.pop(
+                'date_range_validator', DateRange
+            )
 
             #: Default time range validator
-            time_range_validator = TimeRange
+            time_range_validator = defaults.pop(
+                'time_range_validator', TimeRange
+            )
 
             #: Default optional validator
-            optional_validator = Optional
+            optional_validator = defaults.pop(
+                'optional_validator', Optional
+            )
 
             #: Default URL validator
-            url_validator = URL
+            url_validator = defaults.pop('url_validator', URL)
 
             #: Which form generator to use. Only override this if you have a
             #: valid form generator which you want to use instead of the
