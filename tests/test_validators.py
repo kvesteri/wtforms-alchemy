@@ -114,7 +114,7 @@ class TestAutoAssignedValidators(ModelFormTestCase):
         self.init(nullable=False, default=u'default')
         self.assert_not_required('test_column')
 
-    def test_assigns_not_nullable_integers_as_optional(self):
+    def test_assigns_nullable_integers_as_optional(self):
         self.init(sa.Integer, nullable=True)
         self.assert_optional('test_column')
 
@@ -225,6 +225,20 @@ class TestAutoAssignedValidators(ModelFormTestCase):
 
         form = ModelTestForm()
         assert form.test_column.validators[1].message == 'Wrong length'
+
+    def test_override_optional_validator_as_none(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(sa.Boolean, nullable=True)
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                optional_validator = None
+
+        form = ModelTestForm()
+        assert form.test_column.validators == []
 
     def test_override_unique_validator(self):
         class ModelTest(self.base):

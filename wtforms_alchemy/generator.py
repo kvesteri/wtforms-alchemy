@@ -519,6 +519,9 @@ class FormGenerator(object):
     def get_validator(self, name, **kwargs):
         attr_name = '%s_validator' % name
         attr = getattr(self.meta, attr_name)
+        if attr is None:
+            return attr
+
         if inspect.ismethod(attr):
             return six.get_unbound_function(attr)(**kwargs)
         else:
