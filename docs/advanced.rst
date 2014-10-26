@@ -69,4 +69,4 @@ The you can use the ModelForm just like before:
 
     class UserForm(ModelForm):
         class Meta:
-            model User
+            model = User
