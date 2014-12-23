@@ -33,5 +33,3 @@ in WTForms-Alchemy.
 .. autoclass:: ClassMap
     :members:
     :special-members:
-
-.. include:: ../CHANGES.rst
