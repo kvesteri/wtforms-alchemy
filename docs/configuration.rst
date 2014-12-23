@@ -29,6 +29,13 @@ The UserForm would contain two fields name and email. ::
 
 **exclude**
 
+.. warning::
+
+    Using ``exclude`` might lead to problems in situations where you add columns to your model
+    and forget to exclude those from the form by using ``exclude``, hence it is recommended to
+    use ``only`` rather than ``exclude``.
+
+
 You can exclude certain fields by adding them to the exclude list. ::
 
     class User(Base):
@@ -44,6 +51,18 @@ You can exclude certain fields by adding them to the exclude list. ::
             include_primary_keys = True
             exclude = ['email']
             # this form contains only 'name' field
+
+
+**only**
+
+Generates a form using only the field names provided in ``only``.
+
+::
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            only = ['email']
 
 
 **field_args** (default: {})
