@@ -275,3 +275,24 @@ class TestCustomTypeMap(ModelFormTestCase):
 
         form = ModelTestForm()
         assert isinstance(form.test_column, TextAreaField)
+
+    def test_override_type_map_with_callable(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column_short = sa.Column(sa.Unicode(255), nullable=False)
+            test_column_long = sa.Column(sa.Unicode(), nullable=False)
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                not_null_validator = None
+                type_map = ClassMap({
+                    sa.Unicode: lambda column: (
+                        StringField if column.type.length else TextAreaField
+                    )
+                })
+
+        form = ModelTestForm()
+        assert isinstance(form.test_column_short, StringField)
+        assert isinstance(form.test_column_long, TextAreaField)

@@ -272,6 +272,8 @@ Let's say we want to convert all unicode typed properties to TextAreaFields inst
             type_map = ClassMap({sa.Unicode: TextAreaField})
 
 
+In case the type_map dictionary values are not inherited from WTForm field class, they are considered callable functions. These functions will be called with the corresponding column as their only parameter.
+
 
 .. _custom_base:
 
