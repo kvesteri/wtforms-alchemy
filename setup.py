@@ -5,23 +5,8 @@ WTForms-Alchemy
 Generates WTForms forms from SQLAlchemy models.
 """
 
-from setuptools import setup, Command
-import subprocess
+from setuptools import setup
 import sys
-
-
-class PyTest(Command):
-    user_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        errno = subprocess.call(['py.test'])
-        raise SystemExit(errno)
 
 
 PY3 = sys.version_info[0] == 3
@@ -78,7 +63,6 @@ setup(
         if sys.version_info[0] == 2 and sys.version_info[1] < 7 else '',
     ],
     extras_require=extras_require,
-    cmdclass={'test': PyTest},
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
