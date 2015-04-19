@@ -1,13 +1,15 @@
 from distutils.version import LooseVersion
-from pytest import raises
+
 import wtforms
+from pytest import raises
 from wtforms import Form
+
+from tests import ModelFormTestCase
 from wtforms_alchemy import (
-    model_form_factory,
     FormGenerator,
+    model_form_factory,
     UnknownConfigurationOption
 )
-from tests import ModelFormTestCase
 
 
 class TestModelFormFactory(ModelFormTestCase):

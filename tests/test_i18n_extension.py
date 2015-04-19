@@ -1,9 +1,9 @@
-from pytest import raises
 import sqlalchemy as sa
-from sqlalchemy_i18n import Translatable, make_translatable, translation_base
-from wtforms_alchemy import ModelForm
-from tests import ModelFormTestCase, MultiDict
+from pytest import raises
+from sqlalchemy_i18n import make_translatable, Translatable, translation_base
 
+from tests import ModelFormTestCase, MultiDict
+from wtforms_alchemy import ModelForm
 
 make_translatable()
 

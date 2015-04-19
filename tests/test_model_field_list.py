@@ -1,8 +1,9 @@
 import sqlalchemy as sa
-from wtforms_alchemy import ModelForm, ModelFieldList
-from wtforms_components import PassiveHiddenField
 from wtforms.fields import FormField
+from wtforms_components import PassiveHiddenField
+
 from tests import FormRelationsTestCase, MultiDict
+from wtforms_alchemy import ModelFieldList, ModelForm
 
 
 class ModelFieldListTestCase(FormRelationsTestCase):

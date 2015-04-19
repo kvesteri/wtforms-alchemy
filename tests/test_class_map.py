@@ -1,4 +1,5 @@
 from pytest import mark, raises
+
 from wtforms_alchemy.utils import ClassMap, sorted_classes
 
 

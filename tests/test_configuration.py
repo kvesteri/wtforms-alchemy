@@ -1,11 +1,14 @@
-from pytest import raises
 import sqlalchemy as sa
+from pytest import raises
 from wtforms.fields import IntegerField
 from wtforms.validators import Email
-from wtforms_alchemy import (
-    AttributeTypeException, InvalidAttributeException, ModelForm
-)
+
 from tests import ModelFormTestCase, MultiDict
+from wtforms_alchemy import (
+    AttributeTypeException,
+    InvalidAttributeException,
+    ModelForm
+)
 
 
 class UnknownType(sa.types.UserDefinedType):

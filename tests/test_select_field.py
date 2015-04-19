@@ -1,8 +1,10 @@
-import six
 from decimal import Decimal
+
+import six
 import sqlalchemy as sa
-from wtforms_alchemy import SelectField
+
 from tests import ModelFormTestCase
+from wtforms_alchemy import SelectField
 
 
 class MultiDict(dict):

@@ -1,13 +1,16 @@
 import operator
-from wtforms_components import SelectField
-from sqlalchemy_utils import Country, i18n
+
 import six
+from sqlalchemy_utils import Country, i18n
 from wtforms.fields import FieldList, FormField
+from wtforms_components import SelectField
+
+from .utils import find_entity
+
 try:
     from wtforms.utils import unset_value as _unset_value
 except ImportError:
     from wtforms.fields import _unset_value
-from .utils import find_entity
 
 
 class SkipOperation(Exception):

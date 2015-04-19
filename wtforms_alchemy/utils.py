@@ -1,9 +1,11 @@
 from inspect import isclass
+
 import six
 import sqlalchemy as sa
 from sqlalchemy import types
-from sqlalchemy_utils import NumericRangeType, IntRangeType
+from sqlalchemy_utils import IntRangeType, NumericRangeType
 from sqlalchemy_utils.types.choice import Choice
+
 try:
     from collections import OrderedDict
 except ImportError:

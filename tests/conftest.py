@@ -1,7 +1,11 @@
 import pytest
-from wtforms_alchemy import (model_form_factory, model_form_meta_factory,
-                             ModelFormMeta)
 from wtforms.form import FormMeta
+
+from wtforms_alchemy import (
+    model_form_factory,
+    model_form_meta_factory,
+    ModelFormMeta
+)
 
 
 class _MetaWithInit(FormMeta):

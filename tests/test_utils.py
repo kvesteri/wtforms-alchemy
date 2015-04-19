@@ -3,8 +3,8 @@ from __future__ import absolute_import
 
 import sqlalchemy as sa
 
-from wtforms_alchemy import utils
 from tests import FormRelationsTestCase
+from wtforms_alchemy import utils
 
 
 class TestUtils(FormRelationsTestCase):

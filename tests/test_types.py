@@ -1,17 +1,5 @@
-from pytest import raises, mark
 import sqlalchemy as sa
-passlib = None
-try:
-    import passlib  # noqa
-except ImportError:
-    pass
-from wtforms.fields import (
-    TextAreaField,
-    BooleanField,
-    FloatField,
-    PasswordField,
-)
-from wtforms.validators import Length, URL
+from pytest import mark, raises
 from sqlalchemy_utils import (
     ChoiceType,
     ColorType,
@@ -21,9 +9,16 @@ from sqlalchemy_utils import (
     PasswordType,
     PhoneNumberType,
     URLType,
-    UUIDType,
+    UUIDType
 )
 from sqlalchemy_utils.types import arrow, phone_number, WeekDaysType  # noqa
+from wtforms.fields import (
+    BooleanField,
+    FloatField,
+    PasswordField,
+    TextAreaField
+)
+from wtforms.validators import Length, URL
 from wtforms_components import Email
 from wtforms_components.fields import (
     ColorField,
@@ -35,18 +30,25 @@ from wtforms_components.fields import (
     IntIntervalField,
     PhoneNumberField,
     StringField,
-    TimeField,
+    TimeField
 )
 from wtforms_components.fields.weekdays import WeekDaysField
+
+from tests import ModelFormTestCase
 from wtforms_alchemy import (
-    ModelForm,
-    SelectField,
-    UnknownTypeException,
     CountryField,
-    null_or_unicode
+    ModelForm,
+    null_or_unicode,
+    SelectField,
+    UnknownTypeException
 )
 from wtforms_alchemy.utils import ClassMap
-from tests import ModelFormTestCase
+
+passlib = None
+try:
+    import passlib  # noqa
+except ImportError:
+    pass
 
 
 class UnknownType(sa.types.UserDefinedType):

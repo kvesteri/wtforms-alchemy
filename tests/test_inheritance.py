@@ -1,6 +1,7 @@
-from wtforms_alchemy import model_form_factory, ModelForm
 from wtforms import Form
 from wtforms_test import FormTestCase
+
+from wtforms_alchemy import model_form_factory, ModelForm
 
 
 class TestInheritance(FormTestCase):

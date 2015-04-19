@@ -1,13 +1,14 @@
 from datetime import date, time
+
 import sqlalchemy as sa
 from sqlalchemy_utils import IntRangeType
-
 from wtforms import widgets
-from wtforms_alchemy import ModelForm
-from wtforms_components import DateRange, TimeRange
 from wtforms.fields import StringField
 from wtforms.validators import NumberRange
+from wtforms_components import DateRange, TimeRange
+
 from tests import ModelFormTestCase
+from wtforms_alchemy import ModelForm
 
 
 class TestFieldParameters(ModelFormTestCase):

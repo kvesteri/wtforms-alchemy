@@ -1,13 +1,20 @@
 from datetime import datetime, time
-from pytest import raises
+
 import sqlalchemy as sa
+from pytest import raises
 from sqlalchemy_utils import EmailType
 from wtforms.validators import (
-    Email, InputRequired, DataRequired, Optional, NumberRange, Length
+    DataRequired,
+    Email,
+    InputRequired,
+    Length,
+    NumberRange,
+    Optional
 )
-from wtforms_alchemy import Unique, ModelForm, ClassMap, model_form_factory
-from wtforms_components import TimeRange, DateRange
+from wtforms_components import DateRange, TimeRange
+
 from tests import ModelFormTestCase
+from wtforms_alchemy import ClassMap, model_form_factory, ModelForm, Unique
 
 
 class TestAutoAssignedValidators(ModelFormTestCase):

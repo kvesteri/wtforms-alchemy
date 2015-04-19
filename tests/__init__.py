@@ -1,11 +1,11 @@
 import sqlalchemy as sa
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import force_auto_coercion
 from wtforms_test import FormTestCase
-from wtforms_alchemy import ModelForm
 
+from wtforms_alchemy import ModelForm
 
 force_auto_coercion()
 

@@ -1,7 +1,8 @@
 import sqlalchemy as sa
 from wtforms.validators import NumberRange
-from wtforms_alchemy import ModelForm
+
 from tests import ModelFormTestCase
+from wtforms_alchemy import ModelForm
 
 
 class TestColumnAliases(ModelFormTestCase):

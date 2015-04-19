@@ -1,7 +1,8 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
-from wtforms_alchemy import ModelForm
+
 from tests import ModelFormTestCase
+from wtforms_alchemy import ModelForm
 
 
 class TestSynonym(ModelFormTestCase):

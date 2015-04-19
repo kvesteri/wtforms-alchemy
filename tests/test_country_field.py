@@ -1,9 +1,9 @@
+import sqlalchemy_utils
 from babel import Locale
 from wtforms import Form
-from wtforms_alchemy import CountryField
-import sqlalchemy_utils
-from tests import MultiDict
 
+from tests import MultiDict
+from wtforms_alchemy import CountryField
 
 sqlalchemy_utils.i18n.get_locale = lambda: Locale('en')
 

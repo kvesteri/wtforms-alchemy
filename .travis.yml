@@ -15,5 +15,6 @@ install:
   - pip install -e ".[test]"
 
 script:
+  - isort --recursive --diff wtforms_alchemy tests && isort --recursive --check-only wtforms_alchemy tests
   - flake8 wtforms_alchemy tests
   - python setup.py test

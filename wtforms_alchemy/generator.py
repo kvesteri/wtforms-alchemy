@@ -2,22 +2,15 @@ try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
-from decimal import Decimal
 import inspect
+from decimal import Decimal
+
 import six
-from wtforms import (
-    BooleanField,
-    FloatField,
-    TextAreaField,
-    PasswordField,
-)
-from wtforms.widgets import (
-    CheckboxInput,
-    TextArea
-)
 import sqlalchemy as sa
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy_utils import types
+from wtforms import BooleanField, FloatField, PasswordField, TextAreaField
+from wtforms.widgets import CheckboxInput, TextArea
 from wtforms_components import (
     ColorField,
     DateField,
@@ -34,18 +27,19 @@ from wtforms_components import (
     SelectField,
     StringField,
     TimeField,
-    WeekDaysField,
+    WeekDaysField
 )
 from wtforms_components.widgets import (
     ColorInput,
-    EmailInput,
     DateInput,
     DateTimeInput,
     DateTimeLocalInput,
+    EmailInput,
     NumberInput,
     TextInput,
-    TimeInput,
+    TimeInput
 )
+
 from .exc import (
     AttributeTypeException,
     InvalidAttributeException,
@@ -54,6 +48,7 @@ from .exc import (
 from .fields import CountryField
 from .utils import (
     choice_type_coerce_factory,
+    ClassMap,
     flatten,
     is_date_column,
     is_number,
@@ -61,8 +56,7 @@ from .utils import (
     is_scalar,
     null_or_unicode,
     strip_string,
-    translated_attributes,
-    ClassMap
+    translated_attributes
 )
 
 
