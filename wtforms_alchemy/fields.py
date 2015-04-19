@@ -1,7 +1,6 @@
 import operator
 from wtforms_components import SelectField
-from sqlalchemy_utils.types import Country
-from sqlalchemy_utils import i18n
+from sqlalchemy_utils import Country, i18n
 import six
 from wtforms.fields import FieldList, FormField
 try:

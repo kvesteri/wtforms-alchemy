@@ -40,4 +40,4 @@ class TestCountryField(object):
         for country in self.invalid_countries:
             form = form_class(MultiDict(test_field=country))
             form.validate()
-            assert len(form.errors['test_field']) == 1
+            assert len(form.errors['test_field']) == 2

@@ -71,7 +71,7 @@ setup(
         'SQLAlchemy>=0.8.0',
         'WTForms>=1.0.4',
         'WTForms-Components>=0.9.2',
-        'SQLAlchemy-Utils>=0.23.1',
+        'SQLAlchemy-Utils>=0.30.0',
         'six>=1.4.1',
         'ordereddict>=1.1'
         if sys.version_info[0] == 2 and sys.version_info[1] < 7 else '',

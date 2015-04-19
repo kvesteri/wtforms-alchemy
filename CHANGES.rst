@@ -1,7 +1,14 @@
 Changelog
----------
+=========
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
+
+
+0.13.1 (2015-04-19)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed country import caused by SQLAlchemy-Utils 0.30.0
+- Update SQLAlchemy-Utils dependency to 0.30.0
 
 
 0.13.0 (2014-10-14)
