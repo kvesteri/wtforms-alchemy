@@ -33,6 +33,7 @@ extras_require = {
         'Pygments>=1.2',
         'Jinja2>=2.3',
         'docutils>=0.10',
+        'flake8>=2.4.0',
         'flexmock>=0.9.7',
         'WTForms-Test>=0.1.1'
     ],

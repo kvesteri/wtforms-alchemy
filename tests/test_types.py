@@ -2,7 +2,7 @@ from pytest import raises, mark
 import sqlalchemy as sa
 passlib = None
 try:
-    import passlib
+    import passlib  # noqa
 except ImportError:
     pass
 from wtforms.fields import (
@@ -16,17 +16,14 @@ from sqlalchemy_utils import (
     ChoiceType,
     ColorType,
     CountryType,
-    DateRangeType,
-    DateTimeRangeType,
     EmailType,
     IntRangeType,
-    NumericRangeType,
     PasswordType,
     PhoneNumberType,
     URLType,
     UUIDType,
 )
-from sqlalchemy_utils.types import arrow, phone_number, WeekDaysType
+from sqlalchemy_utils.types import arrow, phone_number, WeekDaysType  # noqa
 from wtforms_components import Email
 from wtforms_components.fields import (
     ColorField,
@@ -36,9 +33,6 @@ from wtforms_components.fields import (
     EmailField,
     IntegerField,
     IntIntervalField,
-    DecimalIntervalField,
-    DateIntervalField,
-    DateTimeIntervalField,
     PhoneNumberField,
     StringField,
     TimeField,

@@ -12,15 +12,15 @@ class TestSynonym(ModelFormTestCase):
             _test_column = sa.Column('test_column', sa.Integer, nullable=False)
 
             @hybrid_property
-            def test_column(self):
+            def test_column_hybrid(self):
                 return self.test_column * 2
 
-            @test_column.setter
-            def test_column(self, value):
+            @test_column_hybrid.setter
+            def test_column_hybrid(self, value):
                 self._test_column = value
 
             test_column = sa.orm.synonym(
-                '_test_column', descriptor='test_column'
+                '_test_column', descriptor='test_column_hybrid'
             )
 
         class ModelTestForm(ModelForm):
@@ -41,15 +41,15 @@ class TestSynonym(ModelFormTestCase):
             _test_column = sa.Column('test_column', sa.Integer, nullable=False)
 
             @hybrid_property
-            def test_column(self):
+            def test_column_hybrid(self):
                 return self.test_column * 2
 
-            @test_column.setter
-            def test_column(self, value):
+            @test_column_hybrid.setter
+            def test_column_hybrid(self, value):
                 self._test_column = value
 
             test_column = sa.orm.synonym(
-                '_test_column', descriptor='test_column'
+                '_test_column', descriptor='test_column_hybrid'
             )
 
         class ModelTestForm(ModelForm):

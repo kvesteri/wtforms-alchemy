@@ -6,6 +6,7 @@ import sqlalchemy as sa
 from wtforms_alchemy import utils
 from tests import FormRelationsTestCase
 
+
 class TestUtils(FormRelationsTestCase):
     def create_models(self):
         class Band(self.base):
@@ -46,14 +47,17 @@ class TestUtils(FormRelationsTestCase):
         band = self.Band(name=u'The Furious')
         self.session.add(band)
         singer = self.Person(name=u'Paul Insane')
-        role = self.BandMember(band=band, person=singer, role=u'singer')
+        self.BandMember(band=band, person=singer, role=u'singer')
         guitarist = self.Person(name=u'John Crazy')
-        role = self.BandMember(band=band, person=guitarist, role=u'guitar')
+        self.BandMember(band=band, person=guitarist, role=u'guitar')
         self.session.commit()
 
         sing_data = dict(band_id=band.id, person_id=singer.id, role=u'singer')
-        guitar_data = dict(band_id=band.id, person_id=guitarist.id,
-                           role=u'guitar')
+        guitar_data = dict(
+            band_id=band.id,
+            person_id=guitarist.id,
+            role=u'guitar'
+        )
 
         assert (utils.find_entity(band.members, self.BandMember, sing_data)
                 is singer.band_role)

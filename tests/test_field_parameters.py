@@ -1,6 +1,6 @@
 from datetime import date, time
 import sqlalchemy as sa
-from sqlalchemy_utils import IntRangeType, NumericRangeType
+from sqlalchemy_utils import IntRangeType
 
 from wtforms import widgets
 from wtforms_alchemy import ModelForm

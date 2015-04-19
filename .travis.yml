@@ -15,4 +15,5 @@ install:
   - pip install -e ".[test]"
 
 script:
+  - flake8 wtforms_alchemy tests
   - python setup.py test

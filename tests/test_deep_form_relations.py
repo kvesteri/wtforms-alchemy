@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from wtforms_alchemy import ModelForm, ModelFormField, ModelFieldList
-from wtforms.fields import FormField, FieldList
+from wtforms.fields import FormField
 from tests import FormRelationsTestCase, MultiDict
 
 
