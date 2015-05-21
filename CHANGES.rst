@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.13.2 (2015-05-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for callables in type map argument
+
+
 0.13.1 (2015-04-19)
 ^^^^^^^^^^^^^^^^^^^
 
