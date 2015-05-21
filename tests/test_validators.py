@@ -30,20 +30,6 @@ class TestAutoAssignedValidators(ModelFormTestCase):
         self.init(unique=True)
         self.assert_has_validator('test_column', Unique)
 
-    def test_raises_exception_if_no_session_set_for_unique_validators(self):
-        class ModelTest(self.base):
-            __tablename__ = 'model_test'
-            id = sa.Column(sa.Integer, primary_key=True)
-            test_column = sa.Column(sa.Unicode(255), unique=True)
-
-        Form = model_form_factory()
-        assert not Form.get_session
-
-        with raises(Exception):
-            class ModelTestForm(Form):
-                class Meta:
-                    model = ModelTest
-
     def test_assigns_non_nullable_fields_as_required(self):
         self.init(nullable=False)
         self.assert_has_validator('test_column', DataRequired)
