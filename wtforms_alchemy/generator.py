@@ -9,7 +9,13 @@ import six
 import sqlalchemy as sa
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy_utils import types
-from wtforms import BooleanField, FloatField, PasswordField, TextAreaField
+from wtforms import (
+    BooleanField,
+    Field,
+    FloatField,
+    PasswordField,
+    TextAreaField
+)
 from wtforms.widgets import CheckboxInput, TextArea
 from wtforms_components import (
     ColorField,
@@ -607,6 +613,10 @@ class FormGenerator(object):
             check_type = column.type
 
         try:
-            return self.TYPE_MAP[check_type]
+            column_type = self.TYPE_MAP[check_type]
+            if inspect.isclass(column_type) and issubclass(column_type, Field):
+                return column_type
+            else:
+                return column_type(column)
         except KeyError:
             raise UnknownTypeException(column)
