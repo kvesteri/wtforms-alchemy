@@ -32,6 +32,7 @@ extras_require = {
         'flake8>=2.4.0',
         'flexmock>=0.9.7',
         'isort>=3.9.6',
+        'natsort==3.5.6',
         'WTForms-Test>=0.1.1'
     ],
     'babel': ['Babel>=1.3'],
