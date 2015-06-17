@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.13.3 (2015-06-17)
+^^^^^^^^^^^^^^^^^^^
+
+- Removed ClassMap's inheritance sorting. This never really worked properly and resulted in weird undeterministic bugs on Python 3.
+
+
 0.13.2 (2015-05-21)
 ^^^^^^^^^^^^^^^^^^^
 

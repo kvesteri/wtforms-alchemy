@@ -87,9 +87,9 @@ class FormGenerator(object):
         (sa.types.Float, FloatField),
         (sa.types.Integer, IntegerField),
         (sa.types.Numeric, DecimalField),
+        (sa.types.Unicode, StringField),
         (sa.types.String, StringField),
         (sa.types.Time, TimeField),
-        (sa.types.Unicode, StringField),
         (types.ArrowType, DateTimeField),
         (types.ChoiceType, SelectField),
         (types.ColorType, ColorField),
@@ -614,6 +614,7 @@ class FormGenerator(object):
 
         try:
             column_type = self.TYPE_MAP[check_type]
+
             if inspect.isclass(column_type) and issubclass(column_type, Field):
                 return column_type
             else:

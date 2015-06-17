@@ -128,16 +128,6 @@ def translated_attributes(model):
     ]
 
 
-def sorted_classes(classes, reverse=False):
-    return sorted(
-        classes,
-        # We need to map classes to ids, since python 3 throws error when
-        # trying to compare unorderable types.
-        key=lambda a: tuple(id(v) for v in a.__mro__[::-1]),
-        reverse=reverse
-    )
-
-
 class ClassMap(OrderedDict):
     """
     An ordered dictionary with keys as classes. ClassMap has the following
@@ -150,11 +140,7 @@ class ClassMap(OrderedDict):
         instances also.
     """
     def __init__(self, items=None):
-        if items:
-            items = dict(items)
-            sorted_keys = sorted_classes(items.keys(), reverse=True)
-            items = [(key, items[key]) for key in sorted_keys]
-        else:
+        if items is None:
             items = {}
         OrderedDict.__init__(self, items)
 
