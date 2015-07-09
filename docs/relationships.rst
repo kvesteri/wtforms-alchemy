@@ -73,7 +73,7 @@ with ModelFieldList. ::
         id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
         name = sa.Column(sa.Unicode(255), nullable=True)
 
-        event_id = sa.Column(sa.Integer, sa.ForeignKey(Location.id))
+        event_id = sa.Column(sa.Integer, sa.ForeignKey(Event.id))
         event = sa.orm.relationship(
             Location,
             backref='locations'  # the event needs to have this
