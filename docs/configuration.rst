@@ -297,7 +297,7 @@ form as a parent form for ModelForm. ::
             model = User
 
 
-You can also pass any form genrerator option to model_form_factory. ::
+You can also pass any form generator option to model_form_factory. ::
 
 
     ModelForm = model_form_factory(Form, strip_string_fields=True)
