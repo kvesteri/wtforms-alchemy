@@ -1,5 +1,5 @@
-from wtforms_alchemy import ModelForm
 from tests import ModelFormTestCase, MultiDict
+from wtforms_alchemy import ModelForm
 
 
 class TestStringFieldTrimming(ModelFormTestCase):

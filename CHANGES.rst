@@ -1,7 +1,101 @@
 Changelog
----------
+=========
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
+
+
+0.13.3 (2015-06-17)
+^^^^^^^^^^^^^^^^^^^
+
+- Removed ClassMap's inheritance sorting. This never really worked properly and resulted in weird undeterministic bugs on Python 3.
+
+
+0.13.2 (2015-05-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for callables in type map argument
+
+
+0.13.1 (2015-04-19)
+^^^^^^^^^^^^^^^^^^^
+
+- Added flake8 checks
+- Added isort checks
+- Fixed country import caused by SQLAlchemy-Utils 0.30.0
+- Update SQLAlchemy-Utils dependency to 0.30.0
+
+
+0.13.0 (2014-10-14)
+^^^^^^^^^^^^^^^^^^^
+
+- Made all default validators configurable in model_form_factory
+- Added support for disabling default validators
+
+
+0.12.9 (2014-08-30)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for composite primary keys in ModelFieldList
+
+
+0.12.8 (2014-07-28)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for URLType of SQLAlchemy-Utils
+
+
+0.12.7 (2014-07-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix ModelFieldList handling of simultaneous deletes and updates
+
+
+0.12.6 (2014-06-12)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix various issues with new-style classes
+
+
+0.12.5 (2014-05-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Added CountryField
+- Added CountryType to CountryField conversion
+- Fixed various issues with column aliases
+
+
+0.12.4 (2014-03-26)
+^^^^^^^^^^^^^^^^^^^
+
+- Added WeekDaysType to WeekDaysField conversion
+
+
+0.12.3 (2014-03-24)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed ChoiceType coercion for SelectFields
+
+
+0.12.2 (2014-02-20)
+^^^^^^^^^^^^^^^^^^^
+
+- New configuration option: attr_errors
+- Min and max info attributes generate NumberRange validator for Numeric, Float, IntRangeType and NumericRangeType columns
+
+
+0.12.1 (2014-02-13)
+^^^^^^^^^^^^^^^^^^^
+
+- Updated SQLAlchemy-i18n optional dependency to 0.8.2
+
+
+0.12.0 (2013-12-19)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for SQLAlchemy-Utils range types IntRange, NumericRange, DateRange and DateTimeRange
+- Deprecated support for NumberRangeField
+- Updated SQLAlchemy-Utils dependency to 0.23.1
+- Updated WTForms-Components dependency to 0.9.0
 
 
 0.11.0 (2013-12-19)

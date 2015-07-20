@@ -1,11 +1,31 @@
 from inspect import isclass
+
 import six
 import sqlalchemy as sa
 from sqlalchemy import types
+from sqlalchemy_utils import IntRangeType, NumericRangeType
+from sqlalchemy_utils.types.choice import Choice
+
 try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
+
+
+def choice_type_coerce_factory(type_):
+    """
+    Return a function needed to coerce a ChoiceTyped column. This function is
+    then passed to generated SelectField as the default coerce function.
+
+    :param type_: ChoiceType object
+    """
+    def choice_coerce(value):
+        if value is None:
+            return None
+        if isinstance(value, Choice):
+            return value.code
+        return type_.python_type(value)
+    return choice_coerce
 
 
 def strip_string(value):
@@ -39,20 +59,12 @@ def flatten(list_):
     return result
 
 
-def is_numerical_column(column):
-    return (
-        is_integer_column(column) or
-        isinstance(column.type, types.Float) or
-        isinstance(column.type, types.Numeric)
-    )
+def is_number(type):
+    return isinstance(type, types.Integer) or isinstance(type, types.Numeric)
 
 
-def is_integer_column(column):
-    return (
-        isinstance(column.type, types.Integer) or
-        isinstance(column.type, types.SmallInteger) or
-        isinstance(column.type, types.BigInteger)
-    )
+def is_number_range(type):
+    return isinstance(type, IntRangeType) or isinstance(type, NumericRangeType)
 
 
 def is_date_column(column):
@@ -69,26 +81,28 @@ def table(model):
         return model.__table__
 
 
-def primary_keys(model):
-    for column in table(model).c:
-        if column.primary_key:
-            yield column
-
-
 def find_entity(coll, model, data):
-    for column in primary_keys(model):
-        if not column.name in data or not data[column.name]:
-            return None
-        coerce_func = column.type.python_type
-        for related_obj in coll:
-            value = getattr(related_obj, column.name)
+    """
+    Find object in `coll` that matches `data`
+    """
+    mapper = sa.inspect(model)
 
-            try:
-                if value == coerce_func(data[column.name]):
-                    return related_obj
-            except ValueError:
-                # coerce failed
-                pass
+    def match_pk(obj, col):
+        data_val = data.get(col.name)
+        if not data_val:
+            # name not in data, or null value
+            return False
+        value = getattr(obj, col.name)
+        try:
+            return value == col.type.python_type(data_val)
+        except ValueError:
+            # coerce failed
+            return False
+
+    for obj in coll:
+        if all(match_pk(obj, col) for col in mapper.primary_key):
+            return obj
+
     return None
 
 
@@ -104,25 +118,14 @@ def translated_attributes(model):
     :param model: SQLAlchemy declarative model class
     """
     try:
-        columns = model.__translated_columns__
+        translation_class = model.__translatable__['class']
     except AttributeError:
         return []
-    else:
-        translation_class = model.__translatable__['class']
-        return [
-            getattr(translation_class, column.key)
-            for column in columns
-        ]
-
-
-def sorted_classes(classes, reverse=False):
-    return sorted(
-        classes,
-        # We need to map classes to ids, since python 3 throws error when
-        # trying to compare unorderable types.
-        key=lambda a: tuple(id(v) for v in a.__mro__[::-1]),
-        reverse=reverse
-    )
+    return [
+        getattr(translation_class, column.key)
+        for column in sa.inspect(translation_class).columns
+        if not column.primary_key
+    ]
 
 
 class ClassMap(OrderedDict):
@@ -137,11 +140,7 @@ class ClassMap(OrderedDict):
         instances also.
     """
     def __init__(self, items=None):
-        if items:
-            items = dict(items)
-            sorted_keys = sorted_classes(items.keys(), reverse=True)
-            items = [(key, items[key]) for key in sorted_keys]
-        else:
+        if items is None:
             items = {}
         OrderedDict.__init__(self, items)
 

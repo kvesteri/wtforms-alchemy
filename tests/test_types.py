@@ -1,48 +1,54 @@
-from pytest import raises, mark
 import sqlalchemy as sa
-passlib = None
-try:
-    import passlib
-except ImportError:
-    pass
-from wtforms.fields import (
-    TextAreaField,
-    BooleanField,
-    FloatField,
-    PasswordField,
-)
-from wtforms.validators import Length
+from pytest import mark, raises
 from sqlalchemy_utils import (
     ChoiceType,
     ColorType,
+    CountryType,
     EmailType,
-    NumberRangeType,
+    IntRangeType,
     PasswordType,
     PhoneNumberType,
+    URLType,
     UUIDType
 )
-from sqlalchemy_utils.types import arrow, phone_number
-from wtforms_components import (
+from sqlalchemy_utils.types import arrow, phone_number, WeekDaysType  # noqa
+from wtforms.fields import (
+    BooleanField,
+    FloatField,
+    PasswordField,
+    TextAreaField
+)
+from wtforms.validators import Length, URL
+from wtforms_components import Email
+from wtforms_components.fields import (
     ColorField,
     DateField,
     DateTimeField,
     DecimalField,
-    Email,
     EmailField,
     IntegerField,
-    NumberRangeField,
+    IntIntervalField,
+    PhoneNumberField,
     StringField,
-    TimeField,
+    TimeField
 )
+from wtforms_components.fields.weekdays import WeekDaysField
+
+from tests import ModelFormTestCase
 from wtforms_alchemy import (
+    CountryField,
     ModelForm,
+    null_or_unicode,
     SelectField,
-    UnknownTypeException,
-    null_or_unicode
+    UnknownTypeException
 )
 from wtforms_alchemy.utils import ClassMap
-from wtforms_components import PhoneNumberField
-from tests import ModelFormTestCase
+
+passlib = None
+try:
+    import passlib  # noqa
+except ImportError:
+    pass
 
 
 class UnknownType(sa.types.UserDefinedType):
@@ -153,6 +159,10 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init(type_=EmailType)
         self.assert_has_validator('test_column', Email)
 
+    def test_assigns_url_validator_for_url_type(self):
+        self.init(type_=URLType)
+        self.assert_has_validator('test_column', URL)
+
     def test_time_converts_to_time_field(self):
         self.init(type_=sa.types.Time)
         self.assert_type('test_column', TimeField)
@@ -191,9 +201,12 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         for validator in field.validators:
             assert validator.__class__ != Length
 
-    def test_number_range_converts_to_number_range_field(self):
-        self.init(type_=NumberRangeType)
-        self.assert_type('test_column', NumberRangeField)
+    @mark.parametrize(('type', 'field'), (
+        (IntRangeType, IntIntervalField),
+    ))
+    def test_range_type_conversion(self, type, field):
+        self.init(type_=type)
+        self.assert_type('test_column', field)
 
     @mark.xfail('passlib is None')
     def test_password_type_converts_to_password_field(self):
@@ -204,6 +217,10 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
     def test_arrow_type_converts_to_datetime_field(self):
         self.init(type_=arrow.ArrowType)
         self.assert_type('test_column', DateTimeField)
+
+    def test_url_type_converts_to_string_field(self):
+        self.init(type_=URLType)
+        self.assert_type('test_column', StringField)
 
     def test_uuid_type_converst_to_uuid_type(self):
         self.init(type_=UUIDType)
@@ -217,11 +234,30 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init(type_=EmailType)
         self.assert_type('test_column', EmailField)
 
+    def test_country_type_converts_to_country_field(self):
+        self.init(type_=CountryType)
+        self.assert_type('test_column', CountryField)
+
     def test_choice_type_converts_to_select_field(self):
         choices = [(u'1', u'choice 1'), (u'2', u'choice 2')]
         self.init(type_=ChoiceType(choices))
         self.assert_type('test_column', SelectField)
         assert self.form_class().test_column.choices == choices
+
+    def test_choice_type_uses_custom_coerce_func(self):
+        choices = [(u'1', u'choice 1'), (u'2', u'choice 2')]
+        self.init(type_=ChoiceType(choices))
+        self.assert_type('test_column', SelectField)
+        model = self.ModelTest(test_column=u'2')
+        form = self.form_class(obj=model)
+        assert '<option selected value="2">' in str(form.test_column)
+
+
+class TestWeekDaysTypeConversion(ModelFormTestCase):
+
+    def test_weekdays_type_converts_to_weekdays_field(self):
+        self.init(type_=WeekDaysType)
+        self.assert_type('test_column', WeekDaysField)
 
 
 class TestCustomTypeMap(ModelFormTestCase):
@@ -239,3 +275,24 @@ class TestCustomTypeMap(ModelFormTestCase):
 
         form = ModelTestForm()
         assert isinstance(form.test_column, TextAreaField)
+
+    def test_override_type_map_with_callable(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column_short = sa.Column(sa.Unicode(255), nullable=False)
+            test_column_long = sa.Column(sa.Unicode(), nullable=False)
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                not_null_validator = None
+                type_map = ClassMap({
+                    sa.Unicode: lambda column: (
+                        StringField if column.type.length else TextAreaField
+                    )
+                })
+
+        form = ModelTestForm()
+        assert isinstance(form.test_column_short, StringField)
+        assert isinstance(form.test_column_long, TextAreaField)

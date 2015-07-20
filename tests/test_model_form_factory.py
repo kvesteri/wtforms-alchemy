@@ -1,17 +1,15 @@
+from distutils.version import LooseVersion
+
+import wtforms
 from pytest import raises
 from wtforms import Form
+
+from tests import ModelFormTestCase
 from wtforms_alchemy import (
-    model_form_factory,
     FormGenerator,
+    model_form_factory,
     UnknownConfigurationOption
 )
-from tests import ModelFormTestCase
-
-try:
-    from wtforms.meta import DefaultMeta
-    has_wtforms2 = True
-except ImportError:
-    has_wtforms2 = False
 
 
 class TestModelFormFactory(ModelFormTestCase):
@@ -60,9 +58,41 @@ class TestModelFormFactory(ModelFormTestCase):
 
         assert isinstance(TestCustomBase(), SomeForm)
 
+    def test_url_validator(self):
+        form = model_form_factory(url_validator=None)
+        assert form.Meta.url_validator is None
+
+    def test_email_validator(self):
+        form = model_form_factory(email_validator=None)
+        assert form.Meta.email_validator is None
+
+    def test_length_validator(self):
+        form = model_form_factory(length_validator=None)
+        assert form.Meta.length_validator is None
+
+    def test_number_range_validator(self):
+        form = model_form_factory(number_range_validator=None)
+        assert form.Meta.number_range_validator is None
+
+    def test_date_range_validator(self):
+        form = model_form_factory(date_range_validator=None)
+        assert form.Meta.date_range_validator is None
+
+    def test_time_range_validator(self):
+        form = model_form_factory(time_range_validator=None)
+        assert form.Meta.time_range_validator is None
+
+    def test_optional_validator(self):
+        form = model_form_factory(optional_validator=None)
+        assert form.Meta.optional_validator is None
+
+    def test_unique_validator(self):
+        form = model_form_factory(unique_validator=None)
+        assert form.Meta.unique_validator is None
+
     def test_class_meta_wtforms2(self):
-        if not has_wtforms2:
-            return  # Not running on wtforms2
+        if LooseVersion(wtforms.__version__) < LooseVersion('2'):
+            return  # skip test for wtforms < 2
 
         self.init()
 
@@ -81,7 +111,7 @@ class TestModelFormFactory(ModelFormTestCase):
 
         form = TestCustomBase()
         other_form = OtherForm()
-        assert isinstance(form.meta, DefaultMeta)
+        assert isinstance(form.meta, wtforms.meta.DefaultMeta)
         assert form.meta.locales == ['fr']
         assert hasattr(form.meta, 'model')
         assert hasattr(form.meta, 'csrf')

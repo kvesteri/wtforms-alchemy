@@ -1,11 +1,14 @@
-from pytest import raises
 import sqlalchemy as sa
+from pytest import raises
 from wtforms.fields import IntegerField
 from wtforms.validators import Email
-from wtforms_alchemy import (
-    AttributeTypeException, InvalidAttributeException, ModelForm
-)
+
 from tests import ModelFormTestCase, MultiDict
+from wtforms_alchemy import (
+    AttributeTypeException,
+    InvalidAttributeException,
+    ModelForm
+)
 
 
 class UnknownType(sa.types.UserDefinedType):
@@ -43,6 +46,24 @@ class TestModelFormConfiguration(ModelFormTestCase):
         self.form_class = ModelTestForm
         assert not self.has_field('test_column')
 
+    def test_throws_exception_for_unknown_excluded_column(self):
+        self.init_model()
+
+        with raises(InvalidAttributeException):
+            class ModelTestForm(ModelForm):
+                class Meta:
+                    model = self.ModelTest
+                    exclude = ['some_unknown_column']
+
+    def test_invalid_exclude_with_attr_errors_as_false(self):
+        self.init_model()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+                attr_errors = False
+                exclude = ['some_unknown_column']
+
     def test_throws_exception_for_unknown_included_column(self):
         self.init_model()
 
@@ -51,6 +72,15 @@ class TestModelFormConfiguration(ModelFormTestCase):
                 class Meta:
                     model = self.ModelTest
                     include = ['some_unknown_column']
+
+    def test_invalid_include_with_attr_errors_as_false(self):
+        self.init_model()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+                attr_errors = False
+                include = ['some_unknown_column']
 
     def test_throws_exception_for_non_column_fields(self):
         self.init_model()

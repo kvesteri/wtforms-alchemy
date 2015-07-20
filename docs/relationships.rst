@@ -2,7 +2,7 @@ Forms with relations
 ====================
 
 WTForms-Alchemy provides special Field subtypes ModelFormField and ModelFieldList.
-When using these types WTForms-Alchemy undestands model relations and is smart enough to populate related
+When using these types WTForms-Alchemy understands model relations and is smart enough to populate related
 objects accordingly.
 
 One-to-one relations
@@ -73,7 +73,7 @@ with ModelFieldList. ::
         id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
         name = sa.Column(sa.Unicode(255), nullable=True)
 
-        event_id = sa.Column(sa.Integer, sa.ForeignKey(Location.id))
+        event_id = sa.Column(sa.Integer, sa.ForeignKey(Event.id))
         event = sa.orm.relationship(
             Location,
             backref='locations'  # the event needs to have this

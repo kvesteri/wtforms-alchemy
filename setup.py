@@ -5,47 +5,43 @@ WTForms-Alchemy
 Generates WTForms forms from SQLAlchemy models.
 """
 
-from setuptools import setup, Command
-import subprocess
+from setuptools import setup
+import os
+import re
 import sys
 
 
-class PyTest(Command):
-    user_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        errno = subprocess.call(['py.test'])
-        raise SystemExit(errno)
-
-
+HERE = os.path.dirname(os.path.abspath(__file__))
 PY3 = sys.version_info[0] == 3
+
+
+def get_version():
+    filename = os.path.join(HERE, 'wtforms_alchemy', '__init__.py')
+    with open(filename) as f:
+        contents = f.read()
+    pattern = r"^__version__ = '(.*?)'$"
+    return re.search(pattern, contents, re.MULTILINE).group(1)
 
 
 extras_require = {
     'test': [
-        'pytest==2.2.3',
+        'pytest>=2.3',
         'Pygments>=1.2',
         'Jinja2>=2.3',
         'docutils>=0.10',
+        'flake8>=2.4.0',
         'flexmock>=0.9.7',
-        'psycopg2>=2.4.6',
+        'isort>=3.9.6',
+        'natsort==3.5.6',
         'WTForms-Test>=0.1.1'
     ],
     'babel': ['Babel>=1.3'],
     'arrow': ['arrow>=0.3.4'],
-    'phone': [
-        # The phonenumbers library has a split for 2.x and 3.x support.
-        'phonenumbers3k==5.6b1' if PY3 else 'phonenumbers<5.6b1'
-    ],
+    'phone': ['phonenumbers>=5.9.2'],
+    'intervals': ['intervals>=0.2.0'],
     'password': ['passlib >= 1.6, < 2.0'],
     'color': ['colour>=0.0.4'],
-    'i18n': ['SQLAlchemy-i18n >= 0.6.3'],
+    'i18n': ['SQLAlchemy-i18n >= 0.8.2'],
     'ipaddress': ['ipaddr'] if not PY3 else [],
     'timezone': ['python-dateutil']
 }
@@ -59,7 +55,7 @@ for name, requirements in extras_require.items():
 
 setup(
     name='WTForms-Alchemy',
-    version='0.11.0',
+    version=get_version(),
     url='https://github.com/kvesteri/wtforms-alchemy',
     license='BSD',
     author='Konsta Vesterinen',
@@ -73,14 +69,13 @@ setup(
     install_requires=[
         'SQLAlchemy>=0.8.0',
         'WTForms>=1.0.4',
-        'WTForms-Components>=0.8.1',
-        'SQLAlchemy-Utils>=0.19.0',
+        'WTForms-Components>=0.9.2',
+        'SQLAlchemy-Utils>=0.30.0',
         'six>=1.4.1',
         'ordereddict>=1.1'
         if sys.version_info[0] == 2 and sys.version_info[1] < 7 else '',
     ],
     extras_require=extras_require,
-    cmdclass={'test': PyTest},
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',

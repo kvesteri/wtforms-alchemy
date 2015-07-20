@@ -1,11 +1,14 @@
 from datetime import date, time
+
 import sqlalchemy as sa
+from sqlalchemy_utils import IntRangeType
 from wtforms import widgets
-from wtforms_alchemy import ModelForm
-from wtforms_components import DateRange, TimeRange
 from wtforms.fields import StringField
 from wtforms.validators import NumberRange
+from wtforms_components import DateRange, TimeRange
+
 from tests import ModelFormTestCase
+from wtforms_alchemy import ModelForm
 
 
 class TestFieldParameters(ModelFormTestCase):
@@ -32,8 +35,26 @@ class TestFieldParameters(ModelFormTestCase):
         self.init(default=u"test")
         self.assert_default('test_column', "test")
 
-    def test_min_and_max_info_attributes_generate_number_range_validator(self):
+    def test_min_and_max_info_attributes_with_integer_field(self):
         self.init(type_=sa.Integer, info={'min': 1, 'max': 100})
+        validator = self.get_validator('test_column', NumberRange)
+        assert validator.min == 1
+        assert validator.max == 100
+
+    def test_min_and_max_info_attributes_with_numeric_field(self):
+        self.init(type_=sa.Numeric, info={'min': 1, 'max': 100})
+        validator = self.get_validator('test_column', NumberRange)
+        assert validator.min == 1
+        assert validator.max == 100
+
+    def test_min_and_max_info_attributes_with_float_field(self):
+        self.init(type_=sa.Float, info={'min': 1, 'max': 100})
+        validator = self.get_validator('test_column', NumberRange)
+        assert validator.min == 1
+        assert validator.max == 100
+
+    def test_min_and_max_info_attributes_with_int_range_field(self):
+        self.init(type_=IntRangeType, info={'min': 1, 'max': 100})
         validator = self.get_validator('test_column', NumberRange)
         assert validator.min == 1
         assert validator.max == 100

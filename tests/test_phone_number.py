@@ -1,14 +1,12 @@
-from pytest import mark
 import sqlalchemy as sa
-
+from pytest import mark
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils.types import phone_number
-from wtforms_alchemy import ModelForm
 
 from tests import MultiDict
+from wtforms_alchemy import ModelForm
 
 
 class TestCase(object):

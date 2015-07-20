@@ -13,6 +13,7 @@ By default WTForms-Alchemy ModelForm assigns the following validators:
     * TimeRange validator if column is of type Time and info parameter has min or max arguments defined
     * Unique validator if column has a unique index
     * Length validator for String/Unicode columns with max length
+    * Optional validator for all nullable columns
 
 
 Unique validator
@@ -215,3 +216,15 @@ Here is the full list of configuration options you can use to override default v
 * time_range_validator
 
 * optional_validator
+
+
+Disabling validators
+--------------------
+
+You can disable certain validators by assigning them as `None`. Let's say you want to disable nullable columns having `Optional` validator. This can be achieved as follows::
+
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            optional_validator = None

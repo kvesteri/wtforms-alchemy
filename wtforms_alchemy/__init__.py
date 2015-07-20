@@ -1,98 +1,157 @@
-#import pytz
 import six
 import sqlalchemy as sa
 from wtforms import Form
-from wtforms.validators import (
-    InputRequired, DataRequired, NumberRange, Length, Optional
-)
 from wtforms.form import FormMeta
+from wtforms.validators import (
+    DataRequired,
+    InputRequired,
+    Length,
+    NumberRange,
+    Optional,
+    URL
+)
 from wtforms_components import (
     DateRange,
     Email,
-    NumberRangeField,
     PhoneNumberField,
     SelectField,
     SelectMultipleField,
-    Unique,
-    TimeRange
+    TimeRange,
+    Unique
 )
-from .utils import (
-    is_date_column,
-    is_integer_column,
-    is_scalar,
-    null_or_int,
-    null_or_unicode,
-    ClassMap
-)
+
 from .exc import (
     AttributeTypeException,
     InvalidAttributeException,
-    UnknownTypeException,
-    UnknownConfigurationOption
+    UnknownConfigurationOption,
+    UnknownTypeException
 )
-from .fields import ModelFieldList, ModelFormField, OptionalModelFormField
+from .fields import CountryField, ModelFieldList, ModelFormField
 from .generator import FormGenerator
-
+from .utils import (
+    ClassMap,
+    is_date_column,
+    is_scalar,
+    null_or_int,
+    null_or_unicode
+)
 
 __all__ = (
     AttributeTypeException,
+    CountryField,
     DateRange,
     InvalidAttributeException,
     ModelFieldList,
     ModelFormField,
-    OptionalModelFormField,
-    NumberRangeField,
     PhoneNumberField,
     SelectField,
     SelectMultipleField,
     Unique,
     UnknownTypeException,
     is_date_column,
-    is_integer_column,
     is_scalar,
     null_or_int,
     null_or_unicode,
 )
 
 
-__version__ = '0.11.0'
+__version__ = '0.13.3'
 
 
-class ModelFormMeta(FormMeta):
-    """Meta class that overrides WTForms base meta class. The primary purpose
-    of this class is allowing ModelForms use special configuration params under
-    the 'Meta' class namespace.
-
-    ModelForm classes inherit parent's Meta class properties.
+def model_form_meta_factory(base=FormMeta):
     """
-    def __init__(cls, *args, **kwargs):
-        bases = []
-        for class_ in cls.__mro__:
-            if 'Meta' in class_.__dict__:
-                bases.append(getattr(class_, 'Meta'))
+    Create a new class usable as a metaclass for the
+    :func:`model_form_factory`. You only need to concern yourself with this if
+    you desire to have a custom metclass. Otherwise, a default class is
+    created and is used as a metaclass on :func:`model_form_factory`.
 
-        cls.Meta = type('Meta', tuple(bases), {})
+    :param base: The base class to use for the meta class. This is an optional
+                 parameter that defaults to :class:`.FormMeta`. If you want to
+                 provide your own, your class must derive from this class and
+                 not directly from ``type``.
 
-        FormMeta.__init__(cls, *args, **kwargs)
+    :return: A new class suitable as a metaclass for the actual model form.
+             Therefore, it should be passed as the ``meta`` argument to
+             :func:`model_form_factory`.
 
-        if hasattr(cls.Meta, 'model') and cls.Meta.model:
-            generator = cls.Meta.form_generator(cls)
-            generator.create_form(cls)
+    Example usage:
+
+    .. code-block:: python
+
+        from wtforms.form import FormMeta
+
+
+        class MyModelFormMeta(FormMeta):
+            # do some metaclass magic here
+            pass
+
+        ModelFormMeta = model_form_meta_factory(MyModelFormMeta)
+        ModelForm = model_form_factory(meta=ModelFormMeta)
+    """
+
+    class ModelFormMeta(base):
+        """
+        Meta class that overrides WTForms base meta class. The primary purpose
+        of this class is allowing ModelForms use special configuration params
+        under the 'Meta' class namespace.
+
+        ModelForm classes inherit parent's Meta class properties.
+        """
+        def __init__(cls, *args, **kwargs):
+            bases = []
+            for class_ in cls.__mro__:
+                if 'Meta' in class_.__dict__:
+                    bases.append(getattr(class_, 'Meta'))
+
+            if object not in bases:
+                bases.append(object)
+
+            cls.Meta = type('Meta', tuple(bases), {})
+
+            base.__init__(cls, *args, **kwargs)
+
+            if hasattr(cls.Meta, 'model') and cls.Meta.model:
+                generator = cls.Meta.form_generator(cls)
+                generator.create_form(cls)
+    return ModelFormMeta
+
+ModelFormMeta = model_form_meta_factory()
 
 
 def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
-    """Creates new model form, with given base class."""
+    """
+    Create a base class for all model forms to derive from.
+
+    :param base: Class that should be used as a base for the returned class.
+                 By default, this is WTForms's base class
+                 :class:`wtforms.Form`.
+
+    :param meta: A metaclass to use on this class. Normally, you do not need to
+                 provide this value, but if you want, you should check out
+                 :func:`model_form_meta_factory`.
+
+    :return: A class to be used as the base class for all forms that should be
+             connected to a SQLAlchemy model class.
+
+    Additional arguments provided to the form override the default
+    configuration as described in :ref:`custom_base`.
+    """
 
     class ModelForm(six.with_metaclass(meta, base)):
         """
-        A function that returns SQLAlchemy session. This should be
-        assigned if you wish to use Unique validator. If you are using
-        Flask-SQLAlchemy along with WTForms-Alchemy you don't need to
-        set this.
-        """
-        get_session = None
+        Standard base-class for all forms to be combined with a model. Use
+        :func:`model_form_factory` in case you wish to change its behavior.
 
-        class Meta:
+        ``get_session``: If you want to use the Unique validator, you should
+        define this method. If you are using Flask-SQLAlchemy along with
+        WTForms-Alchemy you don't need to set this. If you define this in the
+        superclass, it will not be overriden.
+        """
+
+        if not hasattr(base, 'get_session'):
+            get_session = None
+
+        class Meta(object):
             model = None
 
             default = None
@@ -156,25 +215,36 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             )
 
             #: Default email validator
-            email_validator = Email
+            email_validator = defaults.pop('email_validator', Email)
 
             #: Default length validator
-            length_validator = Length
+            length_validator = defaults.pop('length_validator', Length)
 
             #: Default unique validator
-            unique_validator = Unique
+            unique_validator = defaults.pop('unique_validator', Unique)
 
             #: Default number range validator
-            number_range_validator = NumberRange
+            number_range_validator = defaults.pop(
+                'number_range_validator', NumberRange
+            )
 
             #: Default date range validator
-            date_range_validator = DateRange
+            date_range_validator = defaults.pop(
+                'date_range_validator', DateRange
+            )
 
             #: Default time range validator
-            time_range_validator = TimeRange
+            time_range_validator = defaults.pop(
+                'time_range_validator', TimeRange
+            )
 
             #: Default optional validator
-            optional_validator = Optional
+            optional_validator = defaults.pop(
+                'optional_validator', Optional
+            )
+
+            #: Default URL validator
+            url_validator = defaults.pop('url_validator', URL)
 
             #: Which form generator to use. Only override this if you have a
             #: valid form generator which you want to use instead of the
@@ -199,6 +269,10 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #: type conversion in class level.
             type_map = defaults.pop('type_map', ClassMap())
 
+            #: Whether or not to raise InvalidAttributExceptions when invalid
+            #: attribute names are given for include / exclude or only
+            attr_errors = defaults.pop('attr_errors', True)
+
             #: Additional fields to include in the generated form.
             include = defaults.pop('include', [])
 
@@ -207,11 +281,6 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
 
             #: List of fields to only include in the generated form.
             only = defaults.pop('only', [])
-
-            #: Silently ignore exclude elements which aren't mapped
-            #:
-            #: By Default silently ignores missing elements
-            silent_exclude = defaults.pop('silent_exclude', True)
 
         def __init__(self, *args, **kwargs):
             """Sets object as form attribute."""
@@ -235,13 +304,13 @@ class ModelCreateForm(ModelForm):
 
 
 class ModelUpdateForm(ModelForm):
-    class Meta:
+    class Meta(object):
         all_fields_optional = True
         assign_required = False
 
 
 class ModelSearchForm(ModelForm):
-    class Meta:
+    class Meta(object):
         all_fields_optional = True
         only_indexed_fields = True
         include_primary_keys = True

@@ -1,9 +1,10 @@
-from pytest import raises
 import sqlalchemy as sa
+from pytest import raises
 from sqlalchemy.ext.hybrid import hybrid_property
+
+from tests import ModelFormTestCase
 from wtforms_alchemy import ModelForm
 from wtforms_alchemy.exc import AttributeTypeException
-from tests import ModelFormTestCase
 
 
 class TestHybridProperties(ModelFormTestCase):

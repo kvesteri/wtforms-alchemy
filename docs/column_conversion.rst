@@ -40,15 +40,27 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
     ArrowType                           wtforms_components.fields.DateTimeField
     ChoiceType                          wtforms_components.fields.SelectField
     ColorType                           wtforms_components.fields.ColorField
-    CountryType                         wtforms_components.fields.CountryType
+    CountryType                         wtforms_alchemy.fields.CountryType
     EmailType                           wtforms_components.fields.EmailField
     IPAddressType                       wtforms_components.fields.IPAddressField
-    NumberRangeType                     wtforms_components.fields.NumberRangeField
     PasswordType                        wtforms.fields.PasswordField
     PhoneNumberType                     wtforms_components.fields.PhoneNumberField
     URLType                             wtforms_components.fields.StringField + URL validator
     UUIDType                            wtforms.fields.TextField + UUID validator
+    WeekDaysType                        wtforms_components.fields.WeekDaysField
 ====================================    =================
+
+
+====================================    =================
+ **SQAlchemy-Utils range type**         **Form field**
+------------------------------------    -----------------
+    DateRangeType                       wtforms_components.fields.DateIntervalField
+    DateTimeRangeType                   wtforms_components.fields.DateTimeIntervalField
+    IntRangeType                        wtforms_components.fields.IntIntervalField
+    NumericRangeType                    wtforms_components.fields.DecimalIntervalField
+====================================    =================
+
+
 
 
 Excluded fields
@@ -119,7 +131,7 @@ Now let's say we want to exclude 'description' from the form. This can be achiev
 
     class ArticleForm(Form):
         class Meta:
-            exclude = ['author_id']
+            exclude = ['description']
 
 
 Or as follows (the recommended way):

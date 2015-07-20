@@ -1,13 +1,14 @@
 import sqlalchemy as sa
-from wtforms_alchemy import ModelForm
+
 from tests import ModelFormTestCase
 
 
 class TestModelFormMetaWithInheritance(ModelFormTestCase):
-    def test_skip_unknown_types(self):
+
+    def test_skip_unknown_types(self, model_form_all):
         self.init(type_=sa.Integer)
 
-        class ModelTestForm(ModelForm):
+        class ModelTestForm(model_form_all):
             class Meta:
                 skip_unknown_types = True
 
@@ -16,14 +17,23 @@ class TestModelFormMetaWithInheritance(ModelFormTestCase):
                 model = self.ModelTest
 
         self.form_class = ModelTestForm2
-        assert self.form_class.Meta.skip_unknown_types == True
+        assert self.form_class.Meta.skip_unknown_types is True
+
+    def test_inheritance_attributes(self, model_form_custom):
+        self.init(type_=sa.Integer)
+
+        class ModelTestForm(model_form_custom):
+            class Meta:
+                model = self.ModelTest
+
+        assert ModelTestForm.test_attr == 'SomeVal'
 
 
 class TestUnboundFieldsInitialization(ModelFormTestCase):
-    def test_skip_unknown_types(self):
+    def test_skip_unknown_types(self, model_form_all):
         self.init(type_=sa.Integer)
 
-        class ModelTestForm(ModelForm):
+        class ModelTestForm(model_form_all):
             class Meta:
                 model = self.ModelTest
                 skip_unknown_types = True

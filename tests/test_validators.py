@@ -1,13 +1,19 @@
 from datetime import datetime, time
-from pytest import raises
+
 import sqlalchemy as sa
 from sqlalchemy_utils import EmailType
 from wtforms.validators import (
-    Email, InputRequired, DataRequired, Optional, NumberRange, Length
+    DataRequired,
+    Email,
+    InputRequired,
+    Length,
+    NumberRange,
+    Optional
 )
-from wtforms_alchemy import Unique, ModelForm, ClassMap
-from wtforms_components import TimeRange, DateRange
+from wtforms_components import DateRange, TimeRange
+
 from tests import ModelFormTestCase
+from wtforms_alchemy import ClassMap, ModelForm, Unique
 
 
 class TestAutoAssignedValidators(ModelFormTestCase):
@@ -22,17 +28,6 @@ class TestAutoAssignedValidators(ModelFormTestCase):
     def test_assigns_unique_validator_for_unique_fields(self):
         self.init(unique=True)
         self.assert_has_validator('test_column', Unique)
-
-    def test_raises_exception_if_no_session_set_for_unique_validators(self):
-        class ModelTest(self.base):
-            __tablename__ = 'model_test'
-            id = sa.Column(sa.Integer, primary_key=True)
-            test_column = sa.Column(sa.Unicode(255), unique=True)
-
-        with raises(Exception):
-            class ModelTestForm(ModelForm):
-                class Meta:
-                    model = ModelTest
 
     def test_assigns_non_nullable_fields_as_required(self):
         self.init(nullable=False)
@@ -114,7 +109,7 @@ class TestAutoAssignedValidators(ModelFormTestCase):
         self.init(nullable=False, default=u'default')
         self.assert_not_required('test_column')
 
-    def test_assigns_not_nullable_integers_as_optional(self):
+    def test_assigns_nullable_integers_as_optional(self):
         self.init(sa.Integer, nullable=True)
         self.assert_optional('test_column')
 
@@ -225,6 +220,20 @@ class TestAutoAssignedValidators(ModelFormTestCase):
 
         form = ModelTestForm()
         assert form.test_column.validators[1].message == 'Wrong length'
+
+    def test_override_optional_validator_as_none(self):
+        class ModelTest(self.base):
+            __tablename__ = 'model_test'
+            id = sa.Column(sa.Integer, primary_key=True)
+            test_column = sa.Column(sa.Boolean, nullable=True)
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = ModelTest
+                optional_validator = None
+
+        form = ModelTestForm()
+        assert form.test_column.validators == []
 
     def test_override_unique_validator(self):
         class ModelTest(self.base):

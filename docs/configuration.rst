@@ -29,6 +29,13 @@ The UserForm would contain two fields name and email. ::
 
 **exclude**
 
+.. warning::
+
+    Using ``exclude`` might lead to problems in situations where you add columns to your model
+    and forget to exclude those from the form by using ``exclude``, hence it is recommended to
+    use ``only`` rather than ``exclude``.
+
+
 You can exclude certain fields by adding them to the exclude list. ::
 
     class User(Base):
@@ -44,6 +51,18 @@ You can exclude certain fields by adding them to the exclude list. ::
             include_primary_keys = True
             exclude = ['email']
             # this form contains only 'name' field
+
+
+**only**
+
+Generates a form using only the field names provided in ``only``.
+
+::
+
+    class UserForm(ModelForm):
+        class Meta:
+            model = User
+            only = ['email']
 
 
 **field_args** (default: {})
@@ -219,7 +238,8 @@ In the following example we set `DataRequired` validator for all not nullable En
 
 
     class MyForm(ModelForm):
-        not_null_validator_type_map = ClassMap({sa.Enum: [DataRequired()]})
+        class Meta:
+            not_null_validator_type_map = ClassMap({sa.Enum: [DataRequired()]})
 
 
 
@@ -252,7 +272,10 @@ Let's say we want to convert all unicode typed properties to TextAreaFields inst
             type_map = ClassMap({sa.Unicode: TextAreaField})
 
 
+In case the type_map dictionary values are not inherited from WTForm field class, they are considered callable functions. These functions will be called with the corresponding column as their only parameter.
 
+
+.. _custom_base:
 
 Custom form base class
 ----------------------
@@ -274,7 +297,7 @@ form as a parent form for ModelForm. ::
             model = User
 
 
-You can also pass any form genrerator option to model_form_factory. ::
+You can also pass any form generator option to model_form_factory. ::
 
 
     ModelForm = model_form_factory(Form, strip_string_fields=True)

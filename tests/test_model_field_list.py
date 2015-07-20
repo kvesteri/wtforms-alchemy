@@ -1,8 +1,9 @@
 import sqlalchemy as sa
-from wtforms_alchemy import ModelForm, ModelFieldList
-from wtforms_components import PassiveHiddenField
 from wtforms.fields import FormField
+from wtforms_components import PassiveHiddenField
+
 from tests import FormRelationsTestCase, MultiDict
+from wtforms_alchemy import ModelFieldList, ModelForm
 
 
 class ModelFieldListTestCase(FormRelationsTestCase):
@@ -229,3 +230,27 @@ class TestUpdateStrategy(ModelFieldListTestCase):
         }
         self.save(event, data)
         assert not event.locations
+
+    def test_update_and_remove(self):
+        location = self.Location(
+            name=u'Location #2'
+        )
+        event = self.Event(
+            name=u'Some event',
+            locations=[
+                self.Location(
+                    name=u'Location #1'
+                ),
+                location
+            ]
+        )
+        self.session.add(event)
+        self.session.commit()
+        data = {
+            'locations-0-id': location.id,
+            'locations-0-name': u'Location',
+        }
+        self.save(event, data)
+        self.session.refresh(event)
+        assert len(event.locations) == 1
+        assert event.locations[0] == location

@@ -8,6 +8,9 @@ WTForms-Alchemy works wonderfully with `SQLAlchemy-Defaults`_. When using `SQLAl
 can define your models and model forms with much more robust syntax. For more information see `SQLAlchemy-Defaults`_ documentation.
 
 
+.. _SQLAlchemy-Defaults: https://github.com/kvesteri/sqlalchemy-defaults
+
+
 Example ::
 
     from sqlalchemy_defaults import LazyConfigured
@@ -40,15 +43,23 @@ Using WTForms-Alchemy with Flask-WTF
 
 In order to make WTForms-Alchemy work with `Flask-WTF`_ you need the following snippet:
 
+.. _Flask-WTF: https://github.com/lepture/flask-wtf/
+
 ::
 
 
     from flask.ext.wtf import Form
     from wtforms_alchemy import model_form_factory
+    # The variable db here is a SQLAlchemy object instance from
+    # Flask-SQLAlchemy package
+    from myproject.extensions import db
 
+    BaseModelForm = model_form_factory(Form)
 
-    ModelForm = model_form_factory(Form)
-
+    class ModelForm(BaseModelForm):
+        @classmethod
+        def get_session(self):
+            return db.session
 
 The you can use the ModelForm just like before:
 
@@ -58,4 +69,4 @@ The you can use the ModelForm just like before:
 
     class UserForm(ModelForm):
         class Meta:
-            model User
+            model = User

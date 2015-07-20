@@ -1,67 +1,20 @@
+import operator
+
 import six
+from sqlalchemy_utils import Country, i18n
 from wtforms.fields import FieldList, FormField
-try:
-    from sqlalchemy.orm.util import identity_key
-    has_identity_key = True
-except ImportError:
-    has_identity_key = False
+from wtforms_components import SelectField
+
+from .utils import find_entity
+
 try:
     from wtforms.utils import unset_value as _unset_value
 except ImportError:
     from wtforms.fields import _unset_value
-from .utils import find_entity
 
 
 class SkipOperation(Exception):
     pass
-
-
-def get_pk_from_identity(obj):
-    cls, key = identity_key(instance=obj)
-    return ':'.join(map(six.text_type, key))
-
-
-def labelize(func):
-    if func is None:
-        return lambda x: x
-    elif isinstance(func, six.string_types):
-        return six.operator.attrgetter(func)
-    else:
-        return func
-
-
-class NoneChoice(object):
-    def __iter__(self):
-        yield '__None', None
-
-
-class QueryChoices(object):
-    def __init__(self, query_factory, get_pk=None, get_label=None):
-        if get_pk is None:
-            if not has_identity_key:
-                raise Exception(
-                    'The sqlalchemy identity_key function could not be '
-                    'imported.'
-                )
-            self.get_pk = get_pk_from_identity
-        else:
-            self.get_pk = get_pk
-
-        self.get_label = labelize(get_label)
-        self.query_factory = query_factory
-        self._object_list = None
-
-    def _get_object_list(self):
-        if self._object_list is None:
-            query = self.query_factory()
-            self._object_list = list(
-                (six.text_type(self.get_pk(obj)), obj) for obj in query
-            )
-        return self._object_list
-
-    def __iter__(self):
-        for pk, obj in self._get_object_list():
-            yield pk, obj
 
 
 class ModelFormField(FormField):
@@ -73,27 +26,6 @@ class ModelFormField(FormField):
             except AttributeError:
                 pass
         FormField.populate_obj(self, obj, name)
-
-
-class OptionalModelFormField(ModelFormField):
-    def __init__(self, *args, **kwargs):
-        super(OptionalModelFormField, self).__init__(*args, **kwargs)
-
-        # just here to set is_missing form field val to False
-        self.is_missing = True
-
-    def process(self, formdata, **kwargs):
-        super(OptionalModelFormField, self).process(formdata, **kwargs)
-
-        # check if the prefix is found anywhere
-        prefix = self.name + self.separator
-        self.is_missing = not any(
-            key.startswith(prefix) for key in formdata.keys())
-
-    def populate_obj(self, obj, name):
-        # only create a new sub object if the form field wasn't missing
-        if not self.is_missing:
-            super(OptionalModelFormField, self).populate_obj(obj, name)
 
 
 class ModelFieldList(FieldList):
@@ -165,9 +97,32 @@ class ModelFieldList(FieldList):
                 except AttributeError:
                     pass
         else:
+            coll = getattr(obj, name)
+            entities = []
             for index, entry in enumerate(self.entries):
                 data = entry.data
-                coll = getattr(obj, name)
-                if find_entity(coll, self.model, data) is None:
-                    coll.insert(index, self.model())
+                entity = find_entity(coll, self.model, data)
+                if entity is None:
+                    entities.insert(index, self.model())
+                else:
+                    entities.append(entity)
+            setattr(obj, name, entities)
         FieldList.populate_obj(self, obj, name)
+
+
+class CountryField(SelectField):
+    def __init__(self, *args, **kwargs):
+        kwargs['coerce'] = Country
+        super(CountryField, self).__init__(*args, **kwargs)
+        self.choices = self._get_choices
+
+    def _get_choices(self):
+        # Get all territories and filter out continents (3-digit code)
+        # and some odd territories such as "Unknown or Invalid Region"
+        # ("ZZ"), "European Union" ("QU") and "Outlying Oceania" ("QO").
+        territories = [
+            (code, name)
+            for code, name in six.iteritems(i18n.get_locale().territories)
+            if len(code) == 2 and code not in ('QO', 'QU', 'ZZ')
+        ]
+        return sorted(territories, key=operator.itemgetter(1))
