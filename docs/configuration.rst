@@ -75,7 +75,7 @@ This parameter can be used for overriding field arguments. In the following exam
      class UserForm(ModelForm):
         class Meta:
             model = User
-            field_args = {'email': {'validators': Optional()}}
+            field_args = {'email': {'validators': [Optional()]}}
 
 
 **include_foreign_keys** (default: False)
