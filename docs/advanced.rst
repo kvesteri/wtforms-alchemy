@@ -61,7 +61,7 @@ In order to make WTForms-Alchemy work with `Flask-WTF`_ you need the following s
         def get_session(self):
             return db.session
 
-The you can use the ModelForm just like before:
+Then you can use the ModelForm just like before:
 
 
 ::
