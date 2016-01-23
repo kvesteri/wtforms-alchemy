@@ -599,8 +599,10 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        if ('form_field_class' in column.info
-                and column.info['form_field_class']):
+        if (
+            'form_field_class' in column.info and
+            column.info['form_field_class']
+        ):
             return column.info['form_field_class']
         if 'choices' in column.info and column.info['choices']:
             return SelectField

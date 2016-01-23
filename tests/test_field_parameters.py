@@ -18,7 +18,8 @@ class TestFieldParameters(ModelFormTestCase):
         assert isinstance(form.test_column.widget, widgets.HiddenInput)
 
     def test_accepts_custom_filters(self):
-        test_filter = lambda a: a
+        def test_filter(a):
+            return a
         self.init(info={'filters': [test_filter]})
         form = self.form_class()
         assert test_filter in form.test_column.filters

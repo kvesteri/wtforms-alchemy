@@ -23,6 +23,18 @@ in WTForms-Alchemy.
 .. autoclass:: FormGenerator
     :members:
 
+:mod:`wtforms_alchemy.fields`
+--------------------------------
+
+.. module:: wtforms_alchemy.fields
+
+.. autoclass:: QuerySelectField
+    :members:
+
+.. autoclass:: QuerySelectMultipleField
+    :members:
+
+
 :mod:`wtforms_alchemy.utils`
 ----------------------------
 
