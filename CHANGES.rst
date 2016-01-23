@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.14.0 (2016-01-23)
+^^^^^^^^^^^^^^^^^^^
+
+- Added QuerySelectField and QuerySelectMultipleField which were deprecated from
+WTForms as of version 2.1
+
+
 0.13.3 (2015-06-17)
 ^^^^^^^^^^^^^^^^^^^
 
