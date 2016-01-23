@@ -26,13 +26,13 @@ from .exc import (
     UnknownConfigurationOption,
     UnknownTypeException
 )
-from .fields import (
+from .fields import (  # noqa
     CountryField,
     ModelFieldList,
     ModelFormField,
     QuerySelectField,
     QuerySelectMultipleField
-) # noqa
+)
 from .generator import FormGenerator
 from .utils import (
     ClassMap,

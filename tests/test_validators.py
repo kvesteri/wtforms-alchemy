@@ -119,10 +119,13 @@ class TestAutoAssignedValidators(ModelFormTestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             test_column = sa.Column(EmailType, nullable=True)
 
+        def validator():
+            return Email('Wrong email')
+
         class ModelTestForm(ModelForm):
             class Meta:
                 model = ModelTest
-                email_validator = lambda: Email('Wrong email')
+                email_validator = validator
 
         form = ModelTestForm()
         assert form.test_column.validators[1].message == 'Wrong email'

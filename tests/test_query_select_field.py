@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 from wtforms import Form
-from wtforms.compat import text_type, iteritems
+from wtforms.compat import text_type
+
 from wtforms_alchemy import QuerySelectField, QuerySelectMultipleField
 
 
@@ -22,7 +23,7 @@ class LazySelect(object):
 
 class Base(object):
     def __init__(self, **kwargs):
-        for k, v in iteritems(kwargs):
+        for k, v in kwargs.items():
             setattr(self, k, v)
 
 

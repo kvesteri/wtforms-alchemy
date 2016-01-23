@@ -5,10 +5,9 @@ import operator
 import six
 from sqlalchemy.orm.util import identity_key
 from sqlalchemy_utils import Country, i18n
-from wtforms.fields import FieldList, FormField
 from wtforms import widgets
-from wtforms.compat import text_type, string_types
-from wtforms.fields import SelectFieldBase
+from wtforms.compat import string_types, text_type
+from wtforms.fields import FieldList, FormField, SelectFieldBase
 from wtforms.validators import ValidationError
 from wtforms_components import SelectField
 
