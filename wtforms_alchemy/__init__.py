@@ -28,6 +28,7 @@ from .exc import (
 )
 from .fields import (  # noqa
     CountryField,
+    GroupedQuerySelectField,
     ModelFieldList,
     ModelFormField,
     QuerySelectField,
