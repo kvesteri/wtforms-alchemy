@@ -1,7 +1,7 @@
 from wtforms import Form
 
 from tests import MultiDict
-from wtforms_components import PhoneNumberField
+from wtforms_alchemy import PhoneNumberField
 
 
 class TestPhoneNumberField(object):

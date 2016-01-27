@@ -16,8 +16,7 @@ from wtforms_components import (
     PhoneNumberField,
     SelectField,
     SelectMultipleField,
-    TimeRange,
-    Unique
+    TimeRange
 )
 
 from .exc import (
@@ -31,8 +30,10 @@ from .fields import (  # noqa
     GroupedQuerySelectField,
     ModelFieldList,
     ModelFormField,
+    PhoneNumberField,
     QuerySelectField,
-    QuerySelectMultipleField
+    QuerySelectMultipleField,
+    WeekDaysField
 )
 from .generator import FormGenerator
 from .utils import (
@@ -42,6 +43,7 @@ from .utils import (
     null_or_int,
     null_or_unicode
 )
+from .validators import Unique  # noqa
 
 __all__ = (
     AttributeTypeException,

@@ -28,19 +28,19 @@ from wtforms_components.fields import (
     EmailField,
     IntegerField,
     IntIntervalField,
-    PhoneNumberField,
     StringField,
     TimeField
 )
-from wtforms_components.fields.weekdays import WeekDaysField
 
 from tests import ModelFormTestCase
 from wtforms_alchemy import (
     CountryField,
     ModelForm,
     null_or_unicode,
+    PhoneNumberField,
     SelectField,
-    UnknownTypeException
+    UnknownTypeException,
+    WeekDaysField
 )
 from wtforms_alchemy.utils import ClassMap
 
