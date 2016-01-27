@@ -29,11 +29,9 @@ from wtforms_components import (
     EmailField,
     IntegerField,
     IntIntervalField,
-    PhoneNumberField,
     SelectField,
     StringField,
-    TimeField,
-    WeekDaysField
+    TimeField
 )
 from wtforms_components.widgets import (
     ColorInput,
@@ -51,7 +49,7 @@ from .exc import (
     InvalidAttributeException,
     UnknownTypeException
 )
-from .fields import CountryField
+from .fields import CountryField, PhoneNumberField, WeekDaysField
 from .utils import (
     choice_type_coerce_factory,
     ClassMap,
