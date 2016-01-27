@@ -8,6 +8,7 @@ Here you can see the full list of changes between each WTForms-Alchemy release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Moved GroupedQuerySelectField from WTForms-Components package to WTForms-Alchemy
+- Moved WeekdaysField from WTForms-Components package to WTForms-Alchemy
 
 
 0.14.0 (2016-01-23)

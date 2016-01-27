@@ -6,11 +6,13 @@ from itertools import groupby
 import six
 from sqlalchemy.orm.util import identity_key
 from sqlalchemy_utils import Country, i18n
+from sqlalchemy_utils.primitives import WeekDay, WeekDays
 from wtforms import widgets
 from wtforms.compat import string_types, text_type
 from wtforms.fields import FieldList, FormField, SelectFieldBase
 from wtforms.validators import ValidationError
-from wtforms_components import SelectField
+from wtforms.widgets import CheckboxInput, ListWidget
+from wtforms_components import SelectField, SelectMultipleField
 from wtforms_components.widgets import SelectWidget
 
 from .utils import find_entity
@@ -440,3 +442,27 @@ class GroupedQuerySelectField(SelectField):
                 raise ValidationError('Not a valid choice')
         elif self._formdata or not self.allow_blank:
             raise ValidationError('Not a valid choice')
+
+
+class WeekDaysField(SelectMultipleField):
+    widget = ListWidget(prefix_label=False)
+    option_widget = CheckboxInput()
+
+    def __init__(self, *args, **kwargs):
+        kwargs['coerce'] = lambda x: WeekDay(int(x))
+        super(WeekDaysField, self).__init__(*args, **kwargs)
+        self.choices = self._get_choices
+
+    def _get_choices(self):
+        days = WeekDays('1111111')
+        for day in days:
+            yield day.index, day.get_name(context='stand-alone')
+
+    def process_data(self, value):
+        self.data = WeekDays(value) if value else None
+
+    def process_formdata(self, valuelist):
+        self.data = WeekDays(self.coerce(x) for x in valuelist)
+
+    def pre_validate(self, form):
+        pass
