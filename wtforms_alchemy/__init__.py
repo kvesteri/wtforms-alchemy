@@ -10,14 +10,7 @@ from wtforms.validators import (
     Optional,
     URL
 )
-from wtforms_components import (
-    DateRange,
-    Email,
-    PhoneNumberField,
-    SelectField,
-    SelectMultipleField,
-    TimeRange
-)
+from wtforms_components import DateRange, Email, TimeRange
 
 from .exc import (
     AttributeTypeException,
@@ -53,8 +46,6 @@ __all__ = (
     ModelFieldList,
     ModelFormField,
     PhoneNumberField,
-    SelectField,
-    SelectMultipleField,
     Unique,
     UnknownTypeException,
     is_date_column,
