@@ -1,7 +1,7 @@
 from wtforms import Form
-from wtforms_components import WeekDaysField
 
 from tests import MultiDict
+from wtforms_alchemy import WeekDaysField
 
 
 class TestWeekDaysField(object):

@@ -1,7 +1,8 @@
 from wtforms import Form
+from wtforms_components import SelectField
 
 from tests import MultiDict
-from wtforms_alchemy import null_or_unicode, SelectField
+from wtforms_alchemy import null_or_unicode
 
 
 class TestSelectField(object):

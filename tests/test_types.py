@@ -28,6 +28,7 @@ from wtforms_components.fields import (
     EmailField,
     IntegerField,
     IntIntervalField,
+    SelectField,
     StringField,
     TimeField
 )
@@ -38,7 +39,6 @@ from wtforms_alchemy import (
     ModelForm,
     null_or_unicode,
     PhoneNumberField,
-    SelectField,
     UnknownTypeException,
     WeekDaysField
 )
