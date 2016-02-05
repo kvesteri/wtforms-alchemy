@@ -7,7 +7,8 @@ from decimal import Decimal
 
 import six
 import sqlalchemy as sa
-from sqlalchemy.orm.properties import ColumnProperty
+from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
+from sqlalchemy.orm.interfaces import ONETOMANY, MANYTOONE, MANYTOMANY
 from sqlalchemy_utils import types
 from wtforms import (
     BooleanField,
@@ -49,7 +50,14 @@ from .exc import (
     InvalidAttributeException,
     UnknownTypeException
 )
-from .fields import CountryField, PhoneNumberField, WeekDaysField
+from .fields import (
+    CountryField,
+    PhoneNumberField,
+    WeekDaysField,
+    QuerySelectField,
+    QuerySelectMultipleField
+)
+
 from .utils import (
     choice_type_coerce_factory,
     ClassMap,
@@ -105,6 +113,12 @@ class FormGenerator(object):
         (types.WeekDaysType, WeekDaysField),
     ))
 
+    RELATIONSHIP_MAP = {
+        MANYTOONE: QuerySelectField,
+        ONETOMANY: QuerySelectMultipleField,
+        MANYTOMANY: QuerySelectMultipleField
+    }
+
     WIDGET_MAP = OrderedDict((
         (BooleanField, CheckboxInput),
         (ColorField, ColorInput),
@@ -131,6 +145,7 @@ class FormGenerator(object):
         self.model_class = self.form_class.Meta.model
         self.meta = self.form_class.Meta
         self.TYPE_MAP.update(self.form_class.Meta.type_map)
+        self.RELATIONSHIP_MAP.update(self.form_class.Meta.relationship_map)
 
     def create_form(self, form):
         """
@@ -140,11 +155,12 @@ class FormGenerator(object):
         """
         attrs = OrderedDict()
         for key, property_ in sa.inspect(self.model_class).attrs.items():
-            if not isinstance(property_, ColumnProperty):
-                continue
-            if self.skip_column_property(property_):
-                continue
-            attrs[key] = property_
+            if (isinstance(property_, ColumnProperty) and
+                    not self.skip_column_property(property_)):
+                attrs[key] = property_
+            if (isinstance(property_, RelationshipProperty) and
+                    not self.skip_relationship_property(property_)):
+                attrs[key] = property_
 
         for attr in translated_attributes(self.model_class):
             attrs[attr.key] = attr.property
@@ -220,14 +236,18 @@ class FormGenerator(object):
         :param attributes: model attributes to generate the form fields from
         """
         for key, prop in properties.items():
-            column = prop.columns[0]
-            try:
-                field = self.create_field(prop, column)
-            except UnknownTypeException:
-                if not self.meta.skip_unknown_types:
-                    raise
-                else:
-                    continue
+            if isinstance(prop, ColumnProperty):
+                column = prop.columns[0]
+                try:
+                    field = self.create_field(prop, column)
+                except UnknownTypeException:
+                    if not self.meta.skip_unknown_types:
+                        raise
+                    else:
+                        continue
+
+            if isinstance(prop, RelationshipProperty):
+                field = self.create_relation_field(prop)
 
             if not hasattr(form, key):
                 setattr(form, key, field)
@@ -242,6 +262,21 @@ class FormGenerator(object):
             return True
 
         return self.skip_column(column_property.columns[0])
+
+    def skip_relationship_property(self, relationship_property):
+        """
+        Whether or not to skip relationship property in the generation process.
+
+        :param realtionship_property: SQLAlchemy RelationshipProperty object
+        """
+        if not self.meta.include_relationships:
+            return True
+
+        # For now only handle one local column relationships
+        if len(relationship_property.local_columns) != 1:
+            return True
+
+        return False
 
     def skip_column(self, column):
         """
@@ -307,6 +342,46 @@ class FormGenerator(object):
         if issubclass(field_class, DecimalField):
             if hasattr(column.type, 'scale'):
                 kwargs['places'] = column.type.scale
+        field = field_class(**kwargs)
+        return field
+
+    def create_relation_field(self, prop):
+        """
+        Create form field for given relation.
+
+        :param prop: SQLAlchemy RelationshipProperty object.
+        """
+        kwargs = {}
+        field_class = self.get_relation_field_class(prop)
+
+        # In one to many we have a column with attributes
+        if prop.direction == ONETOMANY:
+            column = list(prop.local_columns)[0]
+            # and so we check if this column is nullable
+            required_validator = self.required_validator(column)
+            kwargs['validators'] = [required_validator]
+            # If optional allow blank on query select fields
+            if isinstance(
+                    required_validator, type(self.get_validator('optional'))):
+                kwargs.setdefault('allow_blank', True)
+
+        kwargs.update(self.type_agnostic_parameters(prop.key, prop))
+
+        kwarg_props = [
+            'query', 'query_factory', 'get_pk', 'get_label', 'allow_blank',
+            'blank_text'
+        ]
+
+        for kwarg_prop in kwarg_props:
+            if prop.info.get(kwarg_prop):
+                kwargs[kwarg_prop] = prop.info[kwarg_prop]
+
+        if not kwargs.get('query') and not kwargs.get('query_factory'):
+            remote_class = self.get_declarative_class(prop.table.fullname)
+            kwargs['query_factory'] = lambda: remote_class.query.all()
+
+        if prop.key in self.meta.field_args:
+            kwargs.update(self.meta.field_args[prop.key])
         field = field_class(**kwargs)
         return field
 
@@ -621,3 +696,28 @@ class FormGenerator(object):
                 return column_type(column)
         except KeyError:
             raise UnknownTypeException(column)
+
+    def get_relation_field_class(self, prop):
+        """
+        Returns WTForms field class. Class is based on a custom field class
+        attribute or relationship direction.
+
+        :param prop: SQLAlchemy RelationshipProperty object
+        """
+        if (
+            'form_field_class' in prop.info and
+            prop.info['form_field_class']
+        ):
+            return prop.info['form_field_class']
+
+        return self.RELATIONSHIP_MAP.get(prop.direction)
+
+    def get_declarative_class(self, tablename):
+        """Return declarative class from table name
+
+        :param tablename: String with name of table.
+        :return: Class reference or None.
+        """
+        for c in self.model_class._decl_class_registry.values():
+            if hasattr(c, '__table__') and c.__table__.fullname == tablename:
+                return c
