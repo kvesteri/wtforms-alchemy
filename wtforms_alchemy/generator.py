@@ -6,7 +6,6 @@ import inspect
 from decimal import Decimal
 
 import six
-
 import sqlalchemy as sa
 from sqlalchemy.orm.interfaces import MANYTOMANY, MANYTOONE, ONETOMANY
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
