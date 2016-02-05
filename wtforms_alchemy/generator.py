@@ -7,8 +7,8 @@ from decimal import Decimal
 
 import six
 import sqlalchemy as sa
+from sqlalchemy.orm.interfaces import MANYTOMANY, MANYTOONE, ONETOMANY
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
-from sqlalchemy.orm.interfaces import ONETOMANY, MANYTOONE, MANYTOMANY
 from sqlalchemy_utils import types
 from wtforms import (
     BooleanField,
@@ -53,9 +53,9 @@ from .exc import (
 from .fields import (
     CountryField,
     PhoneNumberField,
-    WeekDaysField,
     QuerySelectField,
-    QuerySelectMultipleField
+    QuerySelectMultipleField,
+    WeekDaysField
 )
 
 from .utils import (
