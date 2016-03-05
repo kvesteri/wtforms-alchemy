@@ -7,6 +7,7 @@ from decimal import Decimal
 
 import six
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy_utils import types
 from wtforms import (
@@ -88,6 +89,8 @@ class FormGenerator(object):
         (sa.types.Unicode, StringField),
         (sa.types.String, StringField),
         (sa.types.Time, TimeField),
+        (postgresql.ARRAY, DecimalField),
+        (postgresql.JSON, DecimalField),
         (types.ArrowType, DateTimeField),
         (types.ChoiceType, SelectField),
         (types.ColorType, ColorField),
