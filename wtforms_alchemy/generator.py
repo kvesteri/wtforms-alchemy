@@ -7,7 +7,6 @@ from decimal import Decimal
 
 import six
 import sqlalchemy as sa
-from sqlalchemy.orm.interfaces import MANYTOMANY, MANYTOONE, ONETOMANY
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
 from sqlalchemy_utils import types
 from wtforms import (
@@ -113,9 +112,10 @@ class FormGenerator(object):
     ))
 
     RELATIONSHIP_MAP = {
-        MANYTOONE: QuerySelectField,
-        ONETOMANY: QuerySelectMultipleField,
-        MANYTOMANY: QuerySelectMultipleField
+        'ONETOONE':  QuerySelectField,
+        'MANYTOONE': QuerySelectField,
+        'ONETOMANY': QuerySelectMultipleField,
+        'MANYTOMANY': QuerySelectMultipleField
     }
 
     WIDGET_MAP = OrderedDict((
@@ -354,7 +354,7 @@ class FormGenerator(object):
         field_class = self.get_relation_field_class(prop)
 
         # In one to many we have a column with attributes
-        if prop.direction == ONETOMANY:
+        if prop.direction.name == 'ONETOMANY':
             column = list(prop.local_columns)[0]
             # and so we check if this column is nullable
             required_validator = self.required_validator(column)
@@ -709,7 +709,14 @@ class FormGenerator(object):
         ):
             return prop.info['form_field_class']
 
-        return self.RELATIONSHIP_MAP.get(prop.direction)
+        direction = prop.direction.name
+        if not prop.uselist:
+            if direction == 'ONETOMANY':
+                direction = 'ONETOONE'
+            elif direction == 'MANYTOMANY':
+                direction = 'MANYTOONE'
+
+        return self.RELATIONSHIP_MAP.get(direction)
 
     def get_declarative_class(self, tablename):
         """Return declarative class from table name
