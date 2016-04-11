@@ -1,7 +1,8 @@
+import pytest
 from wtforms import Form
 
 from tests import MultiDict
-from wtforms_alchemy import PhoneNumberField
+from wtforms_alchemy import DataRequired, PhoneNumberField
 
 
 class TestPhoneNumberField(object):
@@ -79,3 +80,31 @@ class TestPhoneNumberField(object):
         form = form_class(MultiDict(phone_number='invalid'))
         form.validate()
         assert 'value="invalid"' in form.phone_number()
+
+    @pytest.mark.parametrize(
+        'number,error_msg,check_value',
+        (
+            ('', 'This field is required.', lambda v, orig: v is None),
+            ('1', 'Not a valid phone number value', lambda v, orig: v is not None),
+            ('123', 'Not a valid phone number value', lambda v, orig: v is not None),
+            ('+46123456789', None, lambda v, orig: v.e164 == orig),
+        )
+    )
+    def test_required_phone_number_form(self, number, error_msg, check_value):
+
+        class PhoneNumberForm(Form):
+            phone = PhoneNumberField(
+                'Phone number',
+                validators=[DataRequired()]
+            )
+
+        form = PhoneNumberForm(MultiDict(
+            phone=number
+        ))
+        form.validate()
+        if error_msg:
+            assert len(form.errors) == 1
+            assert form.errors['phone'][0] == error_msg
+        else:
+            assert len(form.errors) == 0
+        assert check_value(form.phone.data, number) is True
