@@ -152,19 +152,23 @@ class FormGenerator(object):
 
         :param form: ModelForm instance
         """
-        attrs = OrderedDict()
+        column_attrs = OrderedDict()
+        relationship_attrs = OrderedDict()
+
         for key, property_ in sa.inspect(self.model_class).attrs.items():
             if (isinstance(property_, ColumnProperty) and
                     not self.skip_column_property(property_)):
-                attrs[key] = property_
+                column_attrs[key] = property_
             if (isinstance(property_, RelationshipProperty) and
                     not self.skip_relationship_property(property_)):
-                attrs[key] = property_
+                relationship_attrs[key] = property_
 
         for attr in translated_attributes(self.model_class):
-            attrs[attr.key] = attr.property
+            column_attrs[attr.key] = attr.property
 
-        return self.create_fields(form, self.filter_attributes(attrs))
+        return self.create_fields(form, self.filter_attributes(
+            OrderedDict(list(column_attrs.items()) +
+                        list(relationship_attrs.items()))))
 
     def filter_attributes(self, attrs):
         """
