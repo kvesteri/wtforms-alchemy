@@ -84,14 +84,29 @@ class TestPhoneNumberField(object):
     @pytest.mark.parametrize(
         'number,error_msg,check_value',
         (
-            ('', 'This field is required.', lambda v, orig: v is None),
-            ('1', 'Not a valid phone number value', lambda v, orig: v is not None),
-            ('123', 'Not a valid phone number value', lambda v, orig: v is not None),
-            ('+46123456789', None, lambda v, orig: v.e164 == orig),
+            (
+                '',
+                'This field is required.',
+                lambda v, orig: v is None
+            ),
+            (
+                '1',
+                'Not a valid phone number value',
+                lambda v, orig: v is not None
+            ),
+            (
+                '123',
+                'Not a valid phone number value',
+                lambda v, orig: v is not None
+            ),
+            (
+                '+46123456789',
+                None,
+                lambda v, orig: v.e164 == orig
+            ),
         )
     )
     def test_required_phone_number_form(self, number, error_msg, check_value):
-
         class PhoneNumberForm(Form):
             phone = PhoneNumberField(
                 'Phone number',
