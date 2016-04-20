@@ -493,12 +493,13 @@ class PhoneNumberField(StringField):
         self.display_format = display_format
 
     def _value(self):
-        # self.data holds a PhoneNumber object, use it before falling back
-        # to self.rawdata which holds a string
+        # self.data holds a PhoneNumber object if the form is valid,
+        # otherwise it will contain a string.
         if self.data:
-            return getattr(self.data, self.display_format)
-        elif self.raw_data:
-            return self.raw_data[0]
+            try:
+                return getattr(self.data, self.display_format)
+            except AttributeError:
+                return self.data
         else:
             return u''
 
@@ -509,14 +510,13 @@ class PhoneNumberField(StringField):
             if valuelist[0] == u'':
                 self.data = None
             else:
+                self.data = valuelist[0]
                 try:
                     self.data = PhoneNumber(
                         valuelist[0],
                         self.country_code
                     )
                     if not self.data.is_valid_number():
-                        self.data = None
                         raise ValueError(self.gettext(self.error_msg))
                 except phonenumbers.phonenumberutil.NumberParseException:
-                    self.data = None
                     raise ValueError(self.gettext(self.error_msg))
