@@ -358,7 +358,7 @@ class FormGenerator(object):
         field_class = self.get_relation_field_class(prop)
 
         # In one to many we have a column with attributes
-        if prop.direction.name == 'ONETOMANY':
+        if prop.direction.name == 'MANYTOONE':
             column = list(prop.local_columns)[0]
             # and so we check if this column is nullable
             required_validator = self.required_validator(column)
