@@ -29,39 +29,39 @@ class TestPhoneNumberField(object):
         return TestForm
 
     def test_valid_phone_numbers(self):
-        form_class = self.init_form(country_code='FI')
+        form_class = self.init_form(region='FI')
         for phone_number in self.valid_phone_numbers:
             form = form_class(MultiDict(phone_number=phone_number))
             form.validate()
             assert len(form.errors) == 0
 
     def test_invalid_phone_numbers(self):
-        form_class = self.init_form(country_code='FI')
+        form_class = self.init_form(region='FI')
         for phone_number in self.invalid_phone_numbers:
             form = form_class(MultiDict(phone_number=phone_number))
             form.validate()
             assert len(form.errors['phone_number']) == 1
 
     def test_render_empty_phone_number_value(self):
-        form_class = self.init_form(country_code='FI')
+        form_class = self.init_form(region='FI')
         form = form_class(MultiDict(phone_number=''))
         assert 'value=""' in form.phone_number()
 
     def test_empty_phone_number_value_passed_as_none(self):
-        form_class = self.init_form(country_code='FI')
+        form_class = self.init_form(region='FI')
         form = form_class(MultiDict(phone_number=''))
         form.validate()
         assert len(form.errors) == 0
         assert form.data['phone_number'] is None
 
     def test_default_display_format(self):
-        form_class = self.init_form(country_code='FI')
+        form_class = self.init_form(region='FI')
         form = form_class(MultiDict(phone_number='+358401234567'))
         assert 'value="040 1234567"' in form.phone_number()
 
     def test_international_display_format(self):
         form_class = self.init_form(
-            country_code='FI',
+            region='FI',
             display_format='international'
         )
         form = form_class(MultiDict(phone_number='0401234567'))
@@ -69,7 +69,7 @@ class TestPhoneNumberField(object):
 
     def test_e164_display_format(self):
         form_class = self.init_form(
-            country_code='FI',
+            region='FI',
             display_format='e164'
         )
         form = form_class(MultiDict(phone_number='0401234567'))

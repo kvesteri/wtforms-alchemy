@@ -190,9 +190,9 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
     @mark.xfail('phone_number.phonenumbers is None')
     def test_phone_number_country_code_passed_to_field(self):
-        self.init(type_=PhoneNumberType(country_code='SE'))
+        self.init(type_=PhoneNumberType(region='SE'))
         form = self.form_class()
-        assert form.test_column.country_code == 'SE'
+        assert form.test_column.region == 'SE'
 
     @mark.xfail('phone_number.phonenumbers is None')
     def test_phone_number_type_has_no_length_validation(self):
