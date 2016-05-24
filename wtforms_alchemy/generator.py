@@ -455,8 +455,8 @@ class FormGenerator(object):
         if date_format:
             kwargs['format'] = date_format
 
-        if hasattr(column.type, 'country_code'):
-            kwargs['country_code'] = column.type.country_code
+        if hasattr(column.type, 'region'):
+            kwargs['region'] = column.type.region
 
         kwargs['widget'] = self.widget(column)
         return kwargs

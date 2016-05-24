@@ -67,13 +67,11 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'SQLAlchemy>=0.8.0',
+        'SQLAlchemy>=1.0',
         'WTForms>=1.0.4',
         'WTForms-Components>=0.9.2',
-        'SQLAlchemy-Utils>=0.30.0',
+        'SQLAlchemy-Utils>=0.32.6',
         'six>=1.4.1',
-        'ordereddict>=1.1'
-        if sys.version_info[0] == 2 and sys.version_info[1] < 7 else '',
     ],
     extras_require=extras_require,
     classifiers=[
