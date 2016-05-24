@@ -275,10 +275,6 @@ class FormGenerator(object):
         if not self.meta.include_relationships:
             return True
 
-        # For now only handle one local column relationships
-        if len(relationship_property.local_columns) != 1:
-            return True
-
         return False
 
     def skip_column(self, column):
@@ -355,18 +351,24 @@ class FormGenerator(object):
         :param prop: SQLAlchemy RelationshipProperty object.
         """
         kwargs = {}
-        field_class = self.get_relation_field_class(prop)
+        field_class, direction = self.get_relation_field_class(prop)
 
+        optional = False
         # In one to many we have a column with attributes
-        if prop.direction.name == 'MANYTOONE':
+        if direction == 'MANYTOONE':
             column = list(prop.local_columns)[0]
             # and so we check if this column is nullable
-            required_validator = self.required_validator(column)
-            kwargs['validators'] = [required_validator]
+            required_validator = self.required_validator(column),
+            kwargs['validators'] = flatten([
+                v for v in required_validator if v is not None])
             # If optional allow blank on query select fields
-            if isinstance(
-                    required_validator, type(self.get_validator('optional'))):
-                kwargs.setdefault('allow_blank', True)
+            optional = any(
+                isinstance(
+                    validator, type(self.get_validator('optional')))
+                for validator in kwargs['validators'])
+
+        if direction == 'ONETOONE' or optional:
+            kwargs.setdefault('allow_blank', True)
 
         kwargs.update(self.type_agnostic_parameters(prop.key, prop))
 
@@ -385,6 +387,7 @@ class FormGenerator(object):
 
         if prop.key in self.meta.field_args:
             kwargs.update(self.meta.field_args[prop.key])
+
         field = field_class(**kwargs)
         return field
 
@@ -720,7 +723,7 @@ class FormGenerator(object):
             elif direction == 'MANYTOMANY':
                 direction = 'MANYTOONE'
 
-        return self.RELATIONSHIP_MAP.get(direction)
+        return self.RELATIONSHIP_MAP.get(direction), direction
 
     def get_declarative_class(self, tablename):
         """Return declarative class from table name
