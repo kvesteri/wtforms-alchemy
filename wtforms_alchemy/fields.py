@@ -196,7 +196,8 @@ class CountryField(SelectField):
         super(CountryField, self).__init__(*args, **kwargs)
         self.choices = self._get_choices
 
-    def _get_choices(self):
+    @staticmethod
+    def _get_choices():
         # Get all territories and filter out continents (3-digit code)
         # and some odd territories such as "Unknown or Invalid Region"
         # ("ZZ"), "European Union" ("QU") and "Outlying Oceania" ("QO").
