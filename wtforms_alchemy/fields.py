@@ -5,7 +5,7 @@ from itertools import groupby
 
 import six
 from sqlalchemy.orm.util import identity_key
-from sqlalchemy_utils import Country, i18n, PhoneNumber
+from sqlalchemy_utils import Country, i18n, PhoneNumber, Currency
 from sqlalchemy_utils.primitives import WeekDay, WeekDays
 from wtforms import widgets
 from wtforms.compat import string_types, text_type
@@ -22,6 +22,22 @@ try:
     from wtforms.utils import unset_value as _unset_value
 except ImportError:
     from wtforms.fields import _unset_value
+
+
+class CurrencyField(SelectField):
+    def __init__(self, *args, **kwargs):
+        kwargs['coerce'] = Currency
+        kwargs['choices'] = self._get_choices
+        super(CurrencyField, self).__init__(*args, **kwargs)
+
+    @staticmethod
+    def _get_choices():
+        currencies = [
+            (code, name)
+            for code, name in six.iteritems(i18n.get_locale().currencies)
+            if 3 == len(code)
+            ]
+        return sorted(currencies, key=operator.itemgetter(1))
 
 
 class SkipOperation(Exception):
