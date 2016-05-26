@@ -118,6 +118,17 @@ class TestModelFormConfiguration(ModelFormTestCase):
         form = ModelTestForm()
         assert len(form._fields) == 1
 
+    def test_empty_only_attribute(self):
+        self.init()
+
+        class ModelTestForm(ModelForm):
+            class Meta:
+                model = self.ModelTest
+                only = []
+
+        form = ModelTestForm()
+        assert len(form._fields) == 0
+
     def test_supports_field_overriding(self):
         self.init()
 

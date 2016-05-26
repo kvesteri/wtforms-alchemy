@@ -158,7 +158,7 @@ class FormGenerator(object):
 
         :param attrs: Set of attributes
         """
-        if self.meta.only:
+        if self.meta.only is not None:
             attrs = OrderedDict([
                 (key, prop)
                 for key, prop in map(self.validate_attribute, self.meta.only)
