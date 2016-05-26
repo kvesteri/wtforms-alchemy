@@ -266,7 +266,7 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             exclude = defaults.pop("exclude", [])
 
             #: List of fields to only include in the generated form.
-            only = defaults.pop("only", [])
+            only = defaults.pop("only", None)
 
         def __init__(self, *args, **kwargs):
             """Sets object as form attribute."""
