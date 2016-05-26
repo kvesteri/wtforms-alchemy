@@ -3,6 +3,11 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
+0.19.1 (2025-08-11)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed issue where empty list was ignored for the ``only`` meta parameter of ``ModelForm``.
+
 0.19.0 (2024-11-18)
 ^^^^^^^^^^^^^^^^^^^
 
