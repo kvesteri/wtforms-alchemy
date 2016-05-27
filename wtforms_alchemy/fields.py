@@ -515,9 +515,16 @@ class GroupedQuerySelectField(SelectField):
             raise ValidationError('Not a valid choice')
 
 
+class WeekDaysInput(CheckboxInput):
+    def __call__(self, field, **kwargs):
+        if WeekDay(field.data) in field.checked[1]:
+            kwargs['checked'] = True
+        return super(CheckboxInput, self).__call__(field, **kwargs)
+
+
 class WeekDaysField(SelectMultipleField):
     widget = ListWidget(prefix_label=False)
-    option_widget = CheckboxInput()
+    option_widget = WeekDaysInput()
 
     def __init__(self, *args, **kwargs):
         kwargs['coerce'] = lambda x: WeekDay(int(x))
