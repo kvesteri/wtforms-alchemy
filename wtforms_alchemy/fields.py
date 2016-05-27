@@ -517,7 +517,7 @@ class GroupedQuerySelectField(SelectField):
 
 class WeekDaysInput(CheckboxInput):
     def __call__(self, field, **kwargs):
-        if WeekDay(field.data) in field.checked[1]:
+        if field.checked[1] and WeekDay(field.data) in field.checked[1]:
             kwargs['checked'] = True
         return super(CheckboxInput, self).__call__(field, **kwargs)
 
