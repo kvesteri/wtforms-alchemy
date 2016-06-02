@@ -9,7 +9,7 @@ Tools for creating WTForms forms from SQLAlchemy models
 Resources
 ---------
 
-- `Documentation <http://wtforms-alchemy.readthedocs.org/>`_
+- `Documentation <https://wtforms-alchemy.readthedocs.io/>`_
 - `Issue Tracker <http://github.com/kvesteri/wtforms-alchemy/issues>`_
 - `Code <http://github.com/kvesteri/wtforms-alchemy/>`_
 
