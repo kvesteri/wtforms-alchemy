@@ -25,7 +25,7 @@ based forms. Strongly influenced by Django ModelForm.
 
 
 
-.. _`SQLAlchemy-Utils ChoiceType`: http://sqlalchemy-utils.readthedocs.org/en/latest/#choicetype
-.. _`SQLAlchemy-Defaults`: https://sqlalchemy-defaults.readthedocs.org/en/latest/
-.. _`Flask-WTF`: https://flask-wtf.readthedocs.org/en/latest/
+.. _`SQLAlchemy-Utils ChoiceType`: https://sqlalchemy-utils.readthedocs.io/en/latest/#choicetype
+.. _`SQLAlchemy-Defaults`: https://sqlalchemy-defaults.readthedocs.io/en/latest/
+.. _`Flask-WTF`: https://flask-wtf.readthedocs.io/en/latest/
 
