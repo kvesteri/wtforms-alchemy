@@ -33,7 +33,7 @@ extras_require = {
         'flexmock>=0.9.7',
         'isort>=3.9.6',
         'natsort==3.5.6',
-        'WTForms-Test>=0.1.1'
+        'WTForms-Test>=0.1.1',
     ],
     'babel': ['Babel>=1.3'],
     'arrow': ['arrow>=0.3.4'],
@@ -43,7 +43,7 @@ extras_require = {
     'color': ['colour>=0.0.4'],
     'i18n': ['SQLAlchemy-i18n >= 0.8.2'],
     'ipaddress': ['ipaddr'] if not PY3 else [],
-    'timezone': ['python-dateutil']
+    'timezone': ['python-dateutil', 'pytz', 'datetime']
 }
 
 
@@ -72,6 +72,7 @@ setup(
         'WTForms-Components>=0.9.2',
         'SQLAlchemy-Utils>=0.32.6',
         'six>=1.4.1',
+        'operator'
     ],
     extras_require=extras_require,
     classifiers=[

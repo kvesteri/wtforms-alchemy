@@ -4,8 +4,10 @@ import operator
 from itertools import groupby
 
 import six
+import pytz
+import datetime
 from sqlalchemy.orm.util import identity_key
-from sqlalchemy_utils import Country, i18n, PhoneNumber
+from sqlalchemy_utils import Country, i18n, PhoneNumber, Currency
 from sqlalchemy_utils.primitives import WeekDay, WeekDays
 from wtforms import widgets
 from wtforms.compat import string_types, text_type
@@ -22,6 +24,73 @@ try:
     from wtforms.utils import unset_value as _unset_value
 except ImportError:
     from wtforms.fields import _unset_value
+
+
+class TimezoneField(SelectField):
+    """A simple select field that handles pytz to Olson TZ name conversions.
+    """
+
+    def __init__(self, label=None, validators=None, **kwargs):
+        super(TimezoneField, self).__init__(label, validators,
+                                            coerce=self.coerce_timezone,
+                                            choices=self.timezone_choices(),
+                                            default='UTC', **kwargs)
+
+    def pre_validate(self, form):
+        for v, _ in self.choices:
+            if self.data and self.data.zone == v:
+                break
+        else:
+            raise ValueError(self.gettext(u'Not a valid choice'))
+
+    @staticmethod
+    def coerce_timezone(value):
+        if value is None or value == pytz.utc or isinstance(value, (pytz.tzfile.DstTzInfo, pytz.tzfile.StaticTzInfo)):
+            return value
+        else:
+            try:
+                return pytz.timezone(value)
+            except (ValueError, pytz.UnknownTimeZoneError):
+                # ValueError is recognised by SelectField.process_formdata()
+                raise ValueError(u'Not a timezone')
+
+    @staticmethod
+    def timezone_choices():
+        """Helper that generates a list of timezones sorted by ascending UTC offset. The timezones are represented as
+            tuple pairs of timezone name and a string representation of the current UTC offset.
+        """
+        # TODO: Perfect for caching; the list is unlikely to change more than hourly.
+        tzs = []
+        now = datetime.utcnow().replace(tzinfo=pytz.utc)
+        for tz_name in pytz.common_timezones:
+            local_now = now.astimezone(pytz.timezone(tz_name))
+
+            # The real seconds help us sort the TZ list
+            offset = local_now.utcoffset()
+            offset_real_secs = offset.seconds + offset.days * 24 * 60 ** 2
+
+            offset_txt = local_now.strftime(
+                '(UTC %z) [%a %H:%M] {0}').format(tz_name)
+            tzs.append((offset_real_secs, tz_name, offset_txt))
+
+        tzs.sort()
+        return [tz[1:] for tz in tzs]
+
+
+class CurrencyField(SelectField):
+    def __init__(self, *args, **kwargs):
+        kwargs['coerce'] = Currency
+        kwargs['choices'] = self._get_choices
+        super(CurrencyField, self).__init__(*args, **kwargs)
+
+    @staticmethod
+    def _get_choices():
+        currencies = [
+            (code, name)
+            for code, name in six.iteritems(i18n.get_locale().currencies)
+            if 3 == len(code)
+            ]
+        return sorted(currencies, key=operator.itemgetter(1))
 
 
 class SkipOperation(Exception):
@@ -127,7 +196,8 @@ class CountryField(SelectField):
         super(CountryField, self).__init__(*args, **kwargs)
         self.choices = self._get_choices
 
-    def _get_choices(self):
+    @staticmethod
+    def _get_choices():
         # Get all territories and filter out continents (3-digit code)
         # and some odd territories such as "Unknown or Invalid Region"
         # ("ZZ"), "European Union" ("QU") and "Outlying Oceania" ("QO").
@@ -445,9 +515,16 @@ class GroupedQuerySelectField(SelectField):
             raise ValidationError('Not a valid choice')
 
 
+class WeekDaysInput(CheckboxInput):
+    def __call__(self, field, **kwargs):
+        if field.checked[1] and WeekDay(field.data) in field.checked[1]:
+            kwargs['checked'] = True
+        return super(CheckboxInput, self).__call__(field, **kwargs)
+
+
 class WeekDaysField(SelectMultipleField):
     widget = ListWidget(prefix_label=False)
-    option_widget = CheckboxInput()
+    option_widget = WeekDaysInput()
 
     def __init__(self, *args, **kwargs):
         kwargs['coerce'] = lambda x: WeekDay(int(x))
