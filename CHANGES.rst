@@ -4,6 +4,20 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.16.1 (2016-05-11)
+^^^^^^^^^^^^^^^^^^^
+
+- Updated SQLAlchemy-Utils requirement to 0.32.6
+- Fixed PhoneNumberType conversion (#102)
+
+
+0.16.0 (2016-04-20)
+^^^^^^^^^^^^^^^^^^^
+
+- Dropped python 2.6 support
+- Made PhoneNumberField work correctly together with DataRequired (#101, pull request courtesy of jmagnusson)
+
+
 0.15.0 (2016-01-27)
 ^^^^^^^^^^^^^^^^^^^
 
