@@ -325,6 +325,9 @@ class ModelSearchForm(ModelForm):
 class ModelOrderedForm(ModelForm):
     """
         Uses field_order attribute to determine position in new field order.
+
+        Example
+        -------
         nav_metadata = MetaData()
         Base = declarative_base(metadata=metadata)
 
