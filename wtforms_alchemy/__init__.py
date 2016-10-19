@@ -1,5 +1,11 @@
 import six
 import sqlalchemy as sa
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
+
 from wtforms import Form
 from wtforms.form import FormMeta
 from wtforms.validators import (
@@ -314,3 +320,37 @@ class ModelSearchForm(ModelForm):
         all_fields_optional = True
         only_indexed_fields = True
         include_primary_keys = True
+
+
+class ModelOrderedForm(ModelForm):
+    """
+        Uses field_order attribute to determine position in new field order.
+        nav_metadata = MetaData()
+        Base = declarative_base(metadata=metadata)
+
+
+        class Example(Base):
+            __tablename__ = 'example'
+            id = Column(Integer(), primary_key=True)
+            name = Column(String(256), info={'label': "Name"})
+            hidden = Column(Boolean(), info={'label': "Hidden"})
+            active = Column(Boolean(), info={'label': "Active"})
+
+        class ExampleForm(OrderedModelForm):
+            class Meta:
+                model = Example
+            field_order = ('name', 'active', '*')
+    """
+    def __iter__(self):
+        field_order = getattr(self, 'field_order', None)
+        if field_order:
+            temp_fields = OrderedDict()
+            for name in field_order:
+                if name == '*':
+                    for key, f in six.iteritems(self._fields):
+                        if key not in field_order:
+                            temp_fields[key] = f
+                else:
+                    temp_fields[name] = self._fields[name]
+            self._fields = temp_fields
+        return iter(six.itervalues(self._fields))
