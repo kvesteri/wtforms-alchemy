@@ -326,6 +326,11 @@ class ModelOrderedForm(ModelForm):
     """
         Uses field_order attribute to determine position in new field order.
 
+        For when you want that submit button at the bottom of your automatically generated form.
+
+        Because Form._fields is an OrderedDict and the non-meta attributes in the mro get added first the submit button
+        is always first in a for field in form loop, unless you give it some help.
+
         Example
         -------
         nav_metadata = MetaData()
@@ -342,7 +347,8 @@ class ModelOrderedForm(ModelForm):
         class ExampleForm(OrderedModelForm):
             class Meta:
                 model = Example
-            field_order = ('name', 'active', '*')
+            submit = SubmitField('Save')
+            field_order = ('name', 'active', 'hidden', '*')
     """
     def __iter__(self):
         field_order = getattr(self, 'field_order', None)
