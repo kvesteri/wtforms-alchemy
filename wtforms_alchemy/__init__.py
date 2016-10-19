@@ -1,10 +1,11 @@
-import six
-import sqlalchemy as sa
-
 try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
+
+import six
+import sqlalchemy as sa
+
 
 from wtforms import Form
 from wtforms.form import FormMeta
@@ -326,10 +327,12 @@ class ModelOrderedForm(ModelForm):
     """
         Uses field_order attribute to determine position in new field order.
 
-        For when you want that submit button at the bottom of your automatically generated form.
+        For when you want that submit button at the bottom of your
+        automatically generated form.
 
-        Because Form._fields is an OrderedDict and the non-meta attributes in the mro get added first the submit button
-        is always first in a for field in form loop, unless you give it some help.
+        Because Form._fields is an OrderedDict and the non-meta attributes
+        in the mro get added first the submit button is always first in a
+        for field in form loop, unless you give it some help.
 
         Example
         -------
