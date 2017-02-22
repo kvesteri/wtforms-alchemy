@@ -21,6 +21,7 @@ from .exc import (
 from .fields import (  # noqa
     CountryField,
     GroupedQuerySelectField,
+    GroupedQuerySelectMultipleField,
     ModelFieldList,
     ModelFormField,
     PhoneNumberField,
@@ -114,6 +115,7 @@ def model_form_meta_factory(base=FormMeta):
                 generator = cls.Meta.form_generator(cls)
                 generator.create_form(cls)
     return ModelFormMeta
+
 
 ModelFormMeta = model_form_meta_factory()
 

@@ -4,6 +4,8 @@ from wtforms.compat import text_type
 
 from wtforms_alchemy import (
     GroupedQuerySelectField,
+    GroupedQuerySelectMultipleField,
+    ModelForm,
     QuerySelectField,
     QuerySelectMultipleField
 )
@@ -223,16 +225,22 @@ class DatabaseTestCase(object):
         self.base.metadata.drop_all(self.engine)
         self.engine.dispose()
 
-
-class TestGroupedQuerySelectField(DatabaseTestCase):
     def create_models(self):
         class City(self.base):
             __tablename__ = 'city'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.String)
             country = sa.Column(sa.String)
+            state_id = sa.Column(sa.Integer, sa.ForeignKey('state.id'))
 
         self.City = City
+
+        class State(self.base):
+            __tablename__ = 'state'
+            id = sa.Column(sa.Integer, primary_key=True)
+            cities = sa.orm.relationship('City')
+
+        self.State = State
 
     def create_cities(self):
         self.session.add_all([
@@ -243,6 +251,8 @@ class TestGroupedQuerySelectField(DatabaseTestCase):
             self.City(name='Stockholm', country='Sweden'),
         ])
 
+
+class TestGroupedQuerySelectField(DatabaseTestCase):
     def create_form(self, **kwargs):
         query = self.session.query(self.City).order_by('name', 'country')
 
@@ -258,6 +268,19 @@ class TestGroupedQuerySelectField(DatabaseTestCase):
             )
 
         return MyForm
+
+    def test_custom_none_value(self):
+        self.create_cities()
+        MyForm = self.create_form(
+            allow_blank=True,
+            blank_text='Choose city...',
+            blank_value=''
+        )
+        form = MyForm(DummyPostData({'city': ''}))
+        assert form.validate(), form.errors
+        assert '<option selected value="">Choose city...</option>' in (
+            str(form.city)
+        )
 
     def test_rendering(self):
         MyForm = self.create_form()
@@ -277,15 +300,73 @@ class TestGroupedQuerySelectField(DatabaseTestCase):
             '</select>'
         )
 
-    def test_custom_none_value(self):
+
+class TestGroupedQuerySelectMultipleField(DatabaseTestCase):
+    def create_form(self, **kwargs):
+        query = self.session.query(self.City).order_by('name', 'country')
+
+        class MyForm(ModelForm):
+            class Meta:
+                model = self.State
+
+            cities = GroupedQuerySelectMultipleField(
+                label=kwargs.get('label', 'City'),
+                query_factory=kwargs.get('query_factory', lambda: query),
+                get_label=kwargs.get('get_label', lambda c: c.name),
+                get_group=kwargs.get('get_group', lambda c: c.country),
+                blank_text=kwargs.get('blank_text', ''),
+            )
+
+        return MyForm
+
+    def test_unpopulated_default(self):
+        MyForm = self.create_form()
         self.create_cities()
-        MyForm = self.create_form(
-            allow_blank=True,
-            blank_text='Choose city...',
-            blank_value=''
-        )
-        form = MyForm(DummyPostData({'city': ''}))
-        assert form.validate(), form.errors
-        assert '<option selected value="">Choose city...</option>' in (
-            str(form.city)
+        assert MyForm().cities.data == []
+
+    def test_single_value_without_factory(self):
+        obj = self.State()
+        MyForm = self.create_form()
+        self.create_cities()
+        form = MyForm(DummyPostData(cities=['1']), obj=obj)
+        assert [1] == [v.id for v in form.cities.data]
+        assert form.validate()
+        form.populate_obj(obj)
+        assert [city.id for city in obj.cities] == [1]
+
+    def test_multiple_values_without_query_factory(self):
+        obj = self.State()
+        MyForm = self.create_form()
+        self.create_cities()
+        form = MyForm(DummyPostData(cities=['1', '2']), obj=obj)
+        form.cities.query = self.session.query(self.City)
+
+        assert [1, 2] == [v.id for v in form.cities.data]
+        assert form.validate()
+        form.populate_obj(obj)
+        assert [city.id for city in obj.cities] == [1, 2]
+
+        form = MyForm(DummyPostData(cities=['1', '666']))
+        form.cities.query = self.session.query(self.City)
+        assert [x.id for x in form.cities.data] == [1]
+        assert not form.validate()
+        form.populate_obj(obj)
+        assert [city.id for city in obj.cities] == [1]
+
+    def test_rendering(self):
+        MyForm = self.create_form()
+        self.create_cities()
+        assert str(MyForm().cities).replace('\n', '') == (
+            '<select id="cities" multiple name="cities">'
+            '<optgroup label="Finland">'
+            '<option value="1">Helsinki</option>'
+            '<option value="2">Vantaa</option>'
+            '</optgroup><optgroup label="Sweden">'
+            '<option value="5">Stockholm</option>'
+            '</optgroup>'
+            '<optgroup label="USA">'
+            '<option value="3">New York</option>'
+            '<option value="4">Washington</option>'
+            '</optgroup>'
+            '</select>'
         )
