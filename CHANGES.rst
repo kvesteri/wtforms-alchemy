@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.16.2 (2017-02-28)
+^^^^^^^^^^^^^^^^^^^
+
+- Added GroupedQueryMultipleSelectField (#113, pull request courtesy of adarshk7)
+
+
 0.16.1 (2016-05-11)
 ^^^^^^^^^^^^^^^^^^^
 
