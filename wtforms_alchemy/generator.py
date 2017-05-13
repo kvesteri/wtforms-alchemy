@@ -589,6 +589,8 @@ class FormGenerator(object):
             column.type.length
         ):
             min_ = column.info.get('min')
+            if min_ == None:
+            	min_ = 0:
             return self.get_validator('length', max=column.type.length,
                                       min=min_)
 
