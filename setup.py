@@ -25,6 +25,7 @@ def get_version():
 
 extras_require = {
     'test': [
+        'enum34',
         'pytest>=2.3',
         'Pygments>=1.2',
         'Jinja2>=2.3',
