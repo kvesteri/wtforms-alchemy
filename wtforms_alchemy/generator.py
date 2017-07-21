@@ -2,6 +2,10 @@ try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
+try:
+    from enum import Enum
+except ImportError:
+    Enum = None
 import inspect
 from decimal import Decimal
 
@@ -438,7 +442,17 @@ class FormGenerator(object):
         kwargs = {}
         kwargs['coerce'] = self.coerce(column)
         if isinstance(column.type, types.ChoiceType):
-            kwargs['choices'] = column.type.choices
+            choices = column.type.choices
+            if (
+                Enum is not None and
+                isinstance(choices, type)
+                and issubclass(choices, Enum)
+            ):
+                kwargs['choices'] = [
+                    (choice.value, str(choice)) for choice in choices
+                ]
+            else:
+                kwargs['choices'] = choices
         elif 'choices' in column.info and column.info['choices']:
             kwargs['choices'] = column.info['choices']
         else:
