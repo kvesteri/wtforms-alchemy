@@ -10,6 +10,10 @@ try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
+try:
+    from enum import Enum
+except ImportError:
+    Enum = None
 
 
 def choice_type_coerce_factory(type_):
@@ -19,11 +23,21 @@ def choice_type_coerce_factory(type_):
 
     :param type_: ChoiceType object
     """
+    choices = type_.choices
+    if (
+        Enum is not None and
+        isinstance(choices, type)
+        and issubclass(choices, Enum)
+    ):
+        key, choice_cls = 'value', choices
+    else:
+        key, choice_cls = 'code', Choice
+
     def choice_coerce(value):
         if value is None:
             return None
-        if isinstance(value, Choice):
-            return value.code
+        if isinstance(value, choice_cls):
+            return getattr(value, key)
         return type_.python_type(value)
     return choice_coerce
 
