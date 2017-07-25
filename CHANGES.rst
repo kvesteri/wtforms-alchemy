@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.16.3 (2017-06-25)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed ChoiceType conversion for Enums (#112, pull request courtesy of fayazkhan)
+
+
 0.16.2 (2017-02-28)
 ^^^^^^^^^^^^^^^^^^^
 
