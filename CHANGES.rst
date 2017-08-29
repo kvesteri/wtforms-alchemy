@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.16.5 (2017-07-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed GroupedQuerySelectMultipleField validator to support empty data (#123, pull request courtesy of superosku)
+
+
 0.16.4 (2017-07-29)
 ^^^^^^^^^^^^^^^^^^^
 
