@@ -354,6 +354,14 @@ class TestGroupedQuerySelectMultipleField(DatabaseTestCase):
         form.populate_obj(obj)
         assert [city.id for city in obj.cities] == [1]
 
+        form = MyForm(DummyPostData(cities=['666']))
+        form.cities.query = self.session.query(self.City)
+        assert not form.validate()
+        assert [x.id for x in form.cities.data] == []
+        assert not form.validate()
+        form.populate_obj(obj)
+        assert [city.id for city in obj.cities] == []
+
     def test_rendering(self):
         MyForm = self.create_form()
         self.create_cities()
