@@ -568,7 +568,7 @@ class GroupedQuerySelectMultipleField(SelectField):
         self._formdata = set(valuelist)
 
     def pre_validate(self, form):
-        if self._invalid_formdata:
+        if self.data and self._invalid_formdata:
             raise ValidationError(self.gettext('Not a valid choice'))
         elif self.data:
             obj_list = list(x[1] for x in self._get_object_list())

@@ -348,6 +348,7 @@ class TestGroupedQuerySelectMultipleField(DatabaseTestCase):
 
         form = MyForm(DummyPostData(cities=['1', '666']))
         form.cities.query = self.session.query(self.City)
+        assert not form.validate()
         assert [x.id for x in form.cities.data] == [1]
         assert not form.validate()
         form.populate_obj(obj)
