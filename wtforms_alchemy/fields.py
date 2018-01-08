@@ -314,7 +314,7 @@ class QuerySelectMultipleField(QuerySelectField):
 
 
 def get_pk_from_identity(obj):
-    cls, key = identity_key(instance=obj)
+    cls, key = identity_key(instance=obj)[0:2]
     return ':'.join(text_type(x) for x in key)
 
 
