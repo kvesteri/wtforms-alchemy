@@ -75,6 +75,7 @@ class Unique(object):
         query = self.query
         for field_name, column in columns:
             query = query.filter(column == form[field_name].data)
+
         obj = query.first()
 
         if not hasattr(form, '_obj'):
