@@ -241,7 +241,7 @@ class TestUniqueValidator(object):
         form.validate()
         assert form.errors == {'name': [u'Already exists.']}
 
-    def test_existing_name_collision_classical_mapping_when_updating(self):
+    def test_existing_name_collision_classical_mapping_when_updating_object(self):
         sa.Table(
             'user',
             sa.MetaData(None),
@@ -304,7 +304,7 @@ class TestUniqueValidator(object):
         form.validate()
         assert form.errors == {'name': [u'Already exists.']}
 
-    def test_relationship_multiple_collision_when_updating(self):
+    def test_relationship_multiple_collision_when_updating_object(self):
         class MyForm(ModelForm):
             id = HiddenField('id')
             name = TextField(
