@@ -334,11 +334,6 @@ class TestUniqueValidator(object):
                 filter_by(name=u'someone').first()
 
         form = MyForm(obj=obj)
-        # form = myform(multidict({
-        #     'name': u'someone',
-        #     'email': u'second.email@example.com',
-        #     'favorite_color': str(red_color.id)
-        # }))
         form.validate()
         assert form.errors != {'name': [u'already exists.']}
 
