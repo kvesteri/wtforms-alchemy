@@ -304,6 +304,44 @@ class TestUniqueValidator(object):
         form.validate()
         assert form.errors == {'name': [u'Already exists.']}
 
+    def test_relationship_multiple_collision_when_updating(self):
+        class MyForm(ModelForm):
+            id = HiddenField('id')
+            name = TextField(
+                validators=[Unique(
+                    [User.name, User.favorite_color],
+                    get_session=lambda: self.session
+                )]
+            )
+            email = TextField()
+            favorite_color = QuerySelectField(
+                query_factory=lambda: self.session.query(Color).all(),
+                allow_blank=True
+            )
+
+        red_color = Color(name='red')
+        blue_color = Color(name='blue')
+        self.session.add(red_color)
+        self.session.add(blue_color)
+        self.session.add(User(
+            name=u'someone',
+            email=u'first.email@example.com',
+            favorite_color=red_color
+        ))
+        self.session.commit()
+
+        obj = self.session.query(User).\
+                filter_by(name=u'someone').first()
+
+        form = MyForm(obj=obj)
+        # form = myform(multidict({
+        #     'name': u'someone',
+        #     'email': u'second.email@example.com',
+        #     'favorite_color': str(red_color.id)
+        # }))
+        form.validate()
+        assert form.errors != {'name': [u'already exists.']}
+
     def test_relationship_multiple_collision(self):
         class MyForm(ModelForm):
             name = TextField(
