@@ -26,7 +26,8 @@ class Unique(object):
     :param message:
         The error message.
 
-    When you are updating an existing object using a form the primary key field must be
+    When you are updating an existing object using a form
+    the primary key field must be
     included in the form.
     e.g. id = HiddenField('id')
     """
