@@ -241,10 +241,43 @@ class TestUniqueValidator(object):
         form.validate()
         assert form.errors == {'name': [u'Already exists.']}
 
+    def test_existing_name_collision_classical_mapping_when_updating(self):
+        sa.Table(
+            'user',
+            sa.MetaData(None),
+            sa.Column('id', sa.Integer(), primary_key=True),
+            sa.Column('name', sa.String(255)),
+            sa.Column('email', sa.String(255))
+        )
+
+        class MyForm(ModelForm):
+            id = HiddenField('id')
+            name = TextField(
+                validators=[Unique(
+                    [User.name, User.email],
+                    get_session=lambda: self.session
+                )]
+            )
+            email = TextField()
+
+        self.session.add(User(
+            name=u'someone',
+            email=u'someone@example.com'
+        ))
+        self.session.commit()
+
+        usr_obj = self.session.query(User).\
+                filter_by(name=u'someone').first()
+
+        form = MyForm(obj=usr_obj)
+        form.validate()
+        assert form.errors != {'name': [u'Already exists.']}
+
     def test_existing_name_collision_classical_mapping(self):
         sa.Table(
             'user',
             sa.MetaData(None),
+            sa.Column('id', sa.Integer(), primary_key=True),
             sa.Column('name', sa.String(255)),
             sa.Column('email', sa.String(255))
         )
