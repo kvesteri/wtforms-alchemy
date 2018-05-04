@@ -78,6 +78,11 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
             self.init(type_=UnknownType)
             self.form_class()
 
+    def test_raises_exception_for_array_type(self):
+        with raises(UnknownTypeException):
+            self.init(type_=sa.ARRAY(sa.Integer))
+            self.form_class()
+
     def test_unicode_converts_to_text_field(self):
         self.init()
         self.assert_type('test_column', StringField)
