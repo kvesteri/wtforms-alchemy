@@ -2,7 +2,7 @@ class UnknownTypeException(Exception):
     def __init__(self, column):
         Exception.__init__(
             self,
-            "Unknown type '%s' for column '%s'" %
+            "Unknown type '%r' for column '%s'" %
             (column.type, column.name)
         )
 
