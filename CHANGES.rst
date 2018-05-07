@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.16.7 (2018-05-07)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed UnknownTypeException being thrown correctly for unsupported types (#131, pull request courtesy of tvuotila)
+
+
 0.16.6 (2018-01-21)
 ^^^^^^^^^^^^^^^^^^^
 
