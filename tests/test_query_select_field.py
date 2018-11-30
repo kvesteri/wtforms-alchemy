@@ -101,6 +101,15 @@ class TestQuerySelectField(TestBase):
         assert not form.validate()
         assert form.a.errors, ['Not a valid choice']
 
+        # Test query with no results
+        form = F()
+        form.a.query = (
+            sess.query(self.Test)
+            .filter(self.Test.id == 1, self.Test.id != 1)
+            .all()
+        )
+        assert form.a() == []
+
     def test_with_query_factory(self):
         sess = self.Session()
         self._fill(sess)
@@ -127,6 +136,15 @@ class TestQuerySelectField(TestBase):
             ('hello2', 'banana', False)
         ]
         assert not form.validate()
+
+        # Test query with no results
+        form = F()
+        form.a.query = (
+            sess.query(self.Test)
+            .filter(self.Test.id == 1, self.Test.id != 1)
+            .all()
+        )
+        assert form.a() == []
 
         form = F(DummyPostData(a=['1'], b=['hello2']))
         assert form.a.data.id == 1
@@ -206,6 +224,16 @@ class TestQuerySelectMultipleField(TestBase):
         assert [v.id for v in form.a.data], [2]
         assert form.a(), [('1', 'apple', False), ('2', 'banana', True)]
         assert form.validate()
+
+    def test_empty_query(self):
+        # Test query with no results
+        form = self.F()
+        form.a.query = (
+            self.sess.query(self.Test)
+            .filter(self.Test.id == 1, self.Test.id != 1)
+            .all()
+        )
+        assert form.a() == []
 
 
 class DatabaseTestCase(object):
