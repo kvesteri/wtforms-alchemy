@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.16.8 (2018-12-04)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed QuerySelectField.query allowing no results (#136, pull request courtesy of TrilceAC)
+
+
 0.16.7 (2018-05-07)
 ^^^^^^^^^^^^^^^^^^^
 
