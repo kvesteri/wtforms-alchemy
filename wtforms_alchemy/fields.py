@@ -214,7 +214,10 @@ class QuerySelectField(SelectFieldBase):
 
     def _get_object_list(self):
         if self._object_list is None:
-            query = self.query or self.query_factory()
+            query = (
+                self.query if self.query is not None
+                else self.query_factory()
+            )
             get_pk = self.get_pk
             self._object_list = list(
                 (text_type(get_pk(obj)), obj) for obj in query
@@ -359,7 +362,10 @@ class GroupedQuerySelectField(SelectField):
         self._choices = None
 
     def _get_object_list(self):
-        query = self.query or self.query_factory()
+        query = (
+            self.query if self.query is not None
+            else self.query_factory()
+        )
         return list((six.text_type(self.get_pk(obj)), obj) for obj in query)
 
     def _pre_process_object_list(self, object_list):
@@ -493,7 +499,10 @@ class GroupedQuerySelectMultipleField(SelectField):
         self._invalid_formdata = False
 
     def _get_object_list(self):
-        query = self.query or self.query_factory()
+        query = (
+            self.query if self.query is not None
+            else self.query_factory()
+        )
         return list((six.text_type(self.get_pk(obj)), obj) for obj in query)
 
     def _pre_process_object_list(self, object_list):
