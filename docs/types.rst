@@ -293,7 +293,7 @@ Now the UserForm is essentially the same as:
 
     class UserForm(Form):
         name = TextField(validators=[DataRequired(), Length(max=100)])
-        password = PhoneNumberField(validators=[DataRequired()])
+        phone_number = PhoneNumberField(validators=[DataRequired()])
 
 
 URL type
