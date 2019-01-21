@@ -25,13 +25,18 @@ class Unique(object):
         parameter.
     :param message:
         The error message.
+    :param message_uncheck
+        The error message when the attempt to check uniqueness cannot be
+        carried out, i.e. the query throws an exception.
     """
     field_flags = ('unique', )
 
-    def __init__(self, column, get_session=None, message=None):
+    def __init__(self, column, get_session=None, message=None,
+                 message_uncheck=u'Unable to check uniqueness.'):
         self.column = column
         self.message = message
         self.get_session = get_session
+        self.message_uncheck = message_uncheck
 
     @property
     def query(self):
@@ -76,7 +81,10 @@ class Unique(object):
         for field_name, column in columns:
             query = query.filter(column == form[field_name].data)
 
-        obj = query.first()
+        try:
+            obj = query.first()
+        except:
+            raise ValidationError(self.message_uncheck)
 
         if not hasattr(form, '_obj'):
             raise Exception(
