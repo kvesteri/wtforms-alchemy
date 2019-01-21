@@ -83,7 +83,7 @@ class Unique(object):
 
         try:
             obj = query.first()
-        except:
+        except Exception:
             raise ValidationError(self.message_uncheck)
 
         if not hasattr(form, '_obj'):
