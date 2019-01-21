@@ -1,12 +1,15 @@
 import sqlalchemy as sa
-from pytest import mark, raises
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from sqlalchemy_utils import PhoneNumberType
 from wtforms import Form
 from wtforms.fields import TextField
+from wtforms_alchemy import (DataRequired, ModelForm, PhoneNumberField,
+                             QuerySelectField, Unique)
+from wtforms_alchemy.validators import ValidationError
 
+from pytest import mark, raises
 from tests import MultiDict
-from wtforms_alchemy import ModelForm, QuerySelectField, Unique
 
 base = declarative_base()
 
@@ -22,6 +25,10 @@ class User(base):
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.Unicode(255), unique=True)
     email = sa.Column(sa.Unicode(255))
+    phone = sa.Column(
+        PhoneNumberType(region='ES', max_length=25),
+        unique=True
+    )
     favorite_color_id = sa.Column(sa.Integer, sa.ForeignKey(Color.id))
     favorite_color = relationship(Color)
 
@@ -372,3 +379,19 @@ class TestUniqueValidator(object):
 
         form = MyForm(MultiDict({'name': u'someone'}))
         assert form.validate()
+
+    def test_invalid_unique_phone_no_500_error(self):
+        class MyForm(ModelForm):
+            phone = PhoneNumberField(
+                validators=[Unique(User.phone), DataRequired()],
+                region='ES'
+            )
+
+        self.session.add(User(name=u'someone', phone=u'+34963543703'))
+        self.session.commit()
+
+        form = MyForm(MultiDict({'phone': u'abc$%·'}))
+        form.validate()
+        assert len(form.errors['phone']) == 2
+        assert 'Not a valid phone number value' in form.errors['phone']
+        assert 'Unable to check uniqueness.' in form.errors['phone']
