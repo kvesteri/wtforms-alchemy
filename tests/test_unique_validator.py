@@ -1,14 +1,15 @@
 import sqlalchemy as sa
+from pytest import mark, raises
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import PhoneNumberType
 from wtforms import Form
 from wtforms.fields import TextField
+
+from tests import MultiDict
 from wtforms_alchemy import (ModelForm, PhoneNumberField, QuerySelectField,
                              Unique)
 
-from pytest import mark, raises
-from tests import MultiDict
 
 base = declarative_base()
 
