@@ -7,9 +7,12 @@ from wtforms import Form
 from wtforms.fields import TextField
 
 from tests import MultiDict
-from wtforms_alchemy import (ModelForm, PhoneNumberField, QuerySelectField,
-                             Unique)
-
+from wtforms_alchemy import (
+    ModelForm,
+    PhoneNumberField,
+    QuerySelectField,
+    Unique
+)
 
 base = declarative_base()
 
