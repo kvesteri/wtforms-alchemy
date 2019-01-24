@@ -80,17 +80,12 @@ class Unique(object):
         self.model = columns[0][1].class_
         query = self.query
         for field_name, column in columns:
-            # Check that type coercion is possible to avoid 500 errors.
-            # See https://github.com/kvesteri/wtforms-alchemy/issues/139
-            # NOTE: Each type requires its coercion.
-            if type(getattr(column, 'type', False)) is PhoneNumberType:
-                try:
-                    column.type._coerce(form[field_name].data)
-                except PhoneNumberParseException:
-                    raise ValidationError(self.message_uncheck)
             query = query.filter(column == form[field_name].data)
 
-        obj = query.first()
+        try:
+            obj = query.first()
+        except PhoneNumberParseException:
+            raise ValidationError(self.message_uncheck)
 
         if not hasattr(form, '_obj'):
             raise Exception(
