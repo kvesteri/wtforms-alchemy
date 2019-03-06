@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.16.9 (2019-03-06)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for JSON type in TypeMap (#142, pull request courtesy of fedExpress)
+
+
 0.16.8 (2018-12-04)
 ^^^^^^^^^^^^^^^^^^^
 
