@@ -92,6 +92,7 @@ class FormGenerator(object):
         (sa.types.Unicode, StringField),
         (sa.types.String, StringField),
         (sa.types.Time, TimeField),
+        (sa.types.JSON, TextAreaField),
         (types.ArrowType, DateTimeField),
         (types.ChoiceType, SelectField),
         (types.ColorType, ColorField),

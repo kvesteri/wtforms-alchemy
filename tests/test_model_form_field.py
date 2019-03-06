@@ -63,7 +63,7 @@ class TestOneToOneModelFormRelations(FormRelationsTestCase):
         form.populate_obj(event)
         self.session.commit()
         event = self.session.query(self.Event).first()
-        assert event.location.name is u''
+        assert event.location.name == u''
 
     def test_only_populates_related_if_they_are_obj_attributes(self):
         class EventForm(ModelForm):
