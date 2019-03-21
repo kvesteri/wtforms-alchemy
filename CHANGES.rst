@@ -4,6 +4,54 @@ Changelog
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
 
+0.16.9 (2019-03-06)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for JSON type in TypeMap (#142, pull request courtesy of fedExpress)
+
+
+0.16.8 (2018-12-04)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed QuerySelectField.query allowing no results (#136, pull request courtesy of TrilceAC)
+
+
+0.16.7 (2018-05-07)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed UnknownTypeException being thrown correctly for unsupported types (#131, pull request courtesy of tvuotila)
+
+
+0.16.6 (2018-01-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Added SQLAlchemy 1.2 support
+
+
+0.16.5 (2017-07-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed GroupedQuerySelectMultipleField validator to support empty data (#123, pull request courtesy of superosku)
+
+
+0.16.4 (2017-07-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed GroupedQuerySelectMultipleField validator (#121, pull request courtesy of superosku)
+
+
+0.16.3 (2017-06-25)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed ChoiceType conversion for Enums (#112, pull request courtesy of fayazkhan)
+
+
+0.16.2 (2017-02-28)
+^^^^^^^^^^^^^^^^^^^
+
+- Added GroupedQueryMultipleSelectField (#113, pull request courtesy of adarshk7)
+
+
 0.16.1 (2016-05-11)
 ^^^^^^^^^^^^^^^^^^^
 

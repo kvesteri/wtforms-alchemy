@@ -32,13 +32,13 @@ class TestSelectFieldCoerce(ModelFormTestCase):
         choices = [(u'1', '1'), (u'2', '2')]
         self.init(type_=sa.Integer, info={'choices': choices})
         form = self.form_class(MultiDict({'test_column': '2'}))
-        assert form.test_column.data is 2
+        assert form.test_column.data == 2
 
     def test_nullable_integer_coerces_values_to_integers(self):
         choices = [(u'1', '1'), (u'2', '2')]
         self.init(type_=sa.Integer, nullable=True, info={'choices': choices})
         form = self.form_class(MultiDict({'test_column': '2'}))
-        assert form.test_column.data is 2
+        assert form.test_column.data == 2
 
     def test_integer_coerces_empty_strings_to_nulls(self):
         choices = [(u'1', '1'), (u'2', '2')]
@@ -51,13 +51,13 @@ class TestSelectFieldCoerce(ModelFormTestCase):
         self.init(type_=sa.BigInteger, info={'choices': choices})
         self.assert_type('test_column', SelectField)
         form = self.form_class(MultiDict({'test_column': '2'}))
-        assert form.test_column.data is 2
+        assert form.test_column.data == 2
 
     def test_small_integer_coerces_values_to_integers(self):
         choices = [(u'1', '1'), (u'2', '2')]
         self.init(type_=sa.SmallInteger, info={'choices': choices})
         form = self.form_class(MultiDict({'test_column': '2'}))
-        assert form.test_column.data is 2
+        assert form.test_column.data == 2
 
     def test_numeric_coerces_values_to_decimals(self):
         choices = [(u'1.0', '1.0'), (u'2.0', '2.0')]

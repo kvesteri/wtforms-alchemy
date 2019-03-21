@@ -44,11 +44,14 @@ from wtforms_alchemy import (
 )
 from wtforms_alchemy.utils import ClassMap
 
-passlib = None
 try:
     import passlib  # noqa
 except ImportError:
-    pass
+    passlib = None
+try:
+    from enum import Enum
+except ImportError:
+    Enum = None
 
 
 class UnknownType(sa.types.UserDefinedType):
@@ -73,6 +76,11 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
     def test_raises_exception_for_unknown_type(self):
         with raises(UnknownTypeException):
             self.init(type_=UnknownType)
+            self.form_class()
+
+    def test_raises_exception_for_array_type(self):
+        with raises(UnknownTypeException):
+            self.init(type_=sa.ARRAY(sa.Integer))
             self.form_class()
 
     def test_unicode_converts_to_text_field(self):
@@ -183,6 +191,10 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init(type_=sa.types.REAL)
         self.assert_type('test_column', FloatField)
 
+    def test_json_converts_to_textarea_field(self):
+        self.init(type_=sa.types.JSON)
+        self.assert_type('test_column', TextAreaField)
+
     @mark.xfail('phone_number.phonenumbers is None')
     def test_phone_number_converts_to_phone_number_field(self):
         self.init(type_=PhoneNumberType)
@@ -249,6 +261,40 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.init(type_=ChoiceType(choices))
         self.assert_type('test_column', SelectField)
         model = self.ModelTest(test_column=u'2')
+        form = self.form_class(obj=model)
+        assert '<option selected value="2">' in str(form.test_column)
+
+    @mark.xfail('Enum is None')
+    def test_choice_type_with_enum(self):
+        class Choice(Enum):
+            choice1 = 1
+            choice2 = 2
+
+            def __str__(self):
+                return self.name
+        self.init(type_=ChoiceType(Choice))
+        self.assert_type('test_column', SelectField)
+        assert self.form_class().test_column.choices == [
+            (1, u'choice1'), (2, u'choice2')]
+
+    @mark.xfail('Enum is None')
+    @mark.parametrize(
+        ['type_', 'impl'],
+        [
+            (int, sa.Integer()),
+            (str, sa.String())
+        ]
+    )
+    def test_choice_type_with_enum_uses_custom_coerce_func(self, type_, impl):
+        class Choice(Enum):
+            choice1 = type_(1)
+            choice2 = type_(2)
+
+            def __str__(self):
+                return self.name
+        self.init(type_=ChoiceType(Choice, impl=impl))
+        self.assert_type('test_column', SelectField)
+        model = self.ModelTest(test_column=type_(2))
         form = self.form_class(obj=model)
         assert '<option selected value="2">' in str(form.test_column)
 

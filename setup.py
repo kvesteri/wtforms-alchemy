@@ -25,6 +25,7 @@ def get_version():
 
 extras_require = {
     'test': [
+        'enum34',
         'pytest>=2.3',
         'Pygments>=1.2',
         'Jinja2>=2.3',
@@ -83,9 +84,9 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ]

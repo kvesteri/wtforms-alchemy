@@ -3,11 +3,10 @@ from pytest import mark, raises
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from wtforms import Form
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import TextField
 
 from tests import MultiDict
-from wtforms_alchemy import ModelForm, Unique
+from wtforms_alchemy import ModelForm, QuerySelectField, Unique
 
 base = declarative_base()
 
@@ -19,7 +18,7 @@ class Color(base):
 
 
 class User(base):
-    __tablename__ = 'event'
+    __tablename__ = 'user'
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.Unicode(255), unique=True)
     email = sa.Column(sa.Unicode(255))

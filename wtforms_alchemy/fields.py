@@ -214,7 +214,10 @@ class QuerySelectField(SelectFieldBase):
 
     def _get_object_list(self):
         if self._object_list is None:
-            query = self.query or self.query_factory()
+            query = (
+                self.query if self.query is not None
+                else self.query_factory()
+            )
             get_pk = self.get_pk
             self._object_list = list(
                 (text_type(get_pk(obj)), obj) for obj in query
@@ -314,7 +317,7 @@ class QuerySelectMultipleField(QuerySelectField):
 
 
 def get_pk_from_identity(obj):
-    cls, key = identity_key(instance=obj)
+    cls, key = identity_key(instance=obj)[0:2]
     return ':'.join(text_type(x) for x in key)
 
 
@@ -359,7 +362,10 @@ class GroupedQuerySelectField(SelectField):
         self._choices = None
 
     def _get_object_list(self):
-        query = self.query or self.query_factory()
+        query = (
+            self.query if self.query is not None
+            else self.query_factory()
+        )
         return list((six.text_type(self.get_pk(obj)), obj) for obj in query)
 
     def _pre_process_object_list(self, object_list):
@@ -443,6 +449,142 @@ class GroupedQuerySelectField(SelectField):
                 raise ValidationError('Not a valid choice')
         elif self._formdata or not self.allow_blank:
             raise ValidationError('Not a valid choice')
+
+
+class GroupedQuerySelectMultipleField(SelectField):
+    widget = SelectWidget(multiple=True)
+
+    def __init__(
+        self,
+        label=None,
+        validators=None,
+        query_factory=None,
+        get_pk=None,
+        get_label=None,
+        get_group=None,
+        blank_text='',
+        default=None,
+        **kwargs
+    ):
+        if default is None:
+            default = []
+        super(GroupedQuerySelectMultipleField, self).__init__(
+            label,
+            validators,
+            default=default,
+            coerce=lambda x: x,
+            **kwargs
+        )
+        if kwargs.get('allow_blank', False):
+            import warnings
+            warnings.warn(
+                'allow_blank=True does not do anything for '
+                'GroupedQuerySelectMultipleField.'
+            )
+
+        self.query = None
+        self.query_factory = query_factory
+
+        if get_pk is None:
+            self.get_pk = get_pk_from_identity
+        else:
+            self.get_pk = get_pk
+
+        self.get_label = get_label
+        self.get_group = get_group
+
+        self.blank_text = blank_text
+
+        self._choices = None
+        self._invalid_formdata = False
+
+    def _get_object_list(self):
+        query = (
+            self.query if self.query is not None
+            else self.query_factory()
+        )
+        return list((six.text_type(self.get_pk(obj)), obj) for obj in query)
+
+    def _pre_process_object_list(self, object_list):
+        return sorted(
+            object_list,
+            key=lambda x: (x[1] or u'', self.get_label(x[2]) or u'')
+        )
+
+    @property
+    def choices(self):
+        if not self._choices:
+            object_list = map(
+                lambda x: (x[0], self.get_group(x[1]), x[1]),
+                self._get_object_list()
+            )
+            # object_list is (key, group, value) tuple
+            choices = []
+            object_list = self._pre_process_object_list(object_list)
+            for group, data in groupby(object_list, key=lambda x: x[1]):
+                if group is not None:
+                    group_items = []
+                    for key, _, value in data:
+                        group_items.append((key, self.get_label(value)))
+                    choices.append((group, group_items))
+                else:
+                    for key, group, value in data:
+                        choices.append((key, self.get_label(value)))
+            self._choices = choices
+        return self._choices
+
+    @choices.setter
+    def choices(self, value):
+        pass
+
+    @property
+    def data(self):
+        formdata = self._formdata
+        if formdata is not None:
+            data = []
+            for pk, obj in self._get_object_list():
+                if not formdata:
+                    break
+                elif self.coerce(pk) in formdata:
+                    formdata.remove(self.coerce(pk))
+                    data.append(obj)
+            if formdata:
+                self._invalid_formdata = True
+            self.data = data
+        return self._data
+
+    @data.setter
+    def data(self, valuelist):
+        self._data = valuelist
+        self._formdata = None
+
+    def iter_choices(self):
+        """
+        We should update how choices are iter to make sure that value from
+        internal list or tuple should be selected.
+        """
+        for value, label in self.concrete_choices:
+            yield (
+                value,
+                label,
+                (
+                    self.coerce,
+                    [self.get_pk(obj) for obj in self.data or []]
+                )
+            )
+
+    def process_formdata(self, valuelist):
+        self._formdata = set(valuelist)
+
+    def pre_validate(self, form):
+        self.data  # This sets self._invalid_formdata
+        if self._invalid_formdata:
+            raise ValidationError(self.gettext('Not a valid choice'))
+        elif self.data:
+            obj_list = list(x[1] for x in self._get_object_list())
+            for v in self.data:
+                if v not in obj_list:
+                    raise ValidationError(self.gettext('Not a valid choice'))
 
 
 class WeekDaysField(SelectMultipleField):
