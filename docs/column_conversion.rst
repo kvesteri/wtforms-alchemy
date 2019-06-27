@@ -176,6 +176,59 @@ Now the UserForm would have three fields:
     * email, an optional TextField
     * age, IntegerField
 
+Here is an example of how to include checkboxes in WTForms-Alchemy::
+
+    from wtforms.fields import SelectMultipleField
+    from wtforms.widgets import CheckboxInput, ListWidget
+
+    class Fox(Base):
+        __tablename__ = 'foxes'
+        
+        name = sa.Column(
+            sa.Unicode(100), 
+            primary_key=True, 
+            nullable=False,
+            info={'label':"Name of the fox"}
+        )
+        diet = sa.Column(
+            sa.String(200), 
+            nullable=False,
+            info={'label':"The fox's diet"}
+        )
+        
+    class FoxForm(ModelForm):
+        class Meta:
+            model = Fox
+        
+        diet = SelectMultipleField(
+            "The fox's diet", choices=[
+            ('rabbit','Rabbits'),('frog','Frogs'),('bird','Birds')],
+            coerce=str,
+            option_widget=CheckboxInput(),
+            widget=ListWidget(prefix_label=False)
+        )
+        
+Now FoxForm will have two fields:
+    * name, a required TextField
+    * diet, a required SelectMultipleField
+
+Form data collected from fields of type SelectMultipleField will be processed as type `list`, so it must be converted to `str` before committing to the database::
+
+    # processing submitted form data
+    import json
+    fox = Fox()
+    form = FoxForm(request.form)
+    if request.method == 'POST':
+        try:
+            if form.validate():
+                for field in form:
+                    if field.type == 'SelectMultipleField':
+                        field.data = json.dumps(field.data)
+                form.populate_obj(fox)
+                sa.session.add(fox)
+                sa.session.commit()
+        except Exception as e:
+            sa.session.rollback()
 
 Type decorators
 ---------------
