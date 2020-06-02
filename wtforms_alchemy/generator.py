@@ -1,7 +1,7 @@
 import inspect
 from collections import OrderedDict
-from enum import Enum
 from decimal import Decimal
+from enum import Enum
 
 import six
 import sqlalchemy as sa
