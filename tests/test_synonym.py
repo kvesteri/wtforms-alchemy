@@ -20,9 +20,7 @@ class TestSynonym(ModelFormTestCase):
             def test_column_hybrid(self, value):
                 self._test_column = value
 
-            test_column = sa.orm.synonym(
-                '_test_column', descriptor='test_column_hybrid'
-            )
+            test_column = sa.orm.synonym('_test_column')
 
         class ModelTestForm(ModelForm):
             class Meta:
@@ -49,9 +47,7 @@ class TestSynonym(ModelFormTestCase):
             def test_column_hybrid(self, value):
                 self._test_column = value
 
-            test_column = sa.orm.synonym(
-                '_test_column', descriptor='test_column_hybrid'
-            )
+            test_column = sa.orm.synonym('_test_column')
 
         class ModelTestForm(ModelForm):
             class Meta:

@@ -1,13 +1,7 @@
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
-try:
-    from enum import Enum
-except ImportError:
-    Enum = None
 import inspect
+from collections import OrderedDict
 from decimal import Decimal
+from enum import Enum
 
 import six
 import sqlalchemy as sa

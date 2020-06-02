@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from sqlalchemy.orm.session import close_all_sessions
 from wtforms import Form
 from wtforms.compat import text_type
 
@@ -249,7 +250,7 @@ class DatabaseTestCase(object):
         self.session = Session()
 
     def teardown_method(self, method):
-        self.session.close_all()
+        close_all_sessions()
         self.base.metadata.drop_all(self.engine)
         self.engine.dispose()
 
