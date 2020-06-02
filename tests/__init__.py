@@ -2,6 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.session import close_all_sessions
 from sqlalchemy_utils import force_auto_coercion
 from wtforms_test import FormTestCase
 
@@ -67,6 +68,6 @@ class FormRelationsTestCase(object):
         self.session = Session()
 
     def teardown_method(self, method):
-        self.session.close_all()
+        close_all_sessions()
         self.base.metadata.drop_all(self.engine)
         self.engine.dispose()

@@ -1,12 +1,6 @@
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
-try:
-    from enum import Enum
-except ImportError:
-    Enum = None
 import inspect
+from collections import OrderedDict
+from enum import Enum
 from decimal import Decimal
 
 import six
