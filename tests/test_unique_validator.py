@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.session import close_all_sessions
 from wtforms import Form
-from wtforms.fields import TextField
+from wtforms.fields import TextField, HiddenField
 
 from tests import MultiDict
 from wtforms_alchemy import ModelForm, QuerySelectField, Unique
@@ -111,6 +111,7 @@ class TestUniqueValidator(object):
         {'name': User.name},
         (('name', User.name),)
     ))
+
     def test_raises_exception_if_improperly_configured(self, column):
         class MyForm(ModelForm):
             name = TextField(
@@ -133,6 +134,7 @@ class TestUniqueValidator(object):
 
     def test_existing_name_collision(self):
         class MyForm(ModelForm):
+            id = HiddenField('id')
             name = TextField(
                 validators=[Unique(
                     User.name,
@@ -147,8 +149,53 @@ class TestUniqueValidator(object):
         form.validate()
         assert form.errors == {'name': [u'Already exists.']}
 
+    def test_existing_name_collision_when_updating_object(self):
+        class MyForm(ModelForm):
+            id = HiddenField('id')
+            name = TextField(
+                validators=[Unique(
+                    User.name,
+                    get_session=lambda: self.session
+                )]
+            )
+
+        self.session.add(User(name=u'someone'))
+        self.session.commit()
+
+        usr_obj = self.session.query(User).\
+                filter_by(name=u'someone').first()
+
+        form = MyForm(obj=usr_obj)
+        form.validate()
+        assert form.errors != {'name': [u'Already exists.']}
+
+    def test_existing_name_collision_multiple_when_updating_object(self):
+        class MyForm(ModelForm):
+            id = HiddenField('id')
+            name = TextField(
+                validators=[Unique(
+                    [User.name, User.email],
+                    get_session=lambda: self.session
+                )]
+            )
+            email = TextField()
+
+        self.session.add(User(
+            name=u'someone',
+            email=u'someone@example.com'
+        ))
+        self.session.commit()
+
+        usr_obj = self.session.query(User).\
+                filter_by(name=u'someone').first()
+
+        form = MyForm(obj=usr_obj)
+        form.validate()
+        assert form.errors != {'name': [u'Already exists.']}
+
     def test_existing_name_collision_multiple(self):
         class MyForm(ModelForm):
+            id = HiddenField('id')
             name = TextField(
                 validators=[Unique(
                     [User.name, User.email],
@@ -195,10 +242,43 @@ class TestUniqueValidator(object):
         form.validate()
         assert form.errors == {'name': [u'Already exists.']}
 
+    def test_existing_name_collision_classical_mapping_when_updating_object(self):
+        sa.Table(
+            'user',
+            sa.MetaData(None),
+            sa.Column('id', sa.Integer(), primary_key=True),
+            sa.Column('name', sa.String(255)),
+            sa.Column('email', sa.String(255))
+        )
+
+        class MyForm(ModelForm):
+            id = HiddenField('id')
+            name = TextField(
+                validators=[Unique(
+                    [User.name, User.email],
+                    get_session=lambda: self.session
+                )]
+            )
+            email = TextField()
+
+        self.session.add(User(
+            name=u'someone',
+            email=u'someone@example.com'
+        ))
+        self.session.commit()
+
+        usr_obj = self.session.query(User).\
+                filter_by(name=u'someone').first()
+
+        form = MyForm(obj=usr_obj)
+        form.validate()
+        assert form.errors != {'name': [u'Already exists.']}
+
     def test_existing_name_collision_classical_mapping(self):
         sa.Table(
             'user',
             sa.MetaData(None),
+            sa.Column('id', sa.Integer(), primary_key=True),
             sa.Column('name', sa.String(255)),
             sa.Column('email', sa.String(255))
         )
@@ -224,6 +304,39 @@ class TestUniqueValidator(object):
         }))
         form.validate()
         assert form.errors == {'name': [u'Already exists.']}
+
+    def test_relationship_multiple_collision_when_updating_object(self):
+        class MyForm(ModelForm):
+            id = HiddenField('id')
+            name = TextField(
+                validators=[Unique(
+                    [User.name, User.favorite_color],
+                    get_session=lambda: self.session
+                )]
+            )
+            email = TextField()
+            favorite_color = QuerySelectField(
+                query_factory=lambda: self.session.query(Color).all(),
+                allow_blank=True
+            )
+
+        red_color = Color(name='red')
+        blue_color = Color(name='blue')
+        self.session.add(red_color)
+        self.session.add(blue_color)
+        self.session.add(User(
+            name=u'someone',
+            email=u'first.email@example.com',
+            favorite_color=red_color
+        ))
+        self.session.commit()
+
+        obj = self.session.query(User).\
+                filter_by(name=u'someone').first()
+
+        form = MyForm(obj=obj)
+        form.validate()
+        assert form.errors != {'name': [u'already exists.']}
 
     def test_relationship_multiple_collision(self):
         class MyForm(ModelForm):

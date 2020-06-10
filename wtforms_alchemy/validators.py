@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Mapping
 
 import six
-from sqlalchemy import Column
+from sqlalchemy import Column, inspect
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from wtforms import ValidationError
 
@@ -25,6 +25,11 @@ class Unique(object):
         parameter.
     :param message:
         The error message.
+
+    When you are updating an existing object using a form
+    the primary key field must be
+    included in the form.
+    e.g. id = HiddenField('id')
     """
     field_flags = ('unique', )
 
@@ -85,7 +90,17 @@ class Unique(object):
                 "ModelForm or make this attribute available in your form."
             )
 
-        if obj and not form._obj == obj:
-            if self.message is None:
-                self.message = field.gettext(u'Already exists.')
-            raise ValidationError(self.message)
+        is_update = False
+        pkeys = inspect(self.model).primary_key
+        for pk in pkeys:
+            form_has_pk = getattr(form._obj, pk.name, None)
+            if form_has_pk:
+                pk1 = pk.type.python_type(getattr(obj, pk.name, None))
+                pk2 = pk.type.python_type(getattr(form._obj, pk.name, None))
+                is_update = pk1 == pk2
+
+        if not is_update:
+            if obj and not form._obj == obj:
+                if self.message is None:
+                    self.message = field.gettext(u'Already exists.')
+                raise ValidationError(self.message)
