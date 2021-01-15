@@ -1,7 +1,7 @@
 import sqlalchemy as sa
+from sqlalchemy.orm import mapper
 from sqlalchemy.orm.session import close_all_sessions
 from wtforms import Form
-from wtforms.compat import text_type
 
 from wtforms_alchemy import (
     GroupedQuerySelectField,
@@ -23,7 +23,7 @@ class DummyPostData(dict):
 class LazySelect(object):
     def __call__(self, field, **kwargs):
         return list(
-            (val, text_type(label), selected)
+            (val, str(label), selected)
             for val, label, selected in field.iter_choices()
         )
 
@@ -56,8 +56,8 @@ class TestBase(object):
             '__str__': lambda x: x.baz,
         })
 
-        mapper(Test, test_table, order_by=[test_table.c.name])
-        mapper(PKTest, pk_test_table, order_by=[pk_test_table.c.baz])
+        mapper(Test, test_table)
+        mapper(PKTest, pk_test_table)
         self.Test = Test
         self.PKTest = PKTest
 
@@ -77,7 +77,6 @@ class TestQuerySelectField(TestBase):
     def setup_method(self, method):
         engine = sa.create_engine('sqlite:///:memory:', echo=False)
         self.Session = sa.orm.session.sessionmaker(bind=engine)
-        from sqlalchemy.orm import mapper
         self._do_tables(mapper, engine)
 
     def test_without_factory(self):
@@ -178,7 +177,6 @@ class TestQuerySelectField(TestBase):
 
 class TestQuerySelectMultipleField(TestBase):
     def setup_method(self, method):
-        from sqlalchemy.orm import mapper
         engine = sa.create_engine('sqlite:///:memory:', echo=False)
         Session = sa.orm.session.sessionmaker(bind=engine)
         self._do_tables(mapper, engine)

@@ -4,10 +4,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.session import close_all_sessions
 from wtforms import Form
-from wtforms.fields import TextField
 
 from tests import MultiDict
 from wtforms_alchemy import ModelForm, QuerySelectField, Unique
+from wtforms.fields import StringField
 
 base = declarative_base()
 
@@ -51,8 +51,8 @@ class TestUniqueValidator(object):
 
     def _test_syntax(self, column, expected_dict):
         class MyForm(ModelForm):
-            name = TextField()
-            email = TextField()
+            name = StringField()
+            email = StringField()
 
         validator = Unique(
             column,
@@ -67,7 +67,7 @@ class TestUniqueValidator(object):
 
     def test_with_form_obj_unavailable(self):
         class MyForm(Form):
-            name = TextField(
+            name = StringField(
                 validators=[
                     Unique(User.name, get_session=lambda: self.session)
                 ]
@@ -113,7 +113,7 @@ class TestUniqueValidator(object):
     ))
     def test_raises_exception_if_improperly_configured(self, column):
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     column,
                 )]
@@ -123,7 +123,7 @@ class TestUniqueValidator(object):
 
     def test_raises_exception_string_if_improperly_configured(self):
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     ('name', 'email'),
                 )]
@@ -133,7 +133,7 @@ class TestUniqueValidator(object):
 
     def test_existing_name_collision(self):
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     User.name,
                     get_session=lambda: self.session
@@ -149,13 +149,13 @@ class TestUniqueValidator(object):
 
     def test_existing_name_collision_multiple(self):
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     [User.name, User.email],
                     get_session=lambda: self.session
                 )]
             )
-            email = TextField()
+            email = StringField()
 
         self.session.add(User(
             name=u'someone',
@@ -174,13 +174,13 @@ class TestUniqueValidator(object):
         monkeypatch.setattr(User, 'query', self.session.query(User), False)
 
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     [User.name, User.email],
                     get_session=lambda: self.session
                 )]
             )
-            email = TextField()
+            email = StringField()
 
         self.session.add(User(
             name=u'someone',
@@ -204,13 +204,13 @@ class TestUniqueValidator(object):
         )
 
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     [User.name, User.email],
                     get_session=lambda: self.session
                 )]
             )
-            email = TextField()
+            email = StringField()
 
         self.session.add(User(
             name=u'someone',
@@ -227,13 +227,13 @@ class TestUniqueValidator(object):
 
     def test_relationship_multiple_collision(self):
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     [User.name, User.favorite_color],
                     get_session=lambda: self.session
                 )]
             )
-            email = TextField()
+            email = StringField()
             favorite_color = QuerySelectField(
                 query_factory=lambda: self.session.query(Color).all(),
                 allow_blank=True
@@ -260,13 +260,13 @@ class TestUniqueValidator(object):
 
     def test_relationship_multiple_no_collision(self):
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     [User.name, User.favorite_color],
                     get_session=lambda: self.session
                 )]
             )
-            email = TextField()
+            email = StringField()
             favorite_color = QuerySelectField(
                 query_factory=lambda: self.session.query(Color).all(),
                 allow_blank=True
@@ -293,7 +293,7 @@ class TestUniqueValidator(object):
 
     def test_without_obj_without_collision(self):
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     User.name,
                     get_session=lambda: self.session
@@ -308,13 +308,13 @@ class TestUniqueValidator(object):
 
     def test_without_obj_without_collision_multiple(self):
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     [User.name, User.email],
                     get_session=lambda: self.session
                 )]
             )
-            email = TextField()
+            email = StringField()
 
         self.session.add(User(
             name=u'someone',
@@ -330,7 +330,7 @@ class TestUniqueValidator(object):
 
     def test_existing_name_no_collision(self):
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     User.name,
                     get_session=lambda: self.session
@@ -345,13 +345,13 @@ class TestUniqueValidator(object):
 
     def test_existing_name_no_collision_multiple(self):
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     (User.name, User.email),
                     get_session=lambda: self.session
                 )]
             )
-            email = TextField()
+            email = StringField()
 
         obj = User(name=u'someone', email=u'hello@world.com')
         self.session.add(obj)
@@ -365,7 +365,7 @@ class TestUniqueValidator(object):
         User.query = self.session.query(User)
 
         class MyForm(ModelForm):
-            name = TextField(
+            name = StringField(
                 validators=[Unique(
                     User.name,
                 )]

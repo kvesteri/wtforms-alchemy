@@ -1,4 +1,3 @@
-import six
 import sqlalchemy as sa
 from wtforms import Form
 from wtforms.form import FormMeta
@@ -139,7 +138,7 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
     configuration as described in :ref:`custom_base`.
     """
 
-    class ModelForm(six.with_metaclass(meta, base)):
+    class ModelForm(base, metaclass=meta):
         """
         Standard base-class for all forms to be combined with a model. Use
         :func:`model_form_factory` in case you wish to change its behavior.

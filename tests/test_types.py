@@ -1,3 +1,5 @@
+from enum import Enum
+
 import sqlalchemy as sa
 from pytest import mark, raises
 from sqlalchemy_utils import (
@@ -48,16 +50,11 @@ try:
     import passlib  # noqa
 except ImportError:
     passlib = None
-try:
-    from enum import Enum
-except ImportError:
-    Enum = None
 
 
 class UnknownType(sa.types.UserDefinedType):
-
     def get_col_spec(self):
-        return "UNKNOWN()"
+        return 'UNKNOWN()'
 
 
 class CustomUnicodeTextType(sa.types.TypeDecorator):
@@ -251,20 +248,19 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         self.assert_type('test_column', CountryField)
 
     def test_choice_type_converts_to_select_field(self):
-        choices = [(u'1', u'choice 1'), (u'2', u'choice 2')]
+        choices = [('1', 'choice 1'), ('2', 'choice 2')]
         self.init(type_=ChoiceType(choices))
         self.assert_type('test_column', SelectField)
-        assert self.form_class().test_column.choices == choices
+        assert list(self.form_class().test_column.choices) == choices
 
     def test_choice_type_uses_custom_coerce_func(self):
-        choices = [(u'1', u'choice 1'), (u'2', u'choice 2')]
+        choices = [('1', 'choice 1'), ('2', 'choice 2')]
         self.init(type_=ChoiceType(choices))
         self.assert_type('test_column', SelectField)
         model = self.ModelTest(test_column=u'2')
         form = self.form_class(obj=model)
         assert '<option selected value="2">' in str(form.test_column)
 
-    @mark.xfail('Enum is None')
     def test_choice_type_with_enum(self):
         class Choice(Enum):
             choice1 = 1
@@ -272,12 +268,13 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
             def __str__(self):
                 return self.name
+
         self.init(type_=ChoiceType(Choice))
         self.assert_type('test_column', SelectField)
         assert self.form_class().test_column.choices == [
-            (1, u'choice1'), (2, u'choice2')]
+            (1, 'choice1'), (2, 'choice2')
+        ]
 
-    @mark.xfail('Enum is None')
     @mark.parametrize(
         ['type_', 'impl'],
         [
@@ -292,6 +289,7 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
 
             def __str__(self):
                 return self.name
+
         self.init(type_=ChoiceType(Choice, impl=impl))
         self.assert_type('test_column', SelectField)
         model = self.ModelTest(test_column=type_(2))

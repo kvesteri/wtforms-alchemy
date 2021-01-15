@@ -1,6 +1,5 @@
 from collections.abc import Iterable, Mapping
 
-import six
 from sqlalchemy import Column
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from wtforms import ValidationError
@@ -26,7 +25,7 @@ class Unique(object):
     :param message:
         The error message.
     """
-    field_flags = ('unique', )
+    field_flags = {'unique': True}
 
     def __init__(self, column, get_session=None, message=None):
         self.column = column
@@ -52,7 +51,7 @@ class Unique(object):
 
     def _syntaxes_as_tuples(self, form, field, column):
         """Converts a set of different syntaxes into a tuple of tuples"""
-        if isinstance(column, six.string_types):
+        if isinstance(column, str):
             return ((column, getattr(form.Meta.model, column)),)
         elif isinstance(column, Mapping):
             return tuple(
