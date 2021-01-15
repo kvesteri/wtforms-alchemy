@@ -8,7 +8,6 @@ from sqlalchemy.orm.util import identity_key
 from sqlalchemy_utils import Country, i18n, PhoneNumber
 from sqlalchemy_utils.primitives import WeekDay, WeekDays
 from wtforms import widgets
-from wtforms.compat import string_types, text_type
 from wtforms.fields import FieldList, FormField, SelectFieldBase
 from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput, ListWidget
@@ -188,7 +187,7 @@ class QuerySelectField(SelectFieldBase):
 
         if get_label is None:
             self.get_label = lambda x: x
-        elif isinstance(get_label, string_types):
+        elif isinstance(get_label, str):
             self.get_label = operator.attrgetter(get_label)
         else:
             self.get_label = get_label
@@ -220,7 +219,7 @@ class QuerySelectField(SelectFieldBase):
             )
             get_pk = self.get_pk
             self._object_list = list(
-                (text_type(get_pk(obj)), obj) for obj in query
+                (str(get_pk(obj)), obj) for obj in query
             )
         return self._object_list
 
@@ -318,7 +317,7 @@ class QuerySelectMultipleField(QuerySelectField):
 
 def get_pk_from_identity(obj):
     cls, key = identity_key(instance=obj)[0:2]
-    return ':'.join(text_type(x) for x in key)
+    return ':'.join(str(x) for x in key)
 
 
 class GroupedQuerySelectField(SelectField):
@@ -366,7 +365,7 @@ class GroupedQuerySelectField(SelectField):
             self.query if self.query is not None
             else self.query_factory()
         )
-        return list((six.text_type(self.get_pk(obj)), obj) for obj in query)
+        return list((str(self.get_pk(obj)), obj) for obj in query)
 
     def _pre_process_object_list(self, object_list):
         return sorted(
@@ -503,7 +502,7 @@ class GroupedQuerySelectMultipleField(SelectField):
             self.query if self.query is not None
             else self.query_factory()
         )
-        return list((six.text_type(self.get_pk(obj)), obj) for obj in query)
+        return list((str(self.get_pk(obj)), obj) for obj in query)
 
     def _pre_process_object_list(self, object_list):
         return sorted(

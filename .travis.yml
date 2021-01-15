@@ -12,6 +12,9 @@ env:
     - WTFORMS=1.0.5
     - WTFORMS=2.0
     - WTFORMS=2.1
+    - WTFORMS=2.2
+    - WTFORMS=2.3
+    - WTFORMS=3.0.0a1
 
 install:
   - pip install WTForms==$WTFORMS

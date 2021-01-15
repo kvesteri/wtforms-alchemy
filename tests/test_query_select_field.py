@@ -1,7 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.orm.session import close_all_sessions
 from wtforms import Form
-from wtforms.compat import text_type
 
 from wtforms_alchemy import (
     GroupedQuerySelectField,
@@ -23,7 +22,7 @@ class DummyPostData(dict):
 class LazySelect(object):
     def __call__(self, field, **kwargs):
         return list(
-            (val, text_type(label), selected)
+            (val, str(label), selected)
             for val, label, selected in field.iter_choices()
         )
 

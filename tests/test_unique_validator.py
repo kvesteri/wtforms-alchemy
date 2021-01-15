@@ -4,7 +4,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.session import close_all_sessions
 from wtforms import Form
-from wtforms.fields import TextField
+
+try:
+    from wtforms.fields import TextField
+except ImportError:
+    from wtforms.fields import StringField as TextField
 
 from tests import MultiDict
 from wtforms_alchemy import ModelForm, QuerySelectField, Unique
