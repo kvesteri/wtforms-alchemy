@@ -20,6 +20,7 @@ env:
 install:
   - pip install WTForms==$WTFORMS
   - pip install -e ".[test]"
+  - pip install https://github.com/jpic/wtforms-components/archive/wtforms3.zip
   - test -z $SQLALCHEMY || pip install SQLAlchemy==$SQLALCHEMY
 
 script:
