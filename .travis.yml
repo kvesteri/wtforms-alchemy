@@ -14,11 +14,12 @@ env:
     - WTFORMS=2.1
     - WTFORMS=2.2
     - WTFORMS=2.3
-    - WTFORMS=3.0.0a1
+    - WTFORMS=3.0.0a1 SQLALCHEMY=1.4.0b1
 
 install:
   - pip install WTForms==$WTFORMS
   - pip install -e ".[test]"
+  - test -z $SQLALCHEMY || pip install SQLAlchemy==$SQLALCHEMY
 
 script:
   - isort --recursive --diff wtforms_alchemy tests && isort --recursive --check-only wtforms_alchemy tests
