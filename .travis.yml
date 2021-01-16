@@ -17,6 +17,13 @@ env:
     - WTFORMS=3.0.0a1
     - SQLALCHEMY=1.4.0b1 WTFORMS=3.0.0a1
 
+jobs:
+  exclude:
+    - python: 3.5
+      env: WTFORMS=3.0.0a1
+    - python: 3.5
+      env: SQLALCHEMY=1.4.0b1 WTFORMS=3.0.0a1
+
 install:
   - pip install WTForms==$WTFORMS
   - pip install -e ".[test]"
