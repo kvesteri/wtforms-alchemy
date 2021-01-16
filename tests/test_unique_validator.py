@@ -5,13 +5,13 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.session import close_all_sessions
 from wtforms import Form
 
+from tests import MultiDict
+from wtforms_alchemy import ModelForm, QuerySelectField, Unique
+
 try:
     from wtforms.fields import TextField
 except ImportError:
     from wtforms.fields import StringField as TextField
-
-from tests import MultiDict
-from wtforms_alchemy import ModelForm, QuerySelectField, Unique
 
 base = declarative_base()
 
