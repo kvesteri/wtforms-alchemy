@@ -3,13 +3,13 @@ from __future__ import unicode_literals
 import operator
 from itertools import groupby
 
-import six
+import sqlalchemy as sa
 from sqlalchemy.orm.util import identity_key
 from sqlalchemy_utils import Country, i18n, PhoneNumber
 from sqlalchemy_utils.primitives import WeekDay, WeekDays
 from wtforms import widgets
-from wtforms.compat import string_types, text_type
 from wtforms.fields import FieldList, FormField, SelectFieldBase
+from wtforms.utils import unset_value
 from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms_components import SelectField, SelectMultipleField
@@ -17,11 +17,6 @@ from wtforms_components.fields.html5 import StringField
 from wtforms_components.widgets import SelectWidget, TelInput
 
 from .utils import find_entity
-
-try:
-    from wtforms.utils import unset_value as _unset_value
-except ImportError:
-    from wtforms.fields import _unset_value
 
 
 class SkipOperation(Exception):
@@ -58,29 +53,22 @@ class ModelFieldList(FieldList):
         new_index = self.last_index = index or (self.last_index + 1)
         name = '%s-%d' % (self.short_name, new_index)
         id = '%s-%d' % (self.id, new_index)
-        if hasattr(self, 'meta'):
-            # WTForms 2.0
-            return self.unbound_field.bind(
-                form=None,
-                name=name,
-                prefix=self._prefix,
-                id=id,
-                _meta=self.meta
-            )
-        else:
-            # WTForms 1.0
-            return self.unbound_field.bind(
-                form=None, name=name, prefix=self._prefix, id=id
-            )
+        return self.unbound_field.bind(
+            form=None,
+            name=name,
+            prefix=self._prefix,
+            id=id,
+            _meta=self.meta
+        )
 
-    def _add_entry(self, formdata=None, data=_unset_value, index=None):
+    def _add_entry(self, formdata=None, data=unset_value, index=None):
         field = self._get_bound_field_for_entry(
             formdata=formdata,
             data=data,
             index=index
         )
         if (
-            data != _unset_value and
+            data != unset_value and
             data
         ):
             if formdata:
@@ -98,11 +86,11 @@ class ModelFieldList(FieldList):
         return field
 
     def populate_obj(self, obj, name):
-        state = obj._sa_instance_state
+        state = sa.inspect(obj)
 
         if not state.identity or self.population_strategy == 'replace':
             setattr(obj, name, [])
-            for counter in six.moves.range(len(self.entries)):
+            for counter in range(len(self.entries)):
                 try:
                     getattr(obj, name).append(self.model())
                 except AttributeError:
@@ -133,7 +121,7 @@ class CountryField(SelectField):
         # ("ZZ"), "European Union" ("QU") and "Outlying Oceania" ("QO").
         territories = [
             (code, name)
-            for code, name in six.iteritems(i18n.get_locale().territories)
+            for code, name in i18n.get_locale().territories.items()
             if len(code) == 2 and code not in ('QO', 'QU', 'ZZ')
         ]
         return sorted(territories, key=operator.itemgetter(1))
@@ -188,7 +176,7 @@ class QuerySelectField(SelectFieldBase):
 
         if get_label is None:
             self.get_label = lambda x: x
-        elif isinstance(get_label, string_types):
+        elif isinstance(get_label, str):
             self.get_label = operator.attrgetter(get_label)
         else:
             self.get_label = get_label
@@ -220,7 +208,7 @@ class QuerySelectField(SelectFieldBase):
             )
             get_pk = self.get_pk
             self._object_list = list(
-                (text_type(get_pk(obj)), obj) for obj in query
+                (str(get_pk(obj)), obj) for obj in query
             )
         return self._object_list
 
@@ -318,7 +306,7 @@ class QuerySelectMultipleField(QuerySelectField):
 
 def get_pk_from_identity(obj):
     cls, key = identity_key(instance=obj)[0:2]
-    return ':'.join(text_type(x) for x in key)
+    return ':'.join(str(x) for x in key)
 
 
 class GroupedQuerySelectField(SelectField):
@@ -366,7 +354,7 @@ class GroupedQuerySelectField(SelectField):
             self.query if self.query is not None
             else self.query_factory()
         )
-        return list((six.text_type(self.get_pk(obj)), obj) for obj in query)
+        return list((str(self.get_pk(obj)), obj) for obj in query)
 
     def _pre_process_object_list(self, object_list):
         return sorted(
@@ -503,7 +491,7 @@ class GroupedQuerySelectMultipleField(SelectField):
             self.query if self.query is not None
             else self.query_factory()
         )
-        return list((six.text_type(self.get_pk(obj)), obj) for obj in query)
+        return list((str(self.get_pk(obj)), obj) for obj in query)
 
     def _pre_process_object_list(self, object_list):
         return sorted(
@@ -648,13 +636,13 @@ class PhoneNumberField(StringField):
             except AttributeError:
                 return self.data
         else:
-            return u''
+            return ''
 
     def process_formdata(self, valuelist):
         import phonenumbers
 
         if valuelist:
-            if valuelist[0] == u'':
+            if valuelist[0] == '':
                 self.data = None
             else:
                 self.data = valuelist[0]

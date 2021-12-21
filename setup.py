@@ -69,10 +69,9 @@ setup(
     platforms='any',
     install_requires=[
         'SQLAlchemy>=1.0',
-        'WTForms>=1.0.4',
+        'WTForms>=2.2',
         'WTForms-Components>=0.9.2',
-        'SQLAlchemy-Utils>=0.32.6',
-        'six>=1.4.1',
+        'SQLAlchemy-Utils>=0.32.6'
     ],
     extras_require=extras_require,
     classifiers=[
@@ -85,6 +84,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ]

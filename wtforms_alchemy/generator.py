@@ -3,7 +3,6 @@ from collections import OrderedDict
 from decimal import Decimal
 from enum import Enum
 
-import six
 import sqlalchemy as sa
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy_utils import types
@@ -471,7 +470,7 @@ class FormGenerator(object):
         except NotImplementedError:
             return null_or_unicode
 
-        if column.nullable and issubclass(python_type, six.string_types):
+        if column.nullable and issubclass(python_type, str):
             return null_or_unicode
         return python_type
 
@@ -528,10 +527,7 @@ class FormGenerator(object):
         if attr is None:
             return attr
 
-        if inspect.ismethod(attr):
-            return six.get_unbound_function(attr)(**kwargs)
-        else:
-            return attr(**kwargs)
+        return attr(**kwargs)
 
     def additional_validators(self, key, column):
         """

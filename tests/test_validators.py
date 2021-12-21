@@ -83,7 +83,7 @@ class TestAutoAssignedValidators(ModelFormTestCase):
                 not_null_validator = []
 
         form = ModelTestForm()
-        assert form.test_column.validators == []
+        assert list(form.test_column.validators) == []
 
     def test_not_null_validator_as_none(self):
         class ModelTest(self.base):
@@ -136,8 +136,11 @@ class TestAutoAssignedValidators(ModelFormTestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             test_column = sa.Column(EmailType, nullable=True)
 
-        class MyOptionalValidator(object):
+        class MyOptionalValidator:
             def __init__(self, *args, **kwargs):
+                pass
+
+            def __call__(self, form, field):
                 pass
 
         class ModelTestForm(ModelForm):
@@ -236,7 +239,7 @@ class TestAutoAssignedValidators(ModelFormTestCase):
                 optional_validator = None
 
         form = ModelTestForm()
-        assert form.test_column.validators == []
+        assert list(form.test_column.validators) == []
 
     def test_override_unique_validator(self):
         class ModelTest(self.base):

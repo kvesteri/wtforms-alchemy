@@ -54,16 +54,16 @@ class TestOneToOneModelFormRelations(FormRelationsTestCase):
     def test_assigment_and_deletion(self):
         self.save()
         event = self.session.query(self.Event).first()
-        assert event.location.name == u'Some location'
+        assert event.location.name == 'Some location'
         data = {
-            'name': u'Some event'
+            'name': 'Some event'
         }
         form = self.EventForm(MultiDict(data))
         form.validate()
         form.populate_obj(event)
         self.session.commit()
         event = self.session.query(self.Event).first()
-        assert event.location.name == u''
+        assert not event.location.name
 
     def test_only_populates_related_if_they_are_obj_attributes(self):
         class EventForm(ModelForm):
@@ -76,13 +76,16 @@ class TestOneToOneModelFormRelations(FormRelationsTestCase):
 
         with raises(TypeError):
             self.save(data={
-                'name': u'Some event',
-                'unknown_field-name': u'Some location',
+                'name': 'Some event',
+                'unknown_field-name': 'Some location',
             })
 
     def test_updating_related_object(self):
         event = self.save()
         location_id = event.location.id
-        self.save(event, {'location-name': u'Some other location'})
-
+        self.save(
+            event,
+            {'name': 'some name', 'location-name': u'Some other location'}
+        )
+        assert event.name == 'some name'
         assert event.location.id == location_id

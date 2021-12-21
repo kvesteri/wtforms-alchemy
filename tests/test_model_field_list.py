@@ -25,7 +25,7 @@ class ModelFieldListTestCase(FormRelationsTestCase):
         self.Location = Location
 
     def save(self, event=None, data=None):
-        if not data:
+        if data is None:
             data = {
                 'name': u'Some event',
                 'locations-0-name': u'Some location',
@@ -122,11 +122,6 @@ class TestUpdateStrategy(ModelFieldListTestCase):
 
         self.LocationForm = LocationForm
         self.EventForm = EventForm
-
-    def test_with_none_as_formdata_for_existing_objects(self):
-        event = self.save()
-        form = self.EventForm(MultiDict(), obj=event)
-        assert form.locations[0].data['id']
 
     def test_single_entry_update(self):
         event = self.save()
