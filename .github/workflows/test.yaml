@@ -1,0 +1,23 @@
+name: Tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+        tox_env: ['sqlalchemy14']
+        include:
+          - python-version: '3.6'
+            tox_env: 'sqlalchemy13'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install tox
+        run: pip install tox
+      - name: Run tests
+        run: tox -e ${{matrix.tox_env }}
