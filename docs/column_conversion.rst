@@ -42,6 +42,7 @@ WTForms-Alchemy also supports many types provided by SQLAlchemy-Utils.
     ColorType                           wtforms_components.fields.ColorField
     CountryType                         wtforms_alchemy.fields.CountryType
     EmailType                           wtforms_components.fields.EmailField
+    GenderType                          wtforms_components.fields.GenderField
     IPAddressType                       wtforms_components.fields.IPAddressField
     PasswordType                        wtforms.fields.PasswordField
     PhoneNumberType                     wtforms_components.fields.PhoneNumberField
