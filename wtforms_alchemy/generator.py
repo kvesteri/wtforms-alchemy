@@ -217,6 +217,14 @@ class FormGenerator(object):
         :param form: form to attach the generated fields into
         :param attributes: model attributes to generate the form fields from
         """
+
+        order = getattr(form, 'field_order', None)
+        if order:
+            original = properties
+            properties = OrderedDict()
+            for name in order:
+                properties[name] = original[name]
+
         for key, prop in properties.items():
             column = prop.columns[0]
             try:
