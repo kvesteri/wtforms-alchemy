@@ -593,7 +593,11 @@ class FormGenerator(object):
             hasattr(column.type, 'length') and
             column.type.length
         ):
-            return self.get_validator('length', max=column.type.length)
+            min_ = column.info.get('min')
+            if min_ is None:
+                min_ = 0
+            return self.get_validator('length', max=column.type.length,
+                                      min=min_)
 
     def get_field_class(self, column):
         """
