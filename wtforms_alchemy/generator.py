@@ -449,6 +449,10 @@ class FormGenerator(object):
                 kwargs['choices'] = choices
         elif 'choices' in column.info and column.info['choices']:
             kwargs['choices'] = column.info['choices']
+        elif issubclass(column.type.python_type, Enum):
+            kwargs['choices'] = [
+                (choice.value, str(choice)) for choice in column.type.python_type
+            ]
         else:
             kwargs['choices'] = [
                 (enum, enum) for enum in column.type.enums
