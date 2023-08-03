@@ -1,3 +1,4 @@
+import enum
 from decimal import Decimal
 
 import six
@@ -84,3 +85,12 @@ class TestSelectFieldCoerce(ModelFormTestCase):
         form = self.form_class(MultiDict({'test_column': '2.0'}))
         assert form.test_column.data == u'2.0'
         assert isinstance(form.test_column.data, six.text_type)
+
+    def test_enum_coerces_values_to_enums(self):
+        class TestEnum(enum.Enum):
+            A = 'a'
+            B = 'b'
+    
+        self.init(type_=sa.Enum(TestEnum), nullable=True)
+        form = self.form_class(MultiDict({'test_column': 'a'}))
+        assert form.test_column.data == TestEnum.A

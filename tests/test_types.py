@@ -144,14 +144,11 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
         class TestEnum(Enum):
             A = 'a'
             B = 'b'
-
-            def __str__(self):
-                return self.name
     
         self.init(type_=sa.Enum(TestEnum))
         self.assert_type('test_column', SelectField)
         form = self.form_class()
-        assert form.test_column.choices == [('a', 'A'), ('b', 'B')]
+        assert form.test_column.choices == [('a', TestEnum.A), ('b', TestEnum.B)]
 
     def test_nullable_enum_uses_null_or_unicode_coerce_func_by_default(self):
         choices = ['1', '2']
