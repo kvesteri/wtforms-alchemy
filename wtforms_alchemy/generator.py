@@ -592,6 +592,10 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
+        if (isinstance(column.type, sa.types.Enum) and
+            issubclass(column.type.python_type, Enum)):
+            return None
+
         if (
             isinstance(column.type, sa.types.String) and
             hasattr(column.type, 'length') and
