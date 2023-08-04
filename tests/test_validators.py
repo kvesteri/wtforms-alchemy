@@ -1,3 +1,4 @@
+import enum
 from datetime import datetime, time
 
 import sqlalchemy as sa
@@ -265,3 +266,14 @@ class TestAutoAssignedValidators(ModelFormTestCase):
 
         form = ModelTestForm()
         assert form.test_column.validators[2].message == 'Not unique'
+
+    def test_enum_validators(self):
+        class TestEnum(enum.Enum):
+            A = 'a'
+            B = 'b'
+    
+        self.init(type_=sa.Enum(TestEnum), nullable=True)
+        form = self.form_class()
+
+        assert len(form.test_column.validators) == 1
+        assert isinstance(form.test_column.validators[0], Optional)

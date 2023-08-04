@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import enum
 import operator
 from itertools import groupby
 
@@ -109,6 +110,7 @@ class ModelFieldList(FieldList):
         FieldList.populate_obj(self, obj, name)
 
 
+
 class CountryField(SelectField):
     def __init__(self, *args, **kwargs):
         kwargs['coerce'] = Country
@@ -125,6 +127,24 @@ class CountryField(SelectField):
             if len(code) == 2 and code not in ('QO', 'QU', 'ZZ')
         ]
         return sorted(territories, key=operator.itemgetter(1))
+
+
+class EnumSelectField(SelectField):
+    @property
+    def choice_values(self):
+        values = []
+        for value, label in self.concrete_choices:
+            if isinstance(label, enum.Enum):
+                values.append(label)
+            elif isinstance(label, (list, tuple)):
+                for subvalue, sublabel in label:
+                    if isinstance(sublabel, enum.Enum):
+                        values.append(sublabel)
+                    else:
+                        values.append(subvalue)
+            else:
+                values.append(value)
+        return values
 
 
 class QuerySelectField(SelectFieldBase):
