@@ -46,7 +46,7 @@ from .exc import (
     InvalidAttributeException,
     UnknownTypeException
 )
-from .fields import CountryField, PhoneNumberField, WeekDaysField
+from .fields import CountryField, EnumSelectField, PhoneNumberField, WeekDaysField
 from .utils import (
     choice_type_coerce_factory,
     ClassMap,
@@ -78,7 +78,7 @@ class FormGenerator(object):
         (sa.types.Boolean, BooleanField),
         (sa.types.Date, DateField),
         (sa.types.DateTime, DateTimeField),
-        (sa.types.Enum, SelectField),
+        (sa.types.Enum, EnumSelectField),
         (sa.types.Float, FloatField),
         (sa.types.Integer, IntegerField),
         (sa.types.Numeric, DecimalField),

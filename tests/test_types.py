@@ -38,6 +38,7 @@ from wtforms_components.fields import (
 from tests import ModelFormTestCase
 from wtforms_alchemy import (
     CountryField,
+    EnumSelectField,
     ModelForm,
     null_or_unicode,
     PhoneNumberField,
@@ -136,7 +137,7 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
     def test_enum_field_converts_to_select_field(self):
         choices = ['1', '2']
         self.init(type_=sa.Enum(*choices))
-        self.assert_type('test_column', SelectField)
+        self.assert_type('test_column', EnumSelectField)
         form = self.form_class()
         assert form.test_column.choices == [(s, s) for s in choices]
 
@@ -146,7 +147,7 @@ class TestModelColumnToFormFieldTypeConversion(ModelFormTestCase):
             B = 'b'
     
         self.init(type_=sa.Enum(TestEnum))
-        self.assert_type('test_column', SelectField)
+        self.assert_type('test_column', EnumSelectField)
         form = self.form_class()
         assert form.test_column.choices == [('a', TestEnum.A), ('b', TestEnum.B)]
 
