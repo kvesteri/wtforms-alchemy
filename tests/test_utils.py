@@ -47,9 +47,9 @@ class TestUtils(FormRelationsTestCase):
         band = self.Band(name=u'The Furious')
         self.session.add(band)
         singer = self.Person(name=u'Paul Insane')
-        self.BandMember(band=band, person=singer, role=u'singer')
+        self.session.add(self.BandMember(band=band, person=singer, role=u'singer'))
         guitarist = self.Person(name=u'John Crazy')
-        self.BandMember(band=band, person=guitarist, role=u'guitar')
+        self.session.add(self.BandMember(band=band, person=guitarist, role=u'guitar'))
         self.session.commit()
 
         sing_data = dict(band_id=band.id, person_id=singer.id, role=u'singer')

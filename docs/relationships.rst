@@ -11,7 +11,7 @@ One-to-one relations
 Consider the following example. We have Event and Location
 classes with each event having one location. ::
 
-    from sqlalchemy.ext.declarative import declarative_base
+    from sqlalchemy.orm import declarative_base
     from wtforms_alchemy import ModelForm, ModelFormField
 
     Base = declarative_base()
@@ -55,7 +55,7 @@ Consider the following example. We have Event and Location
 classes with each event having many location. Notice we are using FormField along
 with ModelFieldList. ::
 
-    from sqlalchemy.ext.declarative import declarative_base
+    from sqlalchemy.orm import declarative_base
     from wtforms_alchemy import ModelForm, ModelFieldList
     from wtforms.fields import FormField
 

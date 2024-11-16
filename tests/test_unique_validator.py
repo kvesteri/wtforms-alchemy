@@ -1,7 +1,6 @@
 import sqlalchemy as sa
 from pytest import mark, raises
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.orm.session import close_all_sessions
 from wtforms import Form
 

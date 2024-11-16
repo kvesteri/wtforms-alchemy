@@ -1,9 +1,14 @@
 import sqlalchemy as sa
-from pytest import raises
-from sqlalchemy_i18n import make_translatable, Translatable, translation_base
+from packaging.version import Version
+from pytest import raises, skip
+from sqlalchemy_i18n import Translatable, make_translatable, translation_base
 
 from tests import ModelFormTestCase, MultiDict
 from wtforms_alchemy import ModelForm
+
+sqlalchemy_version = sa.__version__
+if Version(sqlalchemy_version) >= Version("2.0"):
+    skip("sqlalchemy_i18n does not support SQLAlchemy 2.0", allow_module_level=True)
 
 make_translatable()
 
