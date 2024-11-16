@@ -7,6 +7,7 @@ Unreleased
 ^^^^^^^^^^
 
 - Dropped support for Python 3.8 and earlier. The minimum supported Python version is now 3.9.
+- Dropped support for SQLAlchemy 1.3 and earlier. The minimum supported SQLAlchemy version is now 1.4.
 
 0.18.0 (2021-12-21)
 ^^^^^^^^^^^^^^^^^^^
