@@ -1,5 +1,3 @@
-from distutils.version import LooseVersion
-
 import wtforms
 from pytest import raises
 from wtforms import Form
@@ -91,9 +89,6 @@ class TestModelFormFactory(ModelFormTestCase):
         assert form.Meta.unique_validator is None
 
     def test_class_meta_wtforms2(self):
-        if LooseVersion(wtforms.__version__) < LooseVersion('2'):
-            return  # skip test for wtforms < 2
-
         self.init()
 
         class SomeForm(Form):
