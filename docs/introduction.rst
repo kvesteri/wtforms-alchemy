@@ -47,7 +47,7 @@ Installation
 
 
 
-The supported Python versions are 3.9.
+The supported Python versions are 3.9–3.13.
 
 
 
