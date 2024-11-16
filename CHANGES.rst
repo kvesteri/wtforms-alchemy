@@ -10,6 +10,7 @@ Unreleased
 - Dropped support for SQLAlchemy 1.3 and earlier. The minimum supported SQLAlchemy version is now 1.4.
 - Added support for Python 3.10–3.13.
 - Added support for SQLAlchemy 2.0.
+- Added support for WTForms 3.2. The minimum supported WTForms version is now 3.1.
 
 0.18.0 (2021-12-21)
 ^^^^^^^^^^^^^^^^^^^

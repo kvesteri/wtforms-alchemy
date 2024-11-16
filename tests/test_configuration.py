@@ -151,7 +151,7 @@ class TestModelFormConfiguration(ModelFormTestCase):
                 datetime_format = '%Y-%m-%dT%H:%M:%S'
 
         form = ModelTestForm()
-        assert form.test_column.format == '%Y-%m-%dT%H:%M:%S'
+        assert form.test_column.format == ['%Y-%m-%dT%H:%M:%S']
 
     def test_supports_additional_validators(self):
         self.init()

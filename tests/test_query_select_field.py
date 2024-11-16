@@ -24,7 +24,7 @@ class LazySelect(object):
     def __call__(self, field, **kwargs):
         return list(
             (val, str(label), selected)
-            for val, label, selected in field.iter_choices()
+            for val, label, selected, _ in field.iter_choices()
         )
 
 
