@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.orm import mapper
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm.session import close_all_sessions
 from wtforms import Form
 
@@ -8,7 +8,7 @@ from wtforms_alchemy import (
     GroupedQuerySelectMultipleField,
     ModelForm,
     QuerySelectField,
-    QuerySelectMultipleField
+    QuerySelectMultipleField,
 )
 
 
@@ -35,33 +35,23 @@ class Base(object):
 
 
 class TestBase(object):
-    def _do_tables(self, mapper, engine):
-        metadata = sa.MetaData()
+    def create_models(self):
+        class Test(self.base):
+            __tablename__ = 'test'
+            id = sa.Column(sa.Integer, primary_key=True, nullable=False)
+            name = sa.Column(sa.String, nullable=False)
 
-        test_table = sa.Table(
-            'test', metadata,
-            sa.Column('id', sa.Integer, primary_key=True, nullable=False),
-            sa.Column('name', sa.String, nullable=False),
-        )
-
-        pk_test_table = sa.Table(
-            'pk_test', metadata,
-            sa.Column('foobar', sa.String, primary_key=True, nullable=False),
-            sa.Column('baz', sa.String, nullable=False),
-        )
-
-        Test = type(str('Test'), (Base, ), {})
-        PKTest = type(str('PKTest'), (Base, ), {
-            '__unicode__': lambda x: x.baz,
-            '__str__': lambda x: x.baz,
-        })
-
-        mapper(Test, test_table)
-        mapper(PKTest, pk_test_table)
         self.Test = Test
-        self.PKTest = PKTest
 
-        metadata.create_all(bind=engine)
+        class PKTest(self.base):
+            __tablename__ = 'pk_test'
+            foobar = sa.Column(sa.String, primary_key=True, nullable=False)
+            baz = sa.Column(sa.String, nullable=False)
+
+            def __str__(self):
+                return self.baz
+
+        self.PKTest = PKTest
 
     def _fill(self, sess):
         for i, n in [(1, 'apple'), (2, 'banana')]:
@@ -74,14 +64,24 @@ class TestBase(object):
 
 
 class TestQuerySelectField(TestBase):
-    def setup_method(self, method):
-        engine = sa.create_engine('sqlite:///:memory:', echo=False)
-        self.Session = sa.orm.session.sessionmaker(bind=engine)
-        self._do_tables(mapper, engine)
+    def setup_method(self):
+        self.engine = sa.create_engine('sqlite:///:memory:', echo=False)
+
+        self.base = declarative_base()
+        self.create_models()
+
+        self.base.metadata.create_all(self.engine)
+
+        Session = sa.orm.session.sessionmaker(bind=self.engine)
+        self.session = Session()
+
+    def teardown_method(self):
+        close_all_sessions()
+        self.base.metadata.drop_all(self.engine)
+        self.engine.dispose()
 
     def test_without_factory(self):
-        sess = self.Session()
-        self._fill(sess)
+        self._fill(self.session)
 
         class F(Form):
             a = QuerySelectField(
@@ -90,39 +90,38 @@ class TestQuerySelectField(TestBase):
                 get_pk=lambda x: x.id
             )
         form = F(DummyPostData(a=['1']))
-        form.a.query = sess.query(self.Test)
+        form.a.query = self.session.query(self.Test)
         assert form.a.data is not None
         assert form.a.data.id, 1
         assert form.a(), [('1', 'apple', True), ('2', 'banana', False)]
         assert form.validate()
 
-        form = F(a=sess.query(self.Test).filter_by(name='banana').first())
-        form.a.query = sess.query(self.Test).filter(self.Test.name != 'banana')
+        form = F(a=self.session.query(self.Test).filter_by(name='banana').first())
+        form.a.query = self.session.query(self.Test).filter(self.Test.name != 'banana')
         assert not form.validate()
         assert form.a.errors, ['Not a valid choice']
 
         # Test query with no results
         form = F()
         form.a.query = (
-            sess.query(self.Test)
+            self.session.query(self.Test)
             .filter(self.Test.id == 1, self.Test.id != 1)
             .all()
         )
         assert form.a() == []
 
     def test_with_query_factory(self):
-        sess = self.Session()
-        self._fill(sess)
+        self._fill(self.session)
 
         class F(Form):
             a = QuerySelectField(
                 get_label=(lambda model: model.name),
-                query_factory=lambda: sess.query(self.Test),
+                query_factory=lambda: self.session.query(self.Test),
                 widget=LazySelect()
             )
             b = QuerySelectField(
                 allow_blank=True,
-                query_factory=lambda: sess.query(self.PKTest),
+                query_factory=lambda: self.session.query(self.PKTest),
                 widget=LazySelect()
             )
 
@@ -140,7 +139,7 @@ class TestQuerySelectField(TestBase):
         # Test query with no results
         form = F()
         form.a.query = (
-            sess.query(self.Test)
+            self.session.query(self.Test)
             .filter(self.Test.id == 1, self.Test.id != 1)
             .all()
         )
@@ -158,9 +157,9 @@ class TestQuerySelectField(TestBase):
         assert form.validate()
 
         # Make sure the query is cached
-        sess.add(self.Test(id=3, name='meh'))
-        sess.flush()
-        sess.commit()
+        self.session.add(self.Test(id=3, name='meh'))
+        self.session.flush()
+        self.session.commit()
         assert form.a() == [('1', 'apple', True), ('2', 'banana', False)]
         form.a._object_list = None
         assert form.a() == [
@@ -176,12 +175,23 @@ class TestQuerySelectField(TestBase):
 
 
 class TestQuerySelectMultipleField(TestBase):
-    def setup_method(self, method):
-        engine = sa.create_engine('sqlite:///:memory:', echo=False)
-        Session = sa.orm.session.sessionmaker(bind=engine)
-        self._do_tables(mapper, engine)
-        self.sess = Session()
-        self._fill(self.sess)
+    def setup_method(self):
+        self.engine = sa.create_engine('sqlite:///:memory:', echo=False)
+
+        self.base = declarative_base()
+        self.create_models()
+
+        self.base.metadata.create_all(self.engine)
+
+        Session = sa.orm.session.sessionmaker(bind=self.engine)
+        self.session = Session()
+
+        self._fill(self.session)
+
+    def teardown_method(self):
+        close_all_sessions()
+        self.base.metadata.drop_all(self.engine)
+        self.engine.dispose()
 
     class F(Form):
         a = QuerySelectMultipleField(get_label='name', widget=LazySelect())
@@ -192,32 +202,32 @@ class TestQuerySelectMultipleField(TestBase):
 
     def test_single_value_without_factory(self):
         form = self.F(DummyPostData(a=['1']))
-        form.a.query = self.sess.query(self.Test)
+        form.a.query = self.session.query(self.Test)
         assert [1] == [v.id for v in form.a.data]
         assert form.a() == [('1', 'apple', True), ('2', 'banana', False)]
         assert form.validate()
 
     def test_multiple_values_without_query_factory(self):
         form = self.F(DummyPostData(a=['1', '2']))
-        form.a.query = self.sess.query(self.Test)
+        form.a.query = self.session.query(self.Test)
         assert [1, 2] == [v.id for v in form.a.data]
         assert form.a() == [('1', 'apple', True), ('2', 'banana', True)]
         assert form.validate()
 
         form = self.F(DummyPostData(a=['1', '3']))
-        form.a.query = self.sess.query(self.Test)
+        form.a.query = self.session.query(self.Test)
         assert [x.id for x in form.a.data], [1]
         assert not form.validate()
 
     def test_single_default_value(self):
-        first_test = self.sess.query(self.Test).get(2)
+        first_test = self.session.get(self.Test, 2)
 
         class F(Form):
             a = QuerySelectMultipleField(
                 get_label='name',
                 default=[first_test],
                 widget=LazySelect(),
-                query_factory=lambda: self.sess.query(self.Test)
+                query_factory=lambda: self.session.query(self.Test)
             )
         form = F()
         assert [v.id for v in form.a.data], [2]
@@ -228,7 +238,7 @@ class TestQuerySelectMultipleField(TestBase):
         # Test query with no results
         form = self.F()
         form.a.query = (
-            self.sess.query(self.Test)
+            self.session.query(self.Test)
             .filter(self.Test.id == 1, self.Test.id != 1)
             .all()
         )
@@ -239,7 +249,7 @@ class DatabaseTestCase(object):
     def setup_method(self, method):
         self.engine = sa.create_engine('sqlite:///:memory:')
 
-        self.base = sa.ext.declarative.declarative_base()
+        self.base = declarative_base()
         self.create_models()
 
         self.base.metadata.create_all(self.engine)

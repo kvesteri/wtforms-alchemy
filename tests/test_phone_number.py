@@ -1,8 +1,7 @@
 import sqlalchemy as sa
 from pytest import mark
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.orm.session import close_all_sessions
 from sqlalchemy_utils.types import phone_number
 
@@ -70,7 +69,7 @@ class TestPhoneNumbers(TestCase):
 
     def test_phone_number_is_stored_as_string(self):
         result = self.session.execute(
-            'SELECT phone_number FROM user WHERE id=:param',
+            sa.text('SELECT phone_number FROM user WHERE id=:param'),
             {'param': self.user.id}
         )
         assert result.first()[0] == u'+358401234567'

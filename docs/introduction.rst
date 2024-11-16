@@ -58,8 +58,7 @@ Lets say we have a model called User with couple of fields::
 
     import sqlalchemy as sa
     from sqlalchemy import create_engine
-    from sqlalchemy.ext.declarative import declarative_base
-    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.orm import declarative_base, sessionmaker
     from wtforms_alchemy import ModelForm
 
     engine = create_engine('sqlite:///:memory:')
