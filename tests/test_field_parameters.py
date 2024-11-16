@@ -81,6 +81,7 @@ class TestFieldParameters(ModelFormTestCase):
     def test_uses_custom_field_class(self):
         class InputTest(widgets.Input):
             input_type = 'color'
+            validation_attrs = []
 
         class FieldTest(StringField):
             widget = InputTest()
@@ -102,12 +103,6 @@ class TestFieldParameters(ModelFormTestCase):
         assert 'type="color"' in str(form.test_column)
 
     def test_accepts_none_as_custom_field_class(self):
-        class InputTest(widgets.Input):
-            input_type = 'color'
-
-        class FieldTest(StringField):
-            widget = InputTest()
-
         class ModelTest(self.base):
             __tablename__ = 'model_test'
             query = None

@@ -214,10 +214,10 @@ class QuerySelectField(SelectFieldBase):
 
     def iter_choices(self):
         if self.allow_blank:
-            yield ('__None', self.blank_text, self.data is None)
+            yield ('__None', self.blank_text, self.data is None, {})
 
         for pk, obj in self._get_object_list():
-            yield (pk, self.get_label(obj), obj == self.data)
+            yield (pk, self.get_label(obj), obj == self.data, {})
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -289,7 +289,7 @@ class QuerySelectMultipleField(QuerySelectField):
 
     def iter_choices(self):
         for pk, obj in self._get_object_list():
-            yield (pk, self.get_label(obj), obj in self.data)
+            yield (pk, self.get_label(obj), obj in self.data, {})
 
     def process_formdata(self, valuelist):
         self._formdata = set(valuelist)
@@ -416,7 +416,8 @@ class GroupedQuerySelectField(SelectField):
                 (
                     self.coerce,
                     self.get_pk(self.data) if self.data else self.blank_value
-                )
+                ),
+                {}
             )
 
     def process_formdata(self, valuelist):
@@ -558,7 +559,8 @@ class GroupedQuerySelectMultipleField(SelectField):
                 (
                     self.coerce,
                     [self.get_pk(obj) for obj in self.data or []]
-                )
+                ),
+                {}
             )
 
     def process_formdata(self, valuelist):
