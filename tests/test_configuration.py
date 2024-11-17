@@ -7,7 +7,7 @@ from tests import ModelFormTestCase, MultiDict
 from wtforms_alchemy import (
     AttributeTypeException,
     InvalidAttributeException,
-    ModelForm
+    ModelForm,
 )
 
 

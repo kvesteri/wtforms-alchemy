@@ -11,7 +11,7 @@ from wtforms import (
     Field,
     FloatField,
     PasswordField,
-    TextAreaField
+    TextAreaField,
 )
 from wtforms.widgets import CheckboxInput, TextArea
 from wtforms_components import (
@@ -28,7 +28,7 @@ from wtforms_components import (
     IntIntervalField,
     SelectField,
     StringField,
-    TimeField
+    TimeField,
 )
 from wtforms_components.widgets import (
     ColorInput,
@@ -38,13 +38,13 @@ from wtforms_components.widgets import (
     EmailInput,
     NumberInput,
     TextInput,
-    TimeInput
+    TimeInput,
 )
 
 from .exc import (
     AttributeTypeException,
     InvalidAttributeException,
-    UnknownTypeException
+    UnknownTypeException,
 )
 from .fields import CountryField, PhoneNumberField, WeekDaysField
 from .utils import (
@@ -57,7 +57,7 @@ from .utils import (
     is_scalar,
     null_or_unicode,
     strip_string,
-    translated_attributes
+    translated_attributes,
 )
 
 
