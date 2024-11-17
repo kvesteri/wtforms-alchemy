@@ -35,11 +35,7 @@ class ModelFormField(FormField):
 
 
 class ModelFieldList(FieldList):
-    def __init__(
-            self,
-            unbound_field,
-            population_strategy='update',
-            **kwargs):
+    def __init__(self, unbound_field, population_strategy="update", **kwargs):
         self.population_strategy = population_strategy
         super(ModelFieldList, self).__init__(unbound_field, **kwargs)
 
@@ -48,29 +44,21 @@ class ModelFieldList(FieldList):
         return self.unbound_field.args[0].Meta.model
 
     def _get_bound_field_for_entry(self, formdata, data, index):
-        assert not self.max_entries or len(self.entries) < self.max_entries, \
-            'You cannot have more than max_entries entries in this FieldList'
+        assert (
+            not self.max_entries or len(self.entries) < self.max_entries
+        ), "You cannot have more than max_entries entries in this FieldList"
         new_index = self.last_index = index or (self.last_index + 1)
-        name = '%s-%d' % (self.short_name, new_index)
-        id = '%s-%d' % (self.id, new_index)
+        name = "%s-%d" % (self.short_name, new_index)
+        id = "%s-%d" % (self.id, new_index)
         return self.unbound_field.bind(
-            form=None,
-            name=name,
-            prefix=self._prefix,
-            id=id,
-            _meta=self.meta
+            form=None, name=name, prefix=self._prefix, id=id, _meta=self.meta
         )
 
     def _add_entry(self, formdata=None, data=unset_value, index=None):
         field = self._get_bound_field_for_entry(
-            formdata=formdata,
-            data=data,
-            index=index
+            formdata=formdata, data=data, index=index
         )
-        if (
-            data != unset_value and
-            data
-        ):
+        if data != unset_value and data:
             if formdata:
                 field.process(formdata)
             else:
@@ -88,7 +76,7 @@ class ModelFieldList(FieldList):
     def populate_obj(self, obj, name):
         state = sa.inspect(obj)
 
-        if not state.identity or self.population_strategy == 'replace':
+        if not state.identity or self.population_strategy == "replace":
             setattr(obj, name, [])
             for counter in range(len(self.entries)):
                 try:
@@ -111,7 +99,7 @@ class ModelFieldList(FieldList):
 
 class CountryField(SelectField):
     def __init__(self, *args, **kwargs):
-        kwargs['coerce'] = Country
+        kwargs["coerce"] = Country
         super(CountryField, self).__init__(*args, **kwargs)
         self.choices = self._get_choices
 
@@ -122,7 +110,7 @@ class CountryField(SelectField):
         territories = [
             (code, name)
             for code, name in i18n.get_locale().territories.items()
-            if len(code) == 2 and code not in ('QO', 'QU', 'ZZ')
+            if len(code) == 2 and code not in ("QO", "QU", "ZZ")
         ]
         return sorted(territories, key=operator.itemgetter(1))
 
@@ -153,6 +141,7 @@ class QuerySelectField(SelectFieldBase):
     being `None`. The label for this blank choice can be set by specifying the
     `blank_text` parameter.
     """
+
     widget = widgets.Select()
 
     def __init__(
@@ -163,8 +152,8 @@ class QuerySelectField(SelectFieldBase):
         get_pk=None,
         get_label=None,
         allow_blank=False,
-        blank_text='',
-        **kwargs
+        blank_text="",
+        **kwargs,
     ):
         super(QuerySelectField, self).__init__(label, validators, **kwargs)
         self.query_factory = query_factory
@@ -202,26 +191,21 @@ class QuerySelectField(SelectFieldBase):
 
     def _get_object_list(self):
         if self._object_list is None:
-            query = (
-                self.query if self.query is not None
-                else self.query_factory()
-            )
+            query = self.query if self.query is not None else self.query_factory()
             get_pk = self.get_pk
-            self._object_list = list(
-                (str(get_pk(obj)), obj) for obj in query
-            )
+            self._object_list = list((str(get_pk(obj)), obj) for obj in query)
         return self._object_list
 
     def iter_choices(self):
         if self.allow_blank:
-            yield ('__None', self.blank_text, self.data is None, {})
+            yield ("__None", self.blank_text, self.data is None, {})
 
         for pk, obj in self._get_object_list():
             yield (pk, self.get_label(obj), obj == self.data, {})
 
     def process_formdata(self, valuelist):
         if valuelist:
-            if self.allow_blank and valuelist[0] == '__None':
+            if self.allow_blank and valuelist[0] == "__None":
                 self.data = None
             else:
                 self._data = None
@@ -234,9 +218,9 @@ class QuerySelectField(SelectFieldBase):
                 if data == obj:
                     break
             else:
-                raise ValidationError(self.gettext('Not a valid choice'))
+                raise ValidationError(self.gettext("Not a valid choice"))
         elif self._formdata or not self.allow_blank:
-            raise ValidationError(self.gettext('Not a valid choice'))
+            raise ValidationError(self.gettext("Not a valid choice"))
 
 
 class QuerySelectMultipleField(QuerySelectField):
@@ -247,22 +231,20 @@ class QuerySelectMultipleField(QuerySelectField):
     If any of the items in the data list or submitted form data cannot be
     found in the query, this will result in a validation error.
     """
+
     widget = widgets.Select(multiple=True)
 
     def __init__(self, label=None, validators=None, default=None, **kwargs):
         if default is None:
             default = []
         super(QuerySelectMultipleField, self).__init__(
-            label,
-            validators,
-            default=default,
-            **kwargs
+            label, validators, default=default, **kwargs
         )
-        if kwargs.get('allow_blank', False):
+        if kwargs.get("allow_blank", False):
             import warnings
+
             warnings.warn(
-                'allow_blank=True does not do anything for '
-                'QuerySelectMultipleField.'
+                "allow_blank=True does not do anything for " "QuerySelectMultipleField."
             )
         self._invalid_formdata = False
 
@@ -296,17 +278,17 @@ class QuerySelectMultipleField(QuerySelectField):
 
     def pre_validate(self, form):
         if self._invalid_formdata:
-            raise ValidationError(self.gettext('Not a valid choice'))
+            raise ValidationError(self.gettext("Not a valid choice"))
         elif self.data:
             obj_list = list(x[1] for x in self._get_object_list())
             for v in self.data:
                 if v not in obj_list:
-                    raise ValidationError(self.gettext('Not a valid choice'))
+                    raise ValidationError(self.gettext("Not a valid choice"))
 
 
 def get_pk_from_identity(obj):
     cls, key = identity_key(instance=obj)[0:2]
-    return ':'.join(str(x) for x in key)
+    return ":".join(str(x) for x in key)
 
 
 class GroupedQuerySelectField(SelectField):
@@ -321,15 +303,12 @@ class GroupedQuerySelectField(SelectField):
         get_label=None,
         get_group=None,
         allow_blank=False,
-        blank_text='',
-        blank_value='__None',
-        **kwargs
+        blank_text="",
+        blank_value="__None",
+        **kwargs,
     ):
         super(GroupedQuerySelectField, self).__init__(
-            label,
-            validators,
-            coerce=lambda x: x,
-            **kwargs
+            label, validators, coerce=lambda x: x, **kwargs
         )
 
         self.query = None
@@ -350,29 +329,22 @@ class GroupedQuerySelectField(SelectField):
         self._choices = None
 
     def _get_object_list(self):
-        query = (
-            self.query if self.query is not None
-            else self.query_factory()
-        )
+        query = self.query if self.query is not None else self.query_factory()
         return list((str(self.get_pk(obj)), obj) for obj in query)
 
     def _pre_process_object_list(self, object_list):
         return sorted(
-            object_list,
-            key=lambda x: (x[1] or u'', self.get_label(x[2]) or u'')
+            object_list, key=lambda x: (x[1] or "", self.get_label(x[2]) or "")
         )
 
     @property
     def choices(self):
         if not self._choices:
             object_list = map(
-                lambda x: (x[0], self.get_group(x[1]), x[1]),
-                self._get_object_list()
+                lambda x: (x[0], self.get_group(x[1]), x[1]), self._get_object_list()
             )
             # object_list is (key, group, value) tuple
-            choices = [
-                (self.blank_value, self.blank_text)
-            ] if self.allow_blank else []
+            choices = [(self.blank_value, self.blank_text)] if self.allow_blank else []
             object_list = self._pre_process_object_list(object_list)
             for group, data in groupby(object_list, key=lambda x: x[1]):
                 if group is not None:
@@ -415,9 +387,9 @@ class GroupedQuerySelectField(SelectField):
                 label,
                 (
                     self.coerce,
-                    self.get_pk(self.data) if self.data else self.blank_value
+                    self.get_pk(self.data) if self.data else self.blank_value,
                 ),
-                {}
+                {},
             )
 
     def process_formdata(self, valuelist):
@@ -435,9 +407,9 @@ class GroupedQuerySelectField(SelectField):
                 if data == obj:
                     break
             else:
-                raise ValidationError('Not a valid choice')
+                raise ValidationError("Not a valid choice")
         elif self._formdata or not self.allow_blank:
-            raise ValidationError('Not a valid choice')
+            raise ValidationError("Not a valid choice")
 
 
 class GroupedQuerySelectMultipleField(SelectField):
@@ -451,24 +423,21 @@ class GroupedQuerySelectMultipleField(SelectField):
         get_pk=None,
         get_label=None,
         get_group=None,
-        blank_text='',
+        blank_text="",
         default=None,
-        **kwargs
+        **kwargs,
     ):
         if default is None:
             default = []
         super(GroupedQuerySelectMultipleField, self).__init__(
-            label,
-            validators,
-            default=default,
-            coerce=lambda x: x,
-            **kwargs
+            label, validators, default=default, coerce=lambda x: x, **kwargs
         )
-        if kwargs.get('allow_blank', False):
+        if kwargs.get("allow_blank", False):
             import warnings
+
             warnings.warn(
-                'allow_blank=True does not do anything for '
-                'GroupedQuerySelectMultipleField.'
+                "allow_blank=True does not do anything for "
+                "GroupedQuerySelectMultipleField."
             )
 
         self.query = None
@@ -488,24 +457,19 @@ class GroupedQuerySelectMultipleField(SelectField):
         self._invalid_formdata = False
 
     def _get_object_list(self):
-        query = (
-            self.query if self.query is not None
-            else self.query_factory()
-        )
+        query = self.query if self.query is not None else self.query_factory()
         return list((str(self.get_pk(obj)), obj) for obj in query)
 
     def _pre_process_object_list(self, object_list):
         return sorted(
-            object_list,
-            key=lambda x: (x[1] or u'', self.get_label(x[2]) or u'')
+            object_list, key=lambda x: (x[1] or "", self.get_label(x[2]) or "")
         )
 
     @property
     def choices(self):
         if not self._choices:
             object_list = map(
-                lambda x: (x[0], self.get_group(x[1]), x[1]),
-                self._get_object_list()
+                lambda x: (x[0], self.get_group(x[1]), x[1]), self._get_object_list()
             )
             # object_list is (key, group, value) tuple
             choices = []
@@ -556,11 +520,8 @@ class GroupedQuerySelectMultipleField(SelectField):
             yield (
                 value,
                 label,
-                (
-                    self.coerce,
-                    [self.get_pk(obj) for obj in self.data or []]
-                ),
-                {}
+                (self.coerce, [self.get_pk(obj) for obj in self.data or []]),
+                {},
             )
 
     def process_formdata(self, valuelist):
@@ -569,12 +530,12 @@ class GroupedQuerySelectMultipleField(SelectField):
     def pre_validate(self, form):
         self.data  # This sets self._invalid_formdata
         if self._invalid_formdata:
-            raise ValidationError(self.gettext('Not a valid choice'))
+            raise ValidationError(self.gettext("Not a valid choice"))
         elif self.data:
             obj_list = list(x[1] for x in self._get_object_list())
             for v in self.data:
                 if v not in obj_list:
-                    raise ValidationError(self.gettext('Not a valid choice'))
+                    raise ValidationError(self.gettext("Not a valid choice"))
 
 
 class WeekDaysField(SelectMultipleField):
@@ -582,14 +543,14 @@ class WeekDaysField(SelectMultipleField):
     option_widget = CheckboxInput()
 
     def __init__(self, *args, **kwargs):
-        kwargs['coerce'] = lambda x: WeekDay(int(x))
+        kwargs["coerce"] = lambda x: WeekDay(int(x))
         super(WeekDaysField, self).__init__(*args, **kwargs)
         self.choices = self._get_choices
 
     def _get_choices(self):
-        days = WeekDays('1111111')
+        days = WeekDays("1111111")
         for day in days:
-            yield day.index, day.get_name(context='stand-alone')
+            yield day.index, day.get_name(context="stand-alone")
 
     def process_data(self, value):
         self.data = WeekDays(value) if value else None
@@ -614,16 +575,17 @@ class PhoneNumberField(StringField):
     :param display_format:
         The format in which the phone number is displayed.
     """
+
     widget = TelInput()
-    error_msg = u'Not a valid phone number value'
+    error_msg = "Not a valid phone number value"
 
     def __init__(
         self,
         label=None,
         validators=None,
-        region='US',
-        display_format='national',
-        **kwargs
+        region="US",
+        display_format="national",
+        **kwargs,
     ):
         super(PhoneNumberField, self).__init__(label, validators, **kwargs)
         self.region = region
@@ -638,21 +600,18 @@ class PhoneNumberField(StringField):
             except AttributeError:
                 return self.data
         else:
-            return ''
+            return ""
 
     def process_formdata(self, valuelist):
         import phonenumbers
 
         if valuelist:
-            if valuelist[0] == '':
+            if valuelist[0] == "":
                 self.data = None
             else:
                 self.data = valuelist[0]
                 try:
-                    self.data = PhoneNumber(
-                        valuelist[0],
-                        self.region
-                    )
+                    self.data = PhoneNumber(valuelist[0], self.region)
                     if not self.data.is_valid_number():
                         raise ValueError(self.gettext(self.error_msg))
                 except phonenumbers.phonenumberutil.NumberParseException:

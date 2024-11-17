@@ -4,7 +4,6 @@ from tests import ModelFormTestCase
 
 
 class TestModelFormMetaWithInheritance(ModelFormTestCase):
-
     def test_skip_unknown_types(self, model_form_all):
         self.init(type_=sa.Integer)
 
@@ -26,7 +25,7 @@ class TestModelFormMetaWithInheritance(ModelFormTestCase):
             class Meta:
                 model = self.ModelTest
 
-        assert ModelTestForm.test_attr == 'SomeVal'
+        assert ModelTestForm.test_attr == "SomeVal"
 
 
 class TestUnboundFieldsInitialization(ModelFormTestCase):

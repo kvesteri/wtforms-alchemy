@@ -10,7 +10,7 @@ from wtforms_alchemy import (
 
 class _MetaWithInit(FormMeta):
     def __init__(cls, *args, **kwargs):
-        cls.test_attr = 'SomeVal'
+        cls.test_attr = "SomeVal"
         FormMeta.__init__(cls, *args, **kwargs)
 
 
@@ -18,7 +18,7 @@ MetaWithInit = model_form_meta_factory(_MetaWithInit)
 
 
 class _MetaWithoutInit(FormMeta):
-    test_attr = 'SomeVal'
+    test_attr = "SomeVal"
 
 
 MetaWithoutInit = model_form_meta_factory(_MetaWithoutInit)

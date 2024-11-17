@@ -18,15 +18,15 @@ class TestModelFormFactory(ModelFormTestCase):
             pass
 
         defaults = {
-            'all_fields_optional': True,
-            'only_indexed_fields': True,
-            'include_primary_keys': True,
-            'include_foreign_keys': True,
-            'strip_string_fields': True,
-            'include_datetimes_with_default': True,
-            'form_generator': True,
-            'date_format': '%d-%m-%Y',
-            'datetime_format': '%Y-%m-%dT%H:%M:%S',
+            "all_fields_optional": True,
+            "only_indexed_fields": True,
+            "include_primary_keys": True,
+            "include_foreign_keys": True,
+            "strip_string_fields": True,
+            "include_datetimes_with_default": True,
+            "form_generator": True,
+            "date_format": "%d-%m-%Y",
+            "datetime_format": "%Y-%m-%dT%H:%M:%S",
         }
         ModelForm = model_form_factory(Form, **defaults)
         for key, value in defaults.items():
@@ -38,9 +38,7 @@ class TestModelFormFactory(ModelFormTestCase):
         class SomeForm(Form):
             pass
 
-        defaults = {
-            'unknown': 'something'
-        }
+        defaults = {"unknown": "something"}
         with raises(UnknownConfigurationOption):
             model_form_factory(SomeForm, **defaults)
 
@@ -93,7 +91,7 @@ class TestModelFormFactory(ModelFormTestCase):
 
         class SomeForm(Form):
             class Meta:
-                locales = ['fr']
+                locales = ["fr"]
                 foo = 9
 
         class OtherForm(SomeForm):
@@ -107,9 +105,9 @@ class TestModelFormFactory(ModelFormTestCase):
         form = TestCustomBase()
         other_form = OtherForm()
         assert isinstance(form.meta, wtforms.meta.DefaultMeta)
-        assert form.meta.locales == ['fr']
-        assert hasattr(form.meta, 'model')
-        assert hasattr(form.meta, 'csrf')
+        assert form.meta.locales == ["fr"]
+        assert hasattr(form.meta, "model")
+        assert hasattr(form.meta, "csrf")
 
         assert form.meta.foo == 9
         # Create a side effect on the base meta.

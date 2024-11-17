@@ -16,18 +16,16 @@ make_translatable()
 class TestInternationalizationExtension(ModelFormTestCase):
     def init(self):
         class ModelTest(self.base, Translatable):
-            __tablename__ = 'model_test'
-            __translatable__ = {
-                'locales': ['fi', 'en']
-            }
+            __tablename__ = "model_test"
+            __translatable__ = {"locales": ["fi", "en"]}
 
             id = sa.Column(sa.Integer, primary_key=True)
-            some_property = 'something'
+            some_property = "something"
 
-            locale = 'en'
+            locale = "en"
 
         class ModelTranslation(translation_base(ModelTest)):
-            __tablename__ = 'model_translation'
+            __tablename__ = "model_translation"
 
             name = sa.Column(sa.Unicode(255))
             content = sa.Column(sa.Unicode(255))
@@ -51,7 +49,7 @@ class TestInternationalizationExtension(ModelFormTestCase):
         class ModelTestForm(ModelForm):
             class Meta:
                 model = self.ModelTest
-                exclude = ['name']
+                exclude = ["name"]
 
         with raises(AttributeError):
             ModelTestForm().name
@@ -64,9 +62,9 @@ class TestInternationalizationExtension(ModelFormTestCase):
                 model = self.ModelTest
 
         form = ModelTestForm(
-            MultiDict([('name', u'something'), ('content', u'something')])
+            MultiDict([("name", "something"), ("content", "something")])
         )
         obj = self.ModelTest()
         form.populate_obj(obj)
-        assert obj.name == u'something'
-        assert obj.content == u'something'
+        assert obj.name == "something"
+        assert obj.content == "something"

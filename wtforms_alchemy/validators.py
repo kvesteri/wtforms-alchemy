@@ -25,7 +25,8 @@ class Unique(object):
     :param message:
         The error message.
     """
-    field_flags = {'unique': True}
+
+    field_flags = {"unique": True}
 
     def __init__(self, column, get_session=None, message=None):
         self.column = column
@@ -37,17 +38,17 @@ class Unique(object):
         self._check_for_session(self.model)
         if self.get_session:
             return self.get_session().query(self.model)
-        elif hasattr(self.model, 'query'):
-            return getattr(self.model, 'query')
+        elif hasattr(self.model, "query"):
+            return getattr(self.model, "query")
         else:
             raise Exception(
-                'Validator requires either get_session or Flask-SQLAlchemy'
-                ' styled query parameter'
+                "Validator requires either get_session or Flask-SQLAlchemy"
+                " styled query parameter"
             )
 
     def _check_for_session(self, model):
-        if not hasattr(model, 'query') and not self.get_session:
-            raise Exception('Could not obtain SQLAlchemy session.')
+        if not hasattr(model, "query") and not self.get_session:
+            raise Exception("Could not obtain SQLAlchemy session.")
 
     def _syntaxes_as_tuples(self, form, field, column):
         """Converts a set of different syntaxes into a tuple of tuples"""
@@ -59,10 +60,7 @@ class Unique(object):
                 for x in column.items()
             )
         elif isinstance(column, Iterable):
-            return tuple(
-                self._syntaxes_as_tuples(form, field, x)[0]
-                for x in column
-            )
+            return tuple(self._syntaxes_as_tuples(form, field, x)[0] for x in column)
         elif isinstance(column, (Column, InstrumentedAttribute)):
             return ((column.key, column),)
         else:
@@ -77,7 +75,7 @@ class Unique(object):
 
         obj = query.first()
 
-        if not hasattr(form, '_obj'):
+        if not hasattr(form, "_obj"):
             raise Exception(
                 "Couldn't access Form._obj attribute. Either make your form "
                 "inherit WTForms-Alchemy ModelForm or WTForms-Components "
@@ -86,5 +84,5 @@ class Unique(object):
 
         if obj and not form._obj == obj:
             if self.message is None:
-                self.message = field.gettext(u'Already exists.')
+                self.message = field.gettext("Already exists.")
             raise ValidationError(self.message)

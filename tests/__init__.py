@@ -16,7 +16,7 @@ class MultiDict(dict):
 
 
 class ModelFormTestCase(FormTestCase):
-    dns = 'sqlite:///:memory:'
+    dns = "sqlite:///:memory:"
 
     def setup_method(self, method):
         self.engine = create_engine(self.dns)
@@ -28,14 +28,14 @@ class ModelFormTestCase(FormTestCase):
         self.form_class = None
 
     def init_model(self, type_=sa.Unicode(255), **kwargs):
-        kwargs.setdefault('nullable', False)
+        kwargs.setdefault("nullable", False)
 
         class ModelTest(self.base):
-            __tablename__ = 'model_test'
+            __tablename__ = "model_test"
             query = None
             id = sa.Column(sa.Integer, primary_key=True)
             test_column = sa.Column(type_, **kwargs)
-            some_property = 'something'
+            some_property = "something"
 
         self.ModelTest = ModelTest
 
@@ -52,7 +52,7 @@ class ModelFormTestCase(FormTestCase):
 
 
 class FormRelationsTestCase(object):
-    dns = 'sqlite:///:memory:'
+    dns = "sqlite:///:memory:"
 
     def setup_method(self, method):
         self.engine = create_engine(self.dns)

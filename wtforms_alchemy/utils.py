@@ -16,14 +16,10 @@ def choice_type_coerce_factory(type_):
     :param type_: ChoiceType object
     """
     choices = type_.choices
-    if (
-        Enum is not None and
-        isinstance(choices, type)
-        and issubclass(choices, Enum)
-    ):
-        key, choice_cls = 'value', choices
+    if Enum is not None and isinstance(choices, type) and issubclass(choices, Enum):
+        key, choice_cls = "value", choices
     else:
-        key, choice_cls = 'code', Choice
+        key, choice_cls = "code", Choice
 
     def choice_coerce(value):
         if value is None:
@@ -31,6 +27,7 @@ def choice_type_coerce_factory(type_):
         if isinstance(value, choice_cls):
             return getattr(value, key)
         return type_.python_type(value)
+
     return choice_coerce
 
 
@@ -74,9 +71,8 @@ def is_number_range(type):
 
 
 def is_date_column(column):
-    return (
-        isinstance(column.type, types.Date) or
-        isinstance(column.type, types.DateTime)
+    return isinstance(column.type, types.Date) or isinstance(
+        column.type, types.DateTime
     )
 
 
@@ -124,7 +120,7 @@ def translated_attributes(model):
     :param model: SQLAlchemy declarative model class
     """
     try:
-        translation_class = model.__translatable__['class']
+        translation_class = model.__translatable__["class"]
     except AttributeError:
         return []
     return [
@@ -145,6 +141,7 @@ class ClassMap(OrderedDict):
         2. Getting an item of ClassMap with a key matches subclasses and
         instances also.
     """
+
     def __init__(self, items=None):
         if items is None:
             items = {}

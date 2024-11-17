@@ -8,7 +8,7 @@ class TestFieldOrder(ModelFormTestCase):
         ModelFormTestCase.setup_method(self, method)
 
         class ModelTest(self.base):
-            __tablename__ = 'model_test'
+            __tablename__ = "model_test"
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=True)
             full_description = sa.Column(sa.UnicodeText)

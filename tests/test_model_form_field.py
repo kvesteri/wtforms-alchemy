@@ -8,12 +8,12 @@ from wtforms_alchemy import ModelForm, ModelFormField
 class TestOneToOneModelFormRelations(FormRelationsTestCase):
     def create_models(self):
         class Location(self.base):
-            __tablename__ = 'location'
+            __tablename__ = "location"
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=True)
 
         class Event(self.base):
-            __tablename__ = 'event'
+            __tablename__ = "event"
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=False)
             location_id = sa.Column(sa.Integer, sa.ForeignKey(Location.id))
@@ -39,8 +39,8 @@ class TestOneToOneModelFormRelations(FormRelationsTestCase):
     def save(self, event=None, data={}):
         if not data:
             data = {
-                'name': u'Some event',
-                'location-name': u'Some location',
+                "name": "Some event",
+                "location-name": "Some location",
             }
         if not event:
             event = self.Event()
@@ -54,10 +54,8 @@ class TestOneToOneModelFormRelations(FormRelationsTestCase):
     def test_assigment_and_deletion(self):
         self.save()
         event = self.session.query(self.Event).first()
-        assert event.location.name == 'Some location'
-        data = {
-            'name': 'Some event'
-        }
+        assert event.location.name == "Some location"
+        data = {"name": "Some event"}
         form = self.EventForm(MultiDict(data))
         form.validate()
         form.populate_obj(event)
@@ -75,17 +73,16 @@ class TestOneToOneModelFormRelations(FormRelationsTestCase):
         self.EventForm = EventForm
 
         with raises(TypeError):
-            self.save(data={
-                'name': 'Some event',
-                'unknown_field-name': 'Some location',
-            })
+            self.save(
+                data={
+                    "name": "Some event",
+                    "unknown_field-name": "Some location",
+                }
+            )
 
     def test_updating_related_object(self):
         event = self.save()
         location_id = event.location.id
-        self.save(
-            event,
-            {'name': 'some name', 'location-name': u'Some other location'}
-        )
-        assert event.name == 'some name'
+        self.save(event, {"name": "some name", "location-name": "Some other location"})
+        assert event.name == "some name"
         assert event.location.id == location_id
