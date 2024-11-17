@@ -188,6 +188,14 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #: form.
             include_foreign_keys = defaults.pop('include_foreign_keys', False)
 
+            #: Whether or not to include relationships. By default this is
+            #: False. When set to True will use query select field for many
+            #: to one relationships and query multiple select field for
+            #: one to many and many to many.
+            #: See relationship_map for overrides
+            include_relationships = defaults.pop(
+                'include_relationships', False)
+
             #: Whether or not to strip string fields
             strip_string_fields = defaults.pop('strip_string_fields', False)
 
@@ -269,6 +277,11 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             #: Using this configuration option one can easily configure the
             #: type conversion in class level.
             type_map = defaults.pop('type_map', ClassMap())
+
+            #: Dictionary of SQLAlchemy RelationshipProperty direction
+            #: (MANYTOONE, ONETOMANY, MANYTOMANY from sqalchemy.orm.interfaces)
+            #: and WTForms field classes as values.
+            relationship_map = defaults.pop('relationship_map', {})
 
             #: Whether or not to raise InvalidAttributExceptions when invalid
             #: attribute names are given for include / exclude or only
