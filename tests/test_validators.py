@@ -8,7 +8,7 @@ from wtforms.validators import (
     InputRequired,
     Length,
     NumberRange,
-    Optional
+    Optional,
 )
 from wtforms_components import DateRange, TimeRange
 

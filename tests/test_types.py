@@ -11,14 +11,14 @@ from sqlalchemy_utils import (
     PasswordType,
     PhoneNumberType,
     URLType,
-    UUIDType
+    UUIDType,
 )
 from sqlalchemy_utils.types import arrow, phone_number, WeekDaysType  # noqa
 from wtforms.fields import (
     BooleanField,
     FloatField,
     PasswordField,
-    TextAreaField
+    TextAreaField,
 )
 from wtforms.validators import Length, URL
 from wtforms_components import Email
@@ -32,7 +32,7 @@ from wtforms_components.fields import (
     IntIntervalField,
     SelectField,
     StringField,
-    TimeField
+    TimeField,
 )
 
 from tests import ModelFormTestCase
@@ -42,7 +42,7 @@ from wtforms_alchemy import (
     null_or_unicode,
     PhoneNumberField,
     UnknownTypeException,
-    WeekDaysField
+    WeekDaysField,
 )
 from wtforms_alchemy.utils import ClassMap
 

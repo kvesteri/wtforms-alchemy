@@ -4,3 +4,18 @@ filterwarnings = [
     'error:.*:sqlalchemy.exc.SAWarning',
     'ignore:.*:sqlalchemy.exc.SADeprecationWarning:sqlalchemy_i18n',
 ]
+
+[tool.ruff]
+target-version = "py39"
+
+[tool.ruff.lint]
+select = [
+    "C90", # mccabe
+    "E",   # pycodestyle errors
+    "F",   # Pyflakes
+    "I",   # isort
+    "W",   # pycodestyle warnings
+]
+
+[tool.ruff.lint.isort]
+order-by-type = false

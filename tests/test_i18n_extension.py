@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from packaging.version import Version
 from pytest import raises, skip
-from sqlalchemy_i18n import Translatable, make_translatable, translation_base
+from sqlalchemy_i18n import make_translatable, Translatable, translation_base
 
 from tests import ModelFormTestCase, MultiDict
 from wtforms_alchemy import ModelForm

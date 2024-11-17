@@ -6,7 +6,7 @@ from tests import ModelFormTestCase
 from wtforms_alchemy import (
     FormGenerator,
     model_form_factory,
-    UnknownConfigurationOption
+    UnknownConfigurationOption,
 )
 
 

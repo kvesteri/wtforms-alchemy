@@ -7,7 +7,7 @@ from wtforms.validators import (
     Length,
     NumberRange,
     Optional,
-    URL
+    URL,
 )
 from wtforms_components import DateRange, Email, TimeRange
 
@@ -15,7 +15,7 @@ from .exc import (
     AttributeTypeException,
     InvalidAttributeException,
     UnknownConfigurationOption,
-    UnknownTypeException
+    UnknownTypeException,
 )
 from .fields import (  # noqa
     CountryField,
@@ -26,7 +26,7 @@ from .fields import (  # noqa
     PhoneNumberField,
     QuerySelectField,
     QuerySelectMultipleField,
-    WeekDaysField
+    WeekDaysField,
 )
 from .generator import FormGenerator
 from .utils import (
@@ -34,7 +34,7 @@ from .utils import (
     is_date_column,
     is_scalar,
     null_or_int,
-    null_or_unicode
+    null_or_unicode,
 )
 from .validators import Unique  # noqa
 
