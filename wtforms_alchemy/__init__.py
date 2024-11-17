@@ -19,6 +19,7 @@ from .exc import (
 )
 from .fields import (  # noqa
     CountryField,
+    EnumSelectField,
     GroupedQuerySelectField,
     GroupedQuerySelectMultipleField,
     ModelFieldList,
@@ -40,6 +41,7 @@ from .validators import Unique  # noqa
 
 __all__ = (
     AttributeTypeException,
+    EnumSelectField,
     CountryField,
     DateRange,
     InvalidAttributeException,

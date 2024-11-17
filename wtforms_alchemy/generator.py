@@ -46,7 +46,7 @@ from .exc import (
     InvalidAttributeException,
     UnknownTypeException,
 )
-from .fields import CountryField, PhoneNumberField, WeekDaysField
+from .fields import CountryField, EnumSelectField, PhoneNumberField, WeekDaysField
 from .utils import (
     choice_type_coerce_factory,
     ClassMap,
@@ -78,7 +78,7 @@ class FormGenerator(object):
         (sa.types.Boolean, BooleanField),
         (sa.types.Date, DateField),
         (sa.types.DateTime, DateTimeField),
-        (sa.types.Enum, SelectField),
+        (sa.types.Enum, EnumSelectField),
         (sa.types.Float, FloatField),
         (sa.types.Integer, IntegerField),
         (sa.types.Numeric, DecimalField),
@@ -449,6 +449,10 @@ class FormGenerator(object):
                 kwargs['choices'] = choices
         elif 'choices' in column.info and column.info['choices']:
             kwargs['choices'] = column.info['choices']
+        elif issubclass(column.type.python_type, Enum):
+            kwargs['choices'] = [
+                (choice.value, choice) for choice in column.type.python_type
+            ]
         else:
             kwargs['choices'] = [
                 (enum, enum) for enum in column.type.enums
@@ -588,6 +592,10 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
+        if (isinstance(column.type, sa.types.Enum) and
+            issubclass(column.type.python_type, Enum)):
+            return None
+
         if (
             isinstance(column.type, sa.types.String) and
             hasattr(column.type, 'length') and
