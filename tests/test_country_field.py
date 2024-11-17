@@ -8,7 +8,7 @@ from wtforms_alchemy import CountryField
 sqlalchemy_utils.i18n.get_locale = lambda: Locale("en")
 
 
-class TestCountryField(object):
+class TestCountryField:
     field_class = CountryField
 
     def init_form(self, **kwargs):

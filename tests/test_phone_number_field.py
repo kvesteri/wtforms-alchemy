@@ -5,7 +5,7 @@ from tests import MultiDict
 from wtforms_alchemy import DataRequired, PhoneNumberField
 
 
-class TestPhoneNumberField(object):
+class TestPhoneNumberField:
     def setup_method(self, method):
         self.valid_phone_numbers = [
             "040 1234567",

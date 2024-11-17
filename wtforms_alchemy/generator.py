@@ -61,7 +61,7 @@ from .utils import (
 )
 
 
-class FormGenerator(object):
+class FormGenerator:
     """
     Base form generator, you can make your own form generators by inheriting
     this class.
@@ -517,7 +517,7 @@ class FormGenerator(object):
         return self.get_validator("optional")
 
     def get_validator(self, name, **kwargs):
-        attr_name = "%s_validator" % name
+        attr_name = f"{name}_validator"
         attr = getattr(self.meta, attr_name)
         if attr is None:
             return attr

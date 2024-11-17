@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import operator
 from itertools import groupby
 
@@ -37,7 +35,7 @@ class ModelFormField(FormField):
 class ModelFieldList(FieldList):
     def __init__(self, unbound_field, population_strategy="update", **kwargs):
         self.population_strategy = population_strategy
-        super(ModelFieldList, self).__init__(unbound_field, **kwargs)
+        super().__init__(unbound_field, **kwargs)
 
     @property
     def model(self):
@@ -100,7 +98,7 @@ class ModelFieldList(FieldList):
 class CountryField(SelectField):
     def __init__(self, *args, **kwargs):
         kwargs["coerce"] = Country
-        super(CountryField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.choices = self._get_choices
 
     def _get_choices(self):
@@ -155,7 +153,7 @@ class QuerySelectField(SelectFieldBase):
         blank_text="",
         **kwargs,
     ):
-        super(QuerySelectField, self).__init__(label, validators, **kwargs)
+        super().__init__(label, validators, **kwargs)
         self.query_factory = query_factory
 
         if get_pk is None:
@@ -237,9 +235,7 @@ class QuerySelectMultipleField(QuerySelectField):
     def __init__(self, label=None, validators=None, default=None, **kwargs):
         if default is None:
             default = []
-        super(QuerySelectMultipleField, self).__init__(
-            label, validators, default=default, **kwargs
-        )
+        super().__init__(label, validators, default=default, **kwargs)
         if kwargs.get("allow_blank", False):
             import warnings
 
@@ -307,9 +303,7 @@ class GroupedQuerySelectField(SelectField):
         blank_value="__None",
         **kwargs,
     ):
-        super(GroupedQuerySelectField, self).__init__(
-            label, validators, coerce=lambda x: x, **kwargs
-        )
+        super().__init__(label, validators, coerce=lambda x: x, **kwargs)
 
         self.query = None
         self.query_factory = query_factory
@@ -429,7 +423,7 @@ class GroupedQuerySelectMultipleField(SelectField):
     ):
         if default is None:
             default = []
-        super(GroupedQuerySelectMultipleField, self).__init__(
+        super().__init__(
             label, validators, default=default, coerce=lambda x: x, **kwargs
         )
         if kwargs.get("allow_blank", False):
@@ -544,7 +538,7 @@ class WeekDaysField(SelectMultipleField):
 
     def __init__(self, *args, **kwargs):
         kwargs["coerce"] = lambda x: WeekDay(int(x))
-        super(WeekDaysField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.choices = self._get_choices
 
     def _get_choices(self):
@@ -587,7 +581,7 @@ class PhoneNumberField(StringField):
         display_format="national",
         **kwargs,
     ):
-        super(PhoneNumberField, self).__init__(label, validators, **kwargs)
+        super().__init__(label, validators, **kwargs)
         self.region = region
         self.display_format = display_format
 

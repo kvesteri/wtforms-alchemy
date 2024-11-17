@@ -9,7 +9,7 @@ from tests import MultiDict
 from wtforms_alchemy import ModelForm
 
 
-class TestCase(object):
+class TestCase:
     def setup_method(self, method):
         self.engine = create_engine("sqlite:///:memory:")
         self.Base = declarative_base()
@@ -44,7 +44,7 @@ class TestPhoneNumbers(TestCase):
     """
 
     def setup_method(self, method):
-        super(TestPhoneNumbers, self).setup_method(method)
+        super().setup_method(method)
 
         class UserForm(ModelForm):
             class Meta:
@@ -52,7 +52,7 @@ class TestPhoneNumbers(TestCase):
 
         self.UserForm = UserForm
 
-        super(TestPhoneNumbers, self).setup_method(method)
+        super().setup_method(method)
         self.phone_number = phone_number.PhoneNumber("040 1234567", "FI")
         self.user = self.User()
         self.user.name = "Someone"

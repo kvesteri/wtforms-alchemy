@@ -94,7 +94,7 @@ class TestUpdateStrategy(ModelFieldListTestCase):
             event = sa.orm.relationship(Event, backref="locations")
 
             def __repr__(self):
-                return "Location(id=%r, name=%r)" % (self.id, self.name)
+                return f"Location(id={self.id!r}, name={self.name!r})"
 
         self.Event = Event
         self.Location = Location

@@ -3,11 +3,11 @@ from pytest import mark, raises
 from wtforms_alchemy.utils import ClassMap
 
 
-class A(object):
+class A:
     pass
 
 
-class B(object):
+class B:
     pass
 
 
@@ -31,7 +31,7 @@ class B2(B):
     pass
 
 
-class C(object):
+class C:
     pass
 
 

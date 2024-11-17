@@ -5,7 +5,7 @@ from tests import MultiDict
 from wtforms_alchemy import null_or_unicode
 
 
-class TestSelectField(object):
+class TestSelectField:
     def test_understands_none_values(self):
         class MyForm(Form):
             choice_field = SelectField(
