@@ -9,11 +9,11 @@ from tests import ModelFormTestCase
 class TestFieldExclusion(ModelFormTestCase):
     def test_does_not_include_datetime_columns_with_default(self):
         self.init(sa.DateTime, default=datetime.now())
-        assert not self.has_field('test_column')
+        assert not self.has_field("test_column")
 
     def test_excludes_surrogate_primary_keys_by_default(self):
         self.init()
-        assert not self.has_field('id')
+        assert not self.has_field("id")
 
     def test_excludes_column_properties(self):
         self.init()
@@ -25,7 +25,6 @@ class TestFieldExclusion(ModelFormTestCase):
 
 
 class TestTSVectorType(ModelFormTestCase):
-
     def test_does_not_include_tsvector_typed_columns_with_default(self):
         self.init(TSVectorType)
-        assert not self.has_field('test_column')
+        assert not self.has_field("test_column")

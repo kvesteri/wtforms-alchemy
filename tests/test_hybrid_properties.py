@@ -10,9 +10,9 @@ from wtforms_alchemy.exc import AttributeTypeException
 class TestHybridProperties(ModelFormTestCase):
     def test_hybrid_property_returning_column_property(self):
         class ModelTest(self.base):
-            __tablename__ = 'model_test'
+            __tablename__ = "model_test"
             id = sa.Column(sa.Integer, primary_key=True)
-            _test_column = sa.Column('test_column', sa.Boolean, nullable=False)
+            _test_column = sa.Column("test_column", sa.Boolean, nullable=False)
 
             @hybrid_property
             def test_column_hybrid(self):
@@ -27,17 +27,17 @@ class TestHybridProperties(ModelFormTestCase):
                 model = ModelTest
                 not_null_str_validator = None
                 not_null_validator = None
-                include = ('test_column_hybrid', )
-                exclude = ('_test_column', )
+                include = ("test_column_hybrid",)
+                exclude = ("_test_column",)
 
         form = ModelTestForm()
         assert form.test_column_hybrid
 
     def test_hybrid_property_returning_expression(self):
         class ModelTest(self.base):
-            __tablename__ = 'model_test'
+            __tablename__ = "model_test"
             id = sa.Column(sa.Integer, primary_key=True)
-            _test_column = sa.Column('test_column', sa.Boolean, nullable=False)
+            _test_column = sa.Column("test_column", sa.Boolean, nullable=False)
 
             @hybrid_property
             def test_column_hybrid(self):
@@ -48,10 +48,11 @@ class TestHybridProperties(ModelFormTestCase):
                 self._test_column = value
 
         with raises(AttributeTypeException):
+
             class ModelTestForm(ModelForm):
                 class Meta:
                     model = ModelTest
                     not_null_str_validator = None
                     not_null_validator = None
-                    include = ('test_column_hybrid', )
-                    exclude = ('_test_column', )
+                    include = ("test_column_hybrid",)
+                    exclude = ("_test_column",)

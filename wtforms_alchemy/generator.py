@@ -70,53 +70,57 @@ class FormGenerator(object):
     # When converting SQLAlchemy types to fields this ordered dict is iterated
     # in given order. This allows smart type conversion of different inherited
     # type objects.
-    TYPE_MAP = ClassMap((
-        (sa.types.UnicodeText, TextAreaField),
-        (sa.types.BigInteger, IntegerField),
-        (sa.types.SmallInteger, IntegerField),
-        (sa.types.Text, TextAreaField),
-        (sa.types.Boolean, BooleanField),
-        (sa.types.Date, DateField),
-        (sa.types.DateTime, DateTimeField),
-        (sa.types.Enum, SelectField),
-        (sa.types.Float, FloatField),
-        (sa.types.Integer, IntegerField),
-        (sa.types.Numeric, DecimalField),
-        (sa.types.Unicode, StringField),
-        (sa.types.String, StringField),
-        (sa.types.Time, TimeField),
-        (sa.types.JSON, TextAreaField),
-        (types.ArrowType, DateTimeField),
-        (types.ChoiceType, SelectField),
-        (types.ColorType, ColorField),
-        (types.CountryType, CountryField),
-        (types.DateRangeType, DateIntervalField),
-        (types.DateTimeRangeType, DateTimeIntervalField),
-        (types.EmailType, EmailField),
-        (types.IntRangeType, IntIntervalField),
-        (types.NumericRangeType, DecimalIntervalField),
-        (types.PasswordType, PasswordField),
-        (types.PhoneNumberType, PhoneNumberField),
-        (types.ScalarListType, StringField),
-        (types.URLType, StringField),
-        (types.UUIDType, StringField),
-        (types.WeekDaysType, WeekDaysField),
-    ))
+    TYPE_MAP = ClassMap(
+        (
+            (sa.types.UnicodeText, TextAreaField),
+            (sa.types.BigInteger, IntegerField),
+            (sa.types.SmallInteger, IntegerField),
+            (sa.types.Text, TextAreaField),
+            (sa.types.Boolean, BooleanField),
+            (sa.types.Date, DateField),
+            (sa.types.DateTime, DateTimeField),
+            (sa.types.Enum, SelectField),
+            (sa.types.Float, FloatField),
+            (sa.types.Integer, IntegerField),
+            (sa.types.Numeric, DecimalField),
+            (sa.types.Unicode, StringField),
+            (sa.types.String, StringField),
+            (sa.types.Time, TimeField),
+            (sa.types.JSON, TextAreaField),
+            (types.ArrowType, DateTimeField),
+            (types.ChoiceType, SelectField),
+            (types.ColorType, ColorField),
+            (types.CountryType, CountryField),
+            (types.DateRangeType, DateIntervalField),
+            (types.DateTimeRangeType, DateTimeIntervalField),
+            (types.EmailType, EmailField),
+            (types.IntRangeType, IntIntervalField),
+            (types.NumericRangeType, DecimalIntervalField),
+            (types.PasswordType, PasswordField),
+            (types.PhoneNumberType, PhoneNumberField),
+            (types.ScalarListType, StringField),
+            (types.URLType, StringField),
+            (types.UUIDType, StringField),
+            (types.WeekDaysType, WeekDaysField),
+        )
+    )
 
-    WIDGET_MAP = OrderedDict((
-        (BooleanField, CheckboxInput),
-        (ColorField, ColorInput),
-        (DateField, DateInput),
-        (DateTimeField, DateTimeInput),
-        (DateTimeLocalField, DateTimeLocalInput),
-        (DecimalField, NumberInput),
-        (EmailField, EmailInput),
-        (FloatField, NumberInput),
-        (IntegerField, NumberInput),
-        (TextAreaField, TextArea),
-        (TimeField, TimeInput),
-        (StringField, TextInput)
-    ))
+    WIDGET_MAP = OrderedDict(
+        (
+            (BooleanField, CheckboxInput),
+            (ColorField, ColorInput),
+            (DateField, DateInput),
+            (DateTimeField, DateTimeInput),
+            (DateTimeLocalField, DateTimeLocalInput),
+            (DecimalField, NumberInput),
+            (EmailField, EmailInput),
+            (FloatField, NumberInput),
+            (IntegerField, NumberInput),
+            (TextAreaField, TextArea),
+            (TimeField, TimeInput),
+            (StringField, TextInput),
+        )
+    )
 
     def __init__(self, form_class):
         """
@@ -157,19 +161,22 @@ class FormGenerator(object):
         :param attrs: Set of attributes
         """
         if self.meta.only:
-            attrs = OrderedDict([
-                (key, prop)
-                for key, prop in map(self.validate_attribute, self.meta.only)
-                if key
-            ])
+            attrs = OrderedDict(
+                [
+                    (key, prop)
+                    for key, prop in map(self.validate_attribute, self.meta.only)
+                    if key
+                ]
+            )
         else:
             if self.meta.include:
-                attrs.update([
-                    (key, prop)
-                    for key, prop
-                    in map(self.validate_attribute, self.meta.include)
-                    if key
-                ])
+                attrs.update(
+                    [
+                        (key, prop)
+                        for key, prop in map(self.validate_attribute, self.meta.include)
+                        if key
+                    ]
+                )
 
             if self.meta.exclude:
                 for key in self.meta.exclude:
@@ -191,9 +198,7 @@ class FormGenerator(object):
             attr = getattr(self.model_class, attr_name)
         except AttributeError:
             try:
-                translation_class = (
-                    self.model_class.__translatable__['class']
-                )
+                translation_class = self.model_class.__translatable__["class"]
                 attr = getattr(translation_class, attr_name)
             except AttributeError:
                 if self.meta.attr_errors:
@@ -253,9 +258,11 @@ class FormGenerator(object):
         if not self.meta.include_primary_keys and column.primary_key:
             return True
 
-        if (not self.meta.include_datetimes_with_default and
-                isinstance(column.type, sa.types.DateTime) and
-                column.default):
+        if (
+            not self.meta.include_datetimes_with_default
+            and isinstance(column.type, sa.types.DateTime)
+            and column.default
+        ):
             return True
 
         if isinstance(column.type, types.TSVectorType):
@@ -294,17 +301,17 @@ class FormGenerator(object):
         """
         kwargs = {}
         field_class = self.get_field_class(column)
-        kwargs['default'] = self.default(column)
-        kwargs['validators'] = self.create_validators(prop, column)
-        kwargs['filters'] = self.filters(column)
+        kwargs["default"] = self.default(column)
+        kwargs["validators"] = self.create_validators(prop, column)
+        kwargs["filters"] = self.filters(column)
         kwargs.update(self.type_agnostic_parameters(prop.key, column))
         kwargs.update(self.type_specific_parameters(column))
         if prop.key in self.meta.field_args:
             kwargs.update(self.meta.field_args[prop.key])
 
         if issubclass(field_class, DecimalField):
-            if hasattr(column.type, 'scale'):
-                kwargs['places'] = column.type.scale
+            if hasattr(column.type, "scale"):
+                kwargs["places"] = column.type.scale
         field = field_class(**kwargs)
         return field
 
@@ -326,16 +333,13 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        should_trim = column.info.get('trim', None)
-        filters = column.info.get('filters', [])
+        should_trim = column.info.get("trim", None)
+        filters = column.info.get("filters", [])
         if (
-            (
-                isinstance(column.type, sa.types.String) and
-                self.meta.strip_string_fields and
-                should_trim is None
-            ) or
-            should_trim is True
-        ):
+            isinstance(column.type, sa.types.String)
+            and self.meta.strip_string_fields
+            and should_trim is None
+        ) or should_trim is True:
             filters.append(strip_string)
         return filters
 
@@ -345,9 +349,8 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        if (
-            isinstance(column.type, sa.types.DateTime) or
-            isinstance(column.type, types.ArrowType)
+        if isinstance(column.type, sa.types.DateTime) or isinstance(
+            column.type, types.ArrowType
         ):
             return self.meta.datetime_format
 
@@ -362,20 +365,20 @@ class FormGenerator(object):
         """
         kwargs = {}
         if (
-            hasattr(column.type, 'enums') or
-            column.info.get('choices') or
-            isinstance(column.type, types.ChoiceType)
+            hasattr(column.type, "enums")
+            or column.info.get("choices")
+            or isinstance(column.type, types.ChoiceType)
         ):
             kwargs.update(self.select_field_kwargs(column))
 
         date_format = self.date_format(column)
         if date_format:
-            kwargs['format'] = date_format
+            kwargs["format"] = date_format
 
-        if hasattr(column.type, 'region'):
-            kwargs['region'] = column.type.region
+        if hasattr(column.type, "region"):
+            kwargs["region"] = column.type.region
 
-        kwargs['widget'] = self.widget(column)
+        kwargs["widget"] = self.widget(column)
         return kwargs
 
     def widget(self, column):
@@ -384,27 +387,22 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        widget = column.info.get('widget', None)
+        widget = column.info.get("widget", None)
         if widget is not None:
             return widget
 
         kwargs = {}
 
-        step = column.info.get('step', None)
+        step = column.info.get("step", None)
         if step is not None:
-            kwargs['step'] = step
+            kwargs["step"] = step
         else:
             if isinstance(column.type, sa.types.Numeric):
-                if (
-                    column.type.scale is not None and
-                    not column.info.get('choices')
-                ):
-                    kwargs['step'] = self.scale_to_step(column.type.scale)
+                if column.type.scale is not None and not column.info.get("choices"):
+                    kwargs["step"] = self.scale_to_step(column.type.scale)
 
         if kwargs:
-            widget_class = self.WIDGET_MAP[
-                self.get_field_class(column)
-            ]
+            widget_class = self.WIDGET_MAP[self.get_field_class(column)]
             return widget_class(**kwargs)
 
     def scale_to_step(self, scale):
@@ -413,7 +411,7 @@ class FormGenerator(object):
 
         :param scale: an integer that defines a Numeric column's scale
         """
-        return str(pow(Decimal('0.1'), scale))
+        return str(pow(Decimal("0.1"), scale))
 
     def type_agnostic_parameters(self, key, column):
         """
@@ -422,8 +420,8 @@ class FormGenerator(object):
         :param column: SQLAlchemy Column object
         """
         kwargs = {}
-        kwargs['description'] = column.info.get('description', '')
-        kwargs['label'] = column.info.get('label', key)
+        kwargs["description"] = column.info.get("description", "")
+        kwargs["label"] = column.info.get("label", key)
         return kwargs
 
     def select_field_kwargs(self, column):
@@ -434,25 +432,21 @@ class FormGenerator(object):
         :param column: SQLAlchemy Column object
         """
         kwargs = {}
-        kwargs['coerce'] = self.coerce(column)
+        kwargs["coerce"] = self.coerce(column)
         if isinstance(column.type, types.ChoiceType):
             choices = column.type.choices
             if (
-                Enum is not None and
-                isinstance(choices, type)
+                Enum is not None
+                and isinstance(choices, type)
                 and issubclass(choices, Enum)
             ):
-                kwargs['choices'] = [
-                    (choice.value, str(choice)) for choice in choices
-                ]
+                kwargs["choices"] = [(choice.value, str(choice)) for choice in choices]
             else:
-                kwargs['choices'] = choices
-        elif 'choices' in column.info and column.info['choices']:
-            kwargs['choices'] = column.info['choices']
+                kwargs["choices"] = choices
+        elif "choices" in column.info and column.info["choices"]:
+            kwargs["choices"] = column.info["choices"]
         else:
-            kwargs['choices'] = [
-                (enum, enum) for enum in column.type.enums
-            ]
+            kwargs["choices"] = [(enum, enum) for enum in column.type.enums]
         return kwargs
 
     def coerce(self, column):
@@ -461,8 +455,8 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        if 'coerce' in column.info:
-            return column.info['coerce']
+        if "coerce" in column.info:
+            return column.info["coerce"]
         if isinstance(column.type, types.ChoiceType):
             return choice_type_coerce_factory(column.type)
         try:
@@ -484,12 +478,12 @@ class FormGenerator(object):
             self.required_validator(column),
             self.length_validator(column),
             self.unique_validator(prop.key, column),
-            self.range_validator(column)
+            self.range_validator(column),
         ]
         if isinstance(column.type, types.EmailType):
-            validators.append(self.get_validator('email'))
+            validators.append(self.get_validator("email"))
         if isinstance(column.type, types.URLType):
-            validators.append(self.get_validator('url'))
+            validators.append(self.get_validator("url"))
         validators = flatten([v for v in validators if v is not None])
 
         validators.extend(self.additional_validators(prop.key, column))
@@ -502,10 +496,11 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        if (not self.meta.all_fields_optional and
-                not column.default and
-                not column.nullable):
-
+        if (
+            not self.meta.all_fields_optional
+            and not column.default
+            and not column.nullable
+        ):
             type_map = self.meta.not_null_validator_type_map
             try:
                 return type_map[column.type]
@@ -519,10 +514,10 @@ class FormGenerator(object):
                         pass
                 if self.meta.not_null_validator is not None:
                     return self.meta.not_null_validator
-        return self.get_validator('optional')
+        return self.get_validator("optional")
 
     def get_validator(self, name, **kwargs):
-        attr_name = '%s_validator' % name
+        attr_name = "%s_validator" % name
         attr = getattr(self.meta, attr_name)
         if attr is None:
             return attr
@@ -543,11 +538,11 @@ class FormGenerator(object):
             except TypeError:
                 validators.append(self.meta.validators[key])
 
-        if 'validators' in column.info and column.info['validators']:
+        if "validators" in column.info and column.info["validators"]:
             try:
-                validators.extend(column.info['validators'])
+                validators.extend(column.info["validators"])
             except TypeError:
-                validators.append(column.info['validators'])
+                validators.append(column.info["validators"])
         return validators
 
     def unique_validator(self, key, column):
@@ -559,9 +554,9 @@ class FormGenerator(object):
         """
         if column.unique:
             return self.get_validator(
-                'unique',
+                "unique",
                 column=getattr(self.model_class, key),
-                get_session=self.form_class.get_session
+                get_session=self.form_class.get_session,
             )
 
     def range_validator(self, column):
@@ -571,16 +566,16 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        min_ = column.info.get('min')
-        max_ = column.info.get('max')
+        min_ = column.info.get("min")
+        max_ = column.info.get("max")
 
         if min_ is not None or max_ is not None:
             if is_number(column.type) or is_number_range(column.type):
-                return self.get_validator('number_range', min=min_, max=max_)
+                return self.get_validator("number_range", min=min_, max=max_)
             elif is_date_column(column):
-                return self.get_validator('date_range', min=min_, max=max_)
+                return self.get_validator("date_range", min=min_, max=max_)
             elif isinstance(column.type, sa.types.Time):
-                return self.get_validator('time_range', min=min_, max=max_)
+                return self.get_validator("time_range", min=min_, max=max_)
 
     def length_validator(self, column):
         """
@@ -589,11 +584,11 @@ class FormGenerator(object):
         :param column: SQLAlchemy Column object
         """
         if (
-            isinstance(column.type, sa.types.String) and
-            hasattr(column.type, 'length') and
-            column.type.length
+            isinstance(column.type, sa.types.String)
+            and hasattr(column.type, "length")
+            and column.type.length
         ):
-            return self.get_validator('length', max=column.type.length)
+            return self.get_validator("length", max=column.type.length)
 
     def get_field_class(self, column):
         """
@@ -602,16 +597,12 @@ class FormGenerator(object):
 
         :param column: SQLAlchemy Column object
         """
-        if (
-            'form_field_class' in column.info and
-            column.info['form_field_class']
-        ):
-            return column.info['form_field_class']
-        if 'choices' in column.info and column.info['choices']:
+        if "form_field_class" in column.info and column.info["form_field_class"]:
+            return column.info["form_field_class"]
+        if "choices" in column.info and column.info["choices"]:
             return SelectField
-        if (
-            column.type not in self.TYPE_MAP and
-            isinstance(column.type, sa.types.TypeDecorator)
+        if column.type not in self.TYPE_MAP and isinstance(
+            column.type, sa.types.TypeDecorator
         ):
             check_type = column.type.impl
         else:

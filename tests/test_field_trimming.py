@@ -11,16 +11,16 @@ class TestStringFieldTrimming(ModelFormTestCase):
                 model = self.ModelTest
                 strip_string_fields = True
 
-        f = ModelTestForm(MultiDict([('test_column', 'strip this   ')]))
-        assert f.test_column.data == 'strip this'
+        f = ModelTestForm(MultiDict([("test_column", "strip this   ")]))
+        assert f.test_column.data == "strip this"
 
     def test_does_not_trim_fields_when_trim_param_is_false(self):
-        self.init(info={'trim': False})
+        self.init(info={"trim": False})
 
         class ModelTestForm(ModelForm):
             class Meta:
                 model = self.ModelTest
                 strip_string_fields = True
 
-        f = ModelTestForm(MultiDict([('test_column', 'strip this   ')]))
-        assert f.test_column.data == 'strip this   '
+        f = ModelTestForm(MultiDict([("test_column", "strip this   ")]))
+        assert f.test_column.data == "strip this   "

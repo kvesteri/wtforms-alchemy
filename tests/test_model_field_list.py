@@ -9,17 +9,17 @@ from wtforms_alchemy import ModelFieldList, ModelForm
 class ModelFieldListTestCase(FormRelationsTestCase):
     def create_models(self):
         class Event(self.base):
-            __tablename__ = 'event'
+            __tablename__ = "event"
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=False)
 
         class Location(self.base):
-            __tablename__ = 'location'
+            __tablename__ = "location"
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=True)
 
             event_id = sa.Column(sa.Integer, sa.ForeignKey(Event.id))
-            event = sa.orm.relationship(Event, backref='locations')
+            event = sa.orm.relationship(Event, backref="locations")
 
         self.Event = Event
         self.Location = Location
@@ -27,9 +27,9 @@ class ModelFieldListTestCase(FormRelationsTestCase):
     def save(self, event=None, data=None):
         if data is None:
             data = {
-                'name': u'Some event',
-                'locations-0-name': u'Some location',
-                'locations-0-description': u'Some description'
+                "name": "Some event",
+                "locations-0-name": "Some location",
+                "locations-0-description": "Some description",
             }
         if not event:
             event = self.Event()
@@ -62,10 +62,8 @@ class TestReplaceStrategy(ModelFieldListTestCase):
     def test_assigment_and_deletion(self):
         self.save()
         event = self.session.query(self.Event).first()
-        assert event.locations[0].name == u'Some location'
-        data = {
-            'name': u'Some event'
-        }
+        assert event.locations[0].name == "Some location"
+        data = {"name": "Some event"}
         form = self.EventForm(MultiDict(data))
         form.validate()
         form.populate_obj(event)
@@ -77,28 +75,26 @@ class TestReplaceStrategy(ModelFieldListTestCase):
 class TestUpdateStrategy(ModelFieldListTestCase):
     def create_models(self):
         class Event(self.base):
-            __tablename__ = 'event'
+            __tablename__ = "event"
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=False)
 
         class Location(self.base):
-            __tablename__ = 'location'
-            TYPES = (u'', u'football field', u'restaurant')
+            __tablename__ = "location"
+            TYPES = ("", "football field", "restaurant")
 
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=True)
-            description = sa.Column(sa.Unicode(255), default=u'')
+            description = sa.Column(sa.Unicode(255), default="")
             type = sa.Column(
-                sa.Unicode(255),
-                info={'choices': zip(TYPES, TYPES)},
-                default=u''
+                sa.Unicode(255), info={"choices": zip(TYPES, TYPES)}, default=""
             )
 
             event_id = sa.Column(sa.Integer, sa.ForeignKey(Event.id))
-            event = sa.orm.relationship(Event, backref='locations')
+            event = sa.orm.relationship(Event, backref="locations")
 
             def __repr__(self):
-                return 'Location(id=%r, name=%r)' % (self.id, self.name)
+                return "Location(id=%r, name=%r)" % (self.id, self.name)
 
         self.Event = Event
         self.Location = Location
@@ -107,7 +103,7 @@ class TestUpdateStrategy(ModelFieldListTestCase):
         class LocationForm(ModelForm):
             class Meta:
                 model = self.Location
-                only = ['name', 'description', 'type']
+                only = ["name", "description", "type"]
 
             id = PassiveHiddenField()
 
@@ -116,8 +112,7 @@ class TestUpdateStrategy(ModelFieldListTestCase):
                 model = self.Event
 
             locations = ModelFieldList(
-                FormField(LocationForm),
-                population_strategy='update'
+                FormField(LocationForm), population_strategy="update"
             )
 
         self.LocationForm = LocationForm
@@ -127,23 +122,23 @@ class TestUpdateStrategy(ModelFieldListTestCase):
         event = self.save()
         location_id = event.locations[0].id
         data = {
-            'name': u'Some event',
-            'locations-0-id': location_id,
-            'locations-0-name': u'Some other location'
+            "name": "Some event",
+            "locations-0-id": location_id,
+            "locations-0-name": "Some other location",
         }
         self.save(event, data)
 
         assert len(event.locations) == 1
         assert event.locations[0].id == location_id
-        assert event.locations[0].name == u'Some other location'
+        assert event.locations[0].name == "Some other location"
 
     def test_creates_new_objects_for_entries_with_unknown_identifiers(self):
         event = self.save()
         location_id = event.locations[0].id
         data = {
-            'name': u'Some event',
-            'locations-0-id': 12,
-            'locations-0-name': u'Some other location'
+            "name": "Some event",
+            "locations-0-id": 12,
+            "locations-0-name": "Some other location",
         }
         self.save(event, data)
         assert event.locations
@@ -151,99 +146,89 @@ class TestUpdateStrategy(ModelFieldListTestCase):
 
     def test_replace_entry(self):
         data = {
-            'name': u'Some event',
-            'locations-0-name': u'Some location',
-            'locations-0-description': u'Some description',
-            'locations-0-type': u'restaurant'
+            "name": "Some event",
+            "locations-0-name": "Some location",
+            "locations-0-description": "Some description",
+            "locations-0-type": "restaurant",
         }
         event = self.save(data=data)
         location_id = event.locations[0].id
         self.session.commit()
         data = {
-            'name': u'Some event',
-            'locations-0-name': u'Some other location',
+            "name": "Some event",
+            "locations-0-name": "Some other location",
         }
         self.save(event, data)
         location = event.locations[0]
         assert location.id != location_id
-        assert location.name == u'Some other location'
-        assert location.description == u''
-        assert location.type == u''
+        assert location.name == "Some other location"
+        assert location.description == ""
+        assert location.type == ""
         assert len(event.locations) == 1
 
     def test_replace_and_update(self):
         data = {
-            'name': u'Some event',
-            'locations-0-name': u'Location 1',
-            'locations-0-description': u'Location 1 description',
-            'locations-1-name': u'Location 2',
-            'locations-1-description': u'Location 2 description',
+            "name": "Some event",
+            "locations-0-name": "Location 1",
+            "locations-0-description": "Location 1 description",
+            "locations-1-name": "Location 2",
+            "locations-1-description": "Location 2 description",
         }
         event = self.save(data=data)
         self.session.commit()
         data = {
-            'name': u'Some event',
-            'locations-0-id': event.locations[1].id,
-            'locations-0-name': u'Location 2 updated',
-            'locations-0-description': u'Location 2 description updated',
-            'locations-1-name': u'Location 3',
+            "name": "Some event",
+            "locations-0-id": event.locations[1].id,
+            "locations-0-name": "Location 2 updated",
+            "locations-0-description": "Location 2 description updated",
+            "locations-1-name": "Location 3",
         }
         self.save(event, data)
         self.session.commit()
         location = event.locations[0]
         location2 = event.locations[1]
-        assert location.name == u'Location 2 updated'
-        assert location.description == u'Location 2 description updated'
+        assert location.name == "Location 2 updated"
+        assert location.description == "Location 2 description updated"
         assert len(event.locations) == 2
-        assert location2.name == u'Location 3'
-        assert location2.description == u''
+        assert location2.name == "Location 3"
+        assert location2.description == ""
 
     def test_multiple_entries(self):
         event = self.save()
         location_id = event.locations[0].id
         data = {
-            'name': u'Some event',
-            'locations-0-name': u'Some location',
-            'locations-1-id': str(location_id),  # test coercing works
-            'locations-1-name': u'Some other location',
-            'locations-2-name': u'Third location',
-            'locations-3-id': 123,
-            'locations-3-name': u'Fourth location'
+            "name": "Some event",
+            "locations-0-name": "Some location",
+            "locations-1-id": str(location_id),  # test coercing works
+            "locations-1-name": "Some other location",
+            "locations-2-name": "Third location",
+            "locations-3-id": 123,
+            "locations-3-name": "Fourth location",
         }
         self.save(event, data)
         assert len(event.locations) == 4
         assert event.locations[0].id == location_id
-        assert event.locations[0].name == u'Some other location'
-        assert event.locations[1].name == u'Some location'
-        assert event.locations[2].name == u'Third location'
-        assert event.locations[3].name == u'Fourth location'
+        assert event.locations[0].name == "Some other location"
+        assert event.locations[1].name == "Some location"
+        assert event.locations[2].name == "Third location"
+        assert event.locations[3].name == "Fourth location"
 
     def test_delete_all_field_list_entries(self):
         event = self.save()
-        data = {
-            'name': u'Some event'
-        }
+        data = {"name": "Some event"}
         self.save(event, data)
         assert not event.locations
 
     def test_update_and_remove(self):
-        location = self.Location(
-            name=u'Location #2'
-        )
+        location = self.Location(name="Location #2")
         event = self.Event(
-            name=u'Some event',
-            locations=[
-                self.Location(
-                    name=u'Location #1'
-                ),
-                location
-            ]
+            name="Some event", locations=[self.Location(name="Location #1"), location]
         )
         self.session.add(event)
         self.session.commit()
         data = {
-            'locations-0-id': location.id,
-            'locations-0-name': u'Location',
+            "locations-0-id": location.id,
+            "locations-0-name": "Location",
         }
         self.save(event, data)
         self.session.refresh(event)

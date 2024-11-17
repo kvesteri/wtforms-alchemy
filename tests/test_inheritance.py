@@ -8,7 +8,7 @@ class TestInheritance(FormTestCase):
     class Base(Form):
         @classmethod
         def get_session(self):
-            return 'TestSession'
+            return "TestSession"
 
     def test_default_base(self):
         assert ModelForm.get_session is None
@@ -19,7 +19,7 @@ class TestInheritance(FormTestCase):
 
     def test_custom_base_with_session(self):
         cls = model_form_factory(self.Base)
-        assert cls.get_session() == 'TestSession'
+        assert cls.get_session() == "TestSession"
 
     def test_inherit_with_new_session(self):
         cls = model_form_factory(self.Base)
@@ -27,12 +27,14 @@ class TestInheritance(FormTestCase):
         class Sub(cls):
             @classmethod
             def get_session(self):
-                return 'SubTestSession'
-        assert Sub.get_session() == 'SubTestSession'
+                return "SubTestSession"
+
+        assert Sub.get_session() == "SubTestSession"
 
     def test_inherit_without_new_session(self):
         cls = model_form_factory(self.Base)
 
         class Sub(cls):
             pass
-        assert Sub.get_session() == 'TestSession'
+
+        assert Sub.get_session() == "TestSession"

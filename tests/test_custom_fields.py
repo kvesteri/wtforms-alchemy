@@ -9,10 +9,10 @@ class TestSelectField(object):
     def test_understands_none_values(self):
         class MyForm(Form):
             choice_field = SelectField(
-                choices=[('', '-- Choose --'), ('choice 1', 'Something')],
-                coerce=null_or_unicode
+                choices=[("", "-- Choose --"), ("choice 1", "Something")],
+                coerce=null_or_unicode,
             )
 
-        form = MyForm(MultiDict({'choice_field': u''}))
+        form = MyForm(MultiDict({"choice_field": ""}))
         form.validate()
         assert form.errors == {}

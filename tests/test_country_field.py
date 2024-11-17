@@ -5,7 +5,7 @@ from wtforms import Form
 from tests import MultiDict
 from wtforms_alchemy import CountryField
 
-sqlalchemy_utils.i18n.get_locale = lambda: Locale('en')
+sqlalchemy_utils.i18n.get_locale = lambda: Locale("en")
 
 
 class TestCountryField(object):
@@ -19,13 +19,9 @@ class TestCountryField(object):
         return self.form_class
 
     def setup_method(self, method):
-        self.valid_countries = [
-            'US',
-            'SA',
-            'FI'
-        ]
+        self.valid_countries = ["US", "SA", "FI"]
         self.invalid_countries = [
-            'unknown',
+            "unknown",
         ]
 
     def test_valid_countries(self):
@@ -40,4 +36,4 @@ class TestCountryField(object):
         for country in self.invalid_countries:
             form = form_class(MultiDict(test_field=country))
             form.validate()
-            assert len(form.errors['test_field']) == 2
+            assert len(form.errors["test_field"]) == 2

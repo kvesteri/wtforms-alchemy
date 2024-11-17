@@ -8,9 +8,9 @@ from wtforms_alchemy import ModelForm
 class TestSynonym(ModelFormTestCase):
     def test_synonym_returning_column_property_with_include(self):
         class ModelTest(self.base):
-            __tablename__ = 'model_test'
+            __tablename__ = "model_test"
             id = sa.Column(sa.Integer, primary_key=True)
-            _test_column = sa.Column('test_column', sa.Integer, nullable=False)
+            _test_column = sa.Column("test_column", sa.Integer, nullable=False)
 
             @hybrid_property
             def test_column_hybrid(self):
@@ -20,24 +20,24 @@ class TestSynonym(ModelFormTestCase):
             def test_column_hybrid(self, value):
                 self._test_column = value
 
-            test_column = sa.orm.synonym('_test_column')
+            test_column = sa.orm.synonym("_test_column")
 
         class ModelTestForm(ModelForm):
             class Meta:
                 model = ModelTest
                 not_null_str_validator = None
                 not_null_validator = None
-                include = ('test_column', )
-                exclude = ('_test_column', )
+                include = ("test_column",)
+                exclude = ("_test_column",)
 
         form = ModelTestForm()
         assert form.test_column
 
     def test_synonym_returning_column_property_with_only(self):
         class ModelTest(self.base):
-            __tablename__ = 'model_test'
+            __tablename__ = "model_test"
             id = sa.Column(sa.Integer, primary_key=True)
-            _test_column = sa.Column('test_column', sa.Integer, nullable=False)
+            _test_column = sa.Column("test_column", sa.Integer, nullable=False)
 
             @hybrid_property
             def test_column_hybrid(self):
@@ -47,14 +47,14 @@ class TestSynonym(ModelFormTestCase):
             def test_column_hybrid(self, value):
                 self._test_column = value
 
-            test_column = sa.orm.synonym('_test_column')
+            test_column = sa.orm.synonym("_test_column")
 
         class ModelTestForm(ModelForm):
             class Meta:
                 model = ModelTest
                 not_null_str_validator = None
                 not_null_validator = None
-                only = ('test_column', )
+                only = ("test_column",)
 
         form = ModelTestForm()
         assert form.test_column

@@ -8,17 +8,17 @@ from wtforms_alchemy import ModelFieldList, ModelForm, ModelFormField
 class TestDeepFormRelationsOneToManyToOne(FormRelationsTestCase):
     def create_models(self):
         class Event(self.base):
-            __tablename__ = 'event'
+            __tablename__ = "event"
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=False)
 
         class Address(self.base):
-            __tablename__ = 'address'
+            __tablename__ = "address"
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             street = sa.Column(sa.Unicode(255), nullable=True)
 
         class Location(self.base):
-            __tablename__ = 'location'
+            __tablename__ = "location"
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=True)
 
@@ -26,7 +26,7 @@ class TestDeepFormRelationsOneToManyToOne(FormRelationsTestCase):
             address = sa.orm.relationship(Address)
 
             event_id = sa.Column(sa.Integer, sa.ForeignKey(Event.id))
-            event = sa.orm.relationship(Event, backref='locations')
+            event = sa.orm.relationship(Event, backref="locations")
 
         self.Event = Event
         self.Location = Location
@@ -55,9 +55,9 @@ class TestDeepFormRelationsOneToManyToOne(FormRelationsTestCase):
 
     def save(self):
         data = {
-            'name': u'Some event',
-            'locations-0-name': u'Some location',
-            'locations-0-address-street': u'Some address'
+            "name": "Some event",
+            "locations-0-name": "Some location",
+            "locations-0-address-street": "Some address",
         }
         event = self.Event()
         self.session.add(event)
@@ -69,11 +69,9 @@ class TestDeepFormRelationsOneToManyToOne(FormRelationsTestCase):
     def test_assigment_and_deletion(self):
         self.save()
         event = self.session.query(self.Event).first()
-        assert event.locations[0].name == u'Some location'
-        assert event.locations[0].address.street == u'Some address'
-        data = {
-            'name': u'Some event'
-        }
+        assert event.locations[0].name == "Some location"
+        assert event.locations[0].address.street == "Some address"
+        data = {"name": "Some event"}
         form = self.EventForm(MultiDict(data))
         form.validate()
         form.populate_obj(event)
@@ -85,20 +83,20 @@ class TestDeepFormRelationsOneToManyToOne(FormRelationsTestCase):
 class TestDeepFormRelationsOneToOneToMany(FormRelationsTestCase):
     def create_models(self):
         class Location(self.base):
-            __tablename__ = 'location'
+            __tablename__ = "location"
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=True)
 
         class Address(self.base):
-            __tablename__ = 'address'
+            __tablename__ = "address"
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             street = sa.Column(sa.Unicode(255), nullable=True)
 
             location_id = sa.Column(sa.Integer, sa.ForeignKey(Location.id))
-            location = sa.orm.relationship(Location, backref='addresses')
+            location = sa.orm.relationship(Location, backref="addresses")
 
         class Event(self.base):
-            __tablename__ = 'event'
+            __tablename__ = "event"
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255), nullable=False)
             location_id = sa.Column(sa.Integer, sa.ForeignKey(Location.id))
@@ -131,9 +129,9 @@ class TestDeepFormRelationsOneToOneToMany(FormRelationsTestCase):
 
     def save(self):
         data = {
-            'name': u'Some event',
-            'location-name': u'Some location',
-            'location-addresses-0-street': u'Some address'
+            "name": "Some event",
+            "location-name": "Some location",
+            "location-addresses-0-street": "Some address",
         }
         event = self.Event()
         self.session.add(event)
@@ -145,11 +143,9 @@ class TestDeepFormRelationsOneToOneToMany(FormRelationsTestCase):
     def test_assigment_and_deletion(self):
         self.save()
         event = self.session.query(self.Event).first()
-        assert event.location.name == u'Some location'
-        assert event.location.addresses[0].street == u'Some address'
-        data = {
-            'name': u'Some event'
-        }
+        assert event.location.name == "Some location"
+        assert event.location.addresses[0].street == "Some address"
+        data = {"name": "Some event"}
         form = self.EventForm(MultiDict(data))
         form.validate()
         form.populate_obj(event)
