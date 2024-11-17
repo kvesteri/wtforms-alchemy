@@ -51,7 +51,7 @@ class ModelFormTestCase(FormTestCase):
         self.form_class = ModelTestForm
 
 
-class FormRelationsTestCase(object):
+class FormRelationsTestCase:
     dns = "sqlite:///:memory:"
 
     def setup_method(self, method):

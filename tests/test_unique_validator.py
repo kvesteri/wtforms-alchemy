@@ -26,7 +26,7 @@ class User(base):
     favorite_color = relationship(Color)
 
 
-class TestUniqueValidator(object):
+class TestUniqueValidator:
     def create_models(self):
         # This is a hack so we can use our classes
         # without initializing self first

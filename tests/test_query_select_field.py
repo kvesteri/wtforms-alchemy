@@ -20,7 +20,7 @@ class DummyPostData(dict):
         return v
 
 
-class LazySelect(object):
+class LazySelect:
     def __call__(self, field, **kwargs):
         return list(
             (val, str(label), selected)
@@ -28,13 +28,13 @@ class LazySelect(object):
         )
 
 
-class Base(object):
+class Base:
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
 
-class TestBase(object):
+class TestBase:
     def create_models(self):
         class Test(self.base):
             __tablename__ = "test"
@@ -56,7 +56,7 @@ class TestBase(object):
     def _fill(self, sess):
         for i, n in [(1, "apple"), (2, "banana")]:
             s = self.Test(id=i, name=n)
-            p = self.PKTest(foobar="hello%s" % (i,), baz=n)
+            p = self.PKTest(foobar=f"hello{i}", baz=n)
             sess.add(s)
             sess.add(p)
         sess.flush()
@@ -247,7 +247,7 @@ class TestQuerySelectMultipleField(TestBase):
         assert form.a() == []
 
 
-class DatabaseTestCase(object):
+class DatabaseTestCase:
     def setup_method(self, method):
         self.engine = sa.create_engine("sqlite:///:memory:")
 

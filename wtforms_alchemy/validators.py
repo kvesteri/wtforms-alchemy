@@ -5,7 +5,7 @@ from sqlalchemy.orm.attributes import InstrumentedAttribute
 from wtforms import ValidationError
 
 
-class Unique(object):
+class Unique:
     """Checks field values unicity against specified table fields.
 
     :param column:

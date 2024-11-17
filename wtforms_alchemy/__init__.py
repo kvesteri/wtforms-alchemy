@@ -154,7 +154,7 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
         if not hasattr(base, "get_session"):
             get_session = None
 
-        class Meta(object):
+        class Meta:
             model = None
 
             default = None
@@ -272,7 +272,7 @@ def model_form_factory(base=Form, meta=ModelFormMeta, **defaults):
             """Sets object as form attribute."""
 
             self._obj = kwargs.get("obj", None)
-            super(ModelForm, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
     if defaults:
         raise UnknownConfigurationOption(list(defaults.keys())[0])
@@ -288,13 +288,13 @@ class ModelCreateForm(ModelForm):
 
 
 class ModelUpdateForm(ModelForm):
-    class Meta(object):
+    class Meta:
         all_fields_optional = True
         assign_required = False
 
 
 class ModelSearchForm(ModelForm):
-    class Meta(object):
+    class Meta:
         all_fields_optional = True
         only_indexed_fields = True
         include_primary_keys = True

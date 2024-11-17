@@ -4,7 +4,7 @@ from tests import MultiDict
 from wtforms_alchemy import WeekDaysField
 
 
-class TestWeekDaysField(object):
+class TestWeekDaysField:
     def init_form(self, **kwargs):
         class TestForm(Form):
             test_field = WeekDaysField(**kwargs)

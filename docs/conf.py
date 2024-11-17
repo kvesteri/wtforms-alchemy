@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # WTForms-Alchemy documentation build configuration file, created by
 # sphinx-quickstart on Wed Aug 29 16:20:21 2012.
