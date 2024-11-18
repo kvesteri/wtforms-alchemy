@@ -3,8 +3,8 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
-Unreleased
-^^^^^^^^^^
+0.19.0 (2024-11-18)
+^^^^^^^^^^^^^^^^^^^
 
 - Dropped support for Python 3.8 and earlier. The minimum supported Python version is now 3.9.
 - Dropped support for SQLAlchemy 1.3 and earlier. The minimum supported SQLAlchemy version is now 1.4.
