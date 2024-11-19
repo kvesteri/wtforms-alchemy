@@ -7,7 +7,6 @@ Generates WTForms forms from SQLAlchemy models.
 
 import os
 import re
-import sys
 
 from setuptools import setup
 
