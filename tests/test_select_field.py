@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-import six
 import sqlalchemy as sa
 from wtforms_components import SelectField
 
@@ -69,11 +68,11 @@ class TestSelectFieldCoerce(ModelFormTestCase):
         self.init(type_=sa.Unicode(255), info={"choices": choices})
         form = self.form_class(MultiDict({"test_column": "2.0"}))
         assert form.test_column.data == "2.0"
-        assert isinstance(form.test_column.data, six.text_type)
+        assert isinstance(form.test_column.data, str)
 
     def test_unicode_text_coerces_values_to_unicode_strings(self):
         choices = [("1.0", "1.0"), ("2.0", "2.0")]
         self.init(type_=sa.UnicodeText, info={"choices": choices})
         form = self.form_class(MultiDict({"test_column": "2.0"}))
         assert form.test_column.data == "2.0"
-        assert isinstance(form.test_column.data, six.text_type)
+        assert isinstance(form.test_column.data, str)
