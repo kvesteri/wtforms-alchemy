@@ -7,12 +7,10 @@ Generates WTForms forms from SQLAlchemy models.
 
 import os
 import re
-import sys
 
 from setuptools import setup
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PY3 = sys.version_info[0] == 3
 
 
 def get_version():
@@ -41,7 +39,6 @@ extras_require = {
     "password": ["passlib >= 1.6, < 2.0"],
     "color": ["colour>=0.0.4"],
     "i18n": ["SQLAlchemy-i18n >= 0.8.2"],
-    "ipaddress": ["ipaddr"] if not PY3 else [],
     "timezone": ["python-dateutil"],
 }
 
