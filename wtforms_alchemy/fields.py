@@ -56,6 +56,7 @@ class ModelFieldList(FieldList):
         field = self._get_bound_field_for_entry(
             formdata=formdata, data=data, index=index
         )
+        field.index = self.last_index
         if data != unset_value and data:
             if formdata:
                 field.process(formdata)
