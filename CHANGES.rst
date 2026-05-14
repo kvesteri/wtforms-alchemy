@@ -3,6 +3,11 @@ Changelog
 
 Here you can see the full list of changes between each WTForms-Alchemy release.
 
+Unreleased
+^^^^^^^^^^
+
+- Dropped support for Python 3.9.
+
 0.19.1 (2025-08-11)
 ^^^^^^^^^^^^^^^^^^^
 

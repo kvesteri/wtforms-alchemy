@@ -38,7 +38,7 @@ def strip_string(value):
 
 
 def is_scalar(value):
-    return isinstance(value, (type(None), str, int, float, bool))
+    return isinstance(value, type(None) | str | int | float | bool)
 
 
 def null_or_unicode(value):
