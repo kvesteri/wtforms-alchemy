@@ -23,22 +23,15 @@ def get_version():
 
 extras_require = {
     "test": [
-        "enum34",
         "pytest>=2.3",
-        "Pygments>=1.2",
-        "Jinja2>=2.3",
-        "docutils>=0.10",
-        "flexmock>=0.9.7",
         "ruff==0.7.4",
     ],
     "babel": ["Babel>=1.3"],
     "arrow": ["arrow>=0.3.4"],
     "phone": ["phonenumbers>=5.9.2"],
-    "intervals": ["intervals>=0.2.0"],
     "password": ["passlib >= 1.6, < 2.0"],
     "color": ["colour>=0.0.4"],
     "i18n": ["SQLAlchemy-i18n >= 0.8.2"],
-    "timezone": ["python-dateutil"],
 }
 
 
