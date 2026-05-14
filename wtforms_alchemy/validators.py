@@ -61,7 +61,7 @@ class Unique:
             )
         elif isinstance(column, Iterable):
             return tuple(self._syntaxes_as_tuples(form, field, x)[0] for x in column)
-        elif isinstance(column, (Column, InstrumentedAttribute)):
+        elif isinstance(column, Column | InstrumentedAttribute):
             return ((column.key, column),)
         else:
             raise TypeError("Invalid syntax for column")
