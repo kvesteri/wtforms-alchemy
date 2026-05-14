@@ -7,6 +7,7 @@ Unreleased
 ^^^^^^^^^^
 
 - Dropped support for Python 3.9.
+- Added support for Python 3.14.
 
 0.19.1 (2025-08-11)
 ^^^^^^^^^^^^^^^^^^^
