@@ -3,9 +3,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.orm.session import close_all_sessions
 from sqlalchemy_utils import force_auto_coercion
-from wtforms_test import FormTestCase
 
 from wtforms_alchemy import ModelForm
+
+from .test_case import FormTestCase
 
 force_auto_coercion()
 

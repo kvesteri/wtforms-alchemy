@@ -30,7 +30,6 @@ extras_require = {
         "docutils>=0.10",
         "flexmock>=0.9.7",
         "ruff==0.7.4",
-        "WTForms-Test>=0.1.1",
     ],
     "babel": ["Babel>=1.3"],
     "arrow": ["arrow>=0.3.4"],
