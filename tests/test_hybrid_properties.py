@@ -37,7 +37,7 @@ class TestHybridProperties(ModelFormTestCase):
         class ModelTest(self.base):
             __tablename__ = "model_test"
             id = sa.Column(sa.Integer, primary_key=True)
-            _test_column = sa.Column("test_column", sa.Boolean, nullable=False)
+            _test_column = sa.Column("test_column", sa.Integer, nullable=False)
 
             @hybrid_property
             def test_column_hybrid(self):

@@ -63,7 +63,7 @@ def flatten(list_):
 
 
 def is_number(type):
-    return isinstance(type, types.Integer) or isinstance(type, types.Numeric)
+    return isinstance(type, types.Integer | types.Numeric | types.Float)
 
 
 def is_number_range(type):
