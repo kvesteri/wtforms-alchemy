@@ -41,35 +41,15 @@ class ModelFieldList(FieldList):
     def model(self):
         return self.unbound_field.args[0].Meta.model
 
-    def _get_bound_field_for_entry(self, formdata, data, index):
-        assert (
-            not self.max_entries or len(self.entries) < self.max_entries
-        ), "You cannot have more than max_entries entries in this FieldList"
-        new_index = self.last_index = index or (self.last_index + 1)
-        name = "%s-%d" % (self.short_name, new_index)
-        id = "%s-%d" % (self.id, new_index)
-        return self.unbound_field.bind(
-            form=None, name=name, prefix=self._prefix, id=id, _meta=self.meta
-        )
-
     def _add_entry(self, formdata=None, data=unset_value, index=None):
-        field = self._get_bound_field_for_entry(
-            formdata=formdata, data=data, index=index
-        )
+        # With formdata, match the entity by submitted identifiers only, not
+        # by the object at the same position in the collection.
+        field = super()._add_entry(formdata, unset_value if formdata else data, index)
         field.index = self.last_index
         if data != unset_value and data:
-            if formdata:
-                field.process(formdata)
-            else:
-                field.process(formdata, data=data)
-
             entity = find_entity(self.object_data, self.model, field.data)
             if entity is not None:
                 field.process(formdata, entity)
-        else:
-            field.process(formdata)
-
-        self.entries.append(field)
         return field
 
     def populate_obj(self, obj, name):

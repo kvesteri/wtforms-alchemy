@@ -8,6 +8,7 @@ Unreleased
 
 - Dropped support for Python 3.9 and 3.10.
 - Added support for Python 3.14 and 3.15.
+- Added support for WTForms 3.3.
 
 0.19.1 (2025-08-11)
 ^^^^^^^^^^^^^^^^^^^
