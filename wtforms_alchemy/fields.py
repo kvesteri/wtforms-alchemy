@@ -12,6 +12,7 @@ from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms_components import SelectField, SelectMultipleField
 from wtforms_components.fields.html5 import StringField
+from wtforms_components.fields.select import Choice
 from wtforms_components.widgets import SelectWidget, TelInput
 
 from .utils import find_entity
@@ -351,21 +352,9 @@ class GroupedQuerySelectField(SelectField):
         self._data = data
         self._formdata = None
 
-    def iter_choices(self):
-        """
-        We should update how choices are iter to make sure that value from
-        internal list or tuple should be selected.
-        """
-        for value, label in self.concrete_choices:
-            yield (
-                value,
-                label,
-                (
-                    self.coerce,
-                    self.get_pk(self.data) if self.data else self.blank_value,
-                ),
-                {},
-            )
+    def _choice(self, value, label):
+        selected = self.get_pk(self.data) if self.data else self.blank_value
+        return Choice(value, label, value == selected, {})
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -486,18 +475,9 @@ class GroupedQuerySelectMultipleField(SelectField):
         self._data = valuelist
         self._formdata = None
 
-    def iter_choices(self):
-        """
-        We should update how choices are iter to make sure that value from
-        internal list or tuple should be selected.
-        """
-        for value, label in self.concrete_choices:
-            yield (
-                value,
-                label,
-                (self.coerce, [self.get_pk(obj) for obj in self.data or []]),
-                {},
-            )
+    def _choice(self, value, label):
+        selected = [self.get_pk(obj) for obj in self.data or []]
+        return Choice(value, label, value in selected, {})
 
     def process_formdata(self, valuelist):
         self._formdata = set(valuelist)
