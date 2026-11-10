@@ -13,6 +13,7 @@ Unreleased
 - Removed the ``i18n`` extra, since SQLAlchemy-i18n does not support SQLAlchemy 2.0.
 - Added support for SQLAlchemy 2.1.
 - Added support for WTForms-Components 0.12. WTForms-Components 0.12.0 or later is now required.
+- SQLAlchemy-Utils 0.43.0 or later is now required.
 
 0.19.1 (2025-08-11)
 ^^^^^^^^^^^^^^^^^^^
