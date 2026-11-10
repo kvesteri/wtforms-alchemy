@@ -1,0 +1,105 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "[0-9]*"
+
+permissions: {}
+
+jobs:
+  tests:
+    name: Tests
+    uses: ./.github/workflows/test.yaml
+    permissions:
+      contents: read
+
+  build:
+    name: Build
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Build distributions
+        run: pipx run build
+
+      - name: Check distributions
+        run: pipx run twine check --strict dist/*
+
+      - name: Check tag matches package version
+        run: |
+          version=$(basename dist/*.whl | cut -d- -f2)
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package version $version"
+            exit 1
+          fi
+
+      - name: Extract release notes from CHANGES.rst
+        run: |
+          python - <<'EOF'
+          import os, re, sys
+          tag = os.environ["GITHUB_REF_NAME"]
+          changes = open("CHANGES.rst").read()
+          match = re.search(
+              rf"^{re.escape(tag)} \([^\n]*\)\n\^+\n(.*?)(?=^\S[^\n]*\n\^+\n|\Z)",
+              changes,
+              re.M | re.S,
+          )
+          if not match:
+              sys.exit(f"No dated '{tag} (YYYY-MM-DD)' section in CHANGES.rst")
+          open("release-notes.md", "w").write(match.group(1).strip() + "\n")
+          EOF
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dist
+          path: dist/
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-notes
+          path: release-notes.md
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/WTForms-Alchemy/${{ github.ref_name }}/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
+
+  github-release:
+    name: Create GitHub release
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "$GITHUB_REF_NAME" dist/*
+          --repo "$GITHUB_REPOSITORY"
+          --title "$GITHUB_REF_NAME"
+          --notes-file release-notes/release-notes.md
