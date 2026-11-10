@@ -24,7 +24,7 @@ def get_version():
 extras_require = {
     "test": [
         "pytest>=2.3",
-        "ruff==0.7.4",
+        "ruff==0.17.4",
     ],
     "babel": ["Babel>=1.3"],
     "arrow": ["arrow>=0.3.4"],
