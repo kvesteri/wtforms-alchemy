@@ -31,7 +31,6 @@ extras_require = {
     "phone": ["phonenumbers>=5.9.2"],
     "password": ["passlib >= 1.6, < 2.0"],
     "color": ["colour>=0.0.4"],
-    "i18n": ["SQLAlchemy-i18n >= 0.8.2"],
 }
 
 
@@ -56,7 +55,7 @@ setup(
     include_package_data=True,
     platforms="any",
     install_requires=[
-        "SQLAlchemy>=1.4",
+        "SQLAlchemy>=2.0",
         "WTForms>=3.1.0",
         "WTForms-Components>=0.12.0",
         "SQLAlchemy-Utils>=0.40.0",
