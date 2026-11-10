@@ -222,7 +222,7 @@ class QuerySelectMultipleField(QuerySelectField):
             import warnings
 
             warnings.warn(
-                "allow_blank=True does not do anything for " "QuerySelectMultipleField."
+                "allow_blank=True does not do anything for QuerySelectMultipleField."
             )
         self._invalid_formdata = False
 

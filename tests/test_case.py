@@ -44,7 +44,7 @@ class FormTestCase:
             if isinstance(validator, Length):
                 if validator.max == max_length:
                     found = True
-        assert found, "Field does not have max length of %d" % max_length
+        assert found, f"Field does not have max length of {max_length}"
 
     def assert_description(self, field_name, description):
         field = self._get_field(field_name)
