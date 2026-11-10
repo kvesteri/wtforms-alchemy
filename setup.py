@@ -58,7 +58,7 @@ setup(
         "SQLAlchemy>=2.0",
         "WTForms>=3.1.0",
         "WTForms-Components>=0.12.0",
-        "SQLAlchemy-Utils>=0.40.0",
+        "SQLAlchemy-Utils>=0.43.0",
     ],
     extras_require=extras_require,
     classifiers=[
