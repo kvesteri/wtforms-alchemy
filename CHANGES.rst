@@ -9,6 +9,8 @@ Unreleased
 - Dropped support for Python 3.9 and 3.10.
 - Added support for Python 3.14 and 3.15.
 - Added support for WTForms 3.3.
+- Dropped support for SQLAlchemy 1.4.
+- Removed the ``i18n`` extra, since SQLAlchemy-i18n does not support SQLAlchemy 2.0.
 - Added support for SQLAlchemy 2.1.
 - Added support for WTForms-Components 0.12. WTForms-Components 0.12.0 or later is now required.
 

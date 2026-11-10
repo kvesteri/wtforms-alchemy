@@ -2,7 +2,6 @@
 filterwarnings = [
     'error:.*:sqlalchemy.exc.SADeprecationWarning',
     'error:.*:sqlalchemy.exc.SAWarning',
-    'ignore:.*:sqlalchemy.exc.SADeprecationWarning:sqlalchemy_i18n',
 ]
 
 [tool.ruff]

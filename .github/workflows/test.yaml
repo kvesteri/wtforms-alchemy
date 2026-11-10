@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13", "3.14", "3.15"]
-        sqlalchemy-version: ["1.4", "2.0", "2.1"]
+        sqlalchemy-version: ["2.0", "2.1"]
         wtforms-version: ["3.1", "3.2", "3.3"]
     steps:
       - uses: actions/checkout@v2
