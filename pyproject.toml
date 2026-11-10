@@ -39,7 +39,7 @@ phone = ["phonenumbers>=5.9.2"]
 password = ["passlib >= 1.6, < 2.0"]
 color = ["colour>=0.0.4"]
 test = [
-    "pytest>=2.3",
+    "pytest>=8.0",
     "ruff==0.17.4",
     "WTForms-Alchemy[babel,arrow,phone,password,color]",
 ]
