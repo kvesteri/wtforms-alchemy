@@ -10,6 +10,7 @@ Unreleased
 - Added support for Python 3.14 and 3.15.
 - Added support for WTForms 3.3.
 - Added support for SQLAlchemy 2.1.
+- Added support for WTForms-Components 0.12. WTForms-Components 0.12.0 or later is now required.
 
 0.19.1 (2025-08-11)
 ^^^^^^^^^^^^^^^^^^^

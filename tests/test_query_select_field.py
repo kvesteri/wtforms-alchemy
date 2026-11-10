@@ -337,6 +337,13 @@ class TestGroupedQuerySelectField(DatabaseTestCase):
             "</select>"
         )
 
+    def test_rendering_selected(self):
+        self.create_cities()
+        form = self.create_form()(DummyPostData({"city": "2"}))
+        html = str(form.city)
+        assert '<option selected value="2">Vantaa</option>' in html
+        assert html.count("selected") == 1
+
 
 class TestGroupedQuerySelectMultipleField(DatabaseTestCase):
     def create_form(self, **kwargs):
@@ -416,3 +423,11 @@ class TestGroupedQuerySelectMultipleField(DatabaseTestCase):
             "</optgroup>"
             "</select>"
         )
+
+    def test_rendering_selected(self):
+        self.create_cities()
+        form = self.create_form()(DummyPostData(cities=["1", "5"]))
+        html = str(form.cities)
+        assert '<option selected value="1">Helsinki</option>' in html
+        assert '<option selected value="5">Stockholm</option>' in html
+        assert html.count("selected") == 2

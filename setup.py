@@ -58,7 +58,7 @@ setup(
     install_requires=[
         "SQLAlchemy>=1.4",
         "WTForms>=3.1.0",
-        "WTForms-Components>=0.11.0",
+        "WTForms-Components>=0.12.0",
         "SQLAlchemy-Utils>=0.40.0",
     ],
     extras_require=extras_require,
